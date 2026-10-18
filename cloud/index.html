@@ -409,6 +409,14 @@ html,body{background:#07080A;}
 .invite-card input{flex:1;min-width:0}
 .code-msg{min-height:18px;margin-top:8px}
 
+/* auto-identify */
+#v-autonote{font-size:12.5px;line-height:1.5;opacity:1}
+#v-autonote[data-kind="loading"]{color:var(--gold)}
+#v-autonote[data-kind="done"]{color:var(--text-secondary)}
+#v-autonote[data-kind="low"]{color:var(--gold)}
+.ai-spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line2);border-top-color:var(--gold);border-radius:50%;margin-right:8px;vertical-align:-2px;animation:bspin .9s linear infinite}
+.ai-tag{margin-top:4px;font-size:11px;letter-spacing:.02em;color:var(--gold)}
+
 </style>
 </head>
 <body>
@@ -673,14 +681,14 @@ html,body{background:#07080A;}
     </div>
     <div id="v-img-preview" style="display:none;margin-top:12px;"><img id="v-img-preview-src" style="width:100%;border-radius:2px;object-fit:cover;max-height:220px;" src="" alt=""><div class="flex gap-2 mt-2"><button class="btn btn-ghost btn-sm" onclick="pickVehicleImage()">Change Photo</button><button class="btn btn-ghost btn-sm" onclick="clearVehicleImage()">Remove Photo</button></div></div>
     
-    <div class="section-title" style="margin-top:28px;margin-bottom:14px;">Vehicle</div>
+    <div class="quiet-note" id="v-autonote" data-kind="idle" aria-live="polite" style="margin-top:12px;max-width:none">Add a photo and the year, make, model and color fill in for you. You can change anything.</div>
+    <div class="section-title" style="margin-top:20px;margin-bottom:14px;">Vehicle</div>
     <div class="form-grid">
       <div class="input-group form-full"><label>Client</label><select id="v-client" onchange="vehicleClientChanged()"><option value="">Select client</option></select></div>
       <div class="input-group"><label>Year</label><input type="number" id="v-year" placeholder="2022" inputmode="numeric"></div>
       <div class="input-group"><label>Make</label><input type="text" id="v-make" maxlength="40" placeholder="Porsche"></div>
       <div class="input-group"><label>Model</label><input type="text" id="v-model" maxlength="60" placeholder="911 GT3"></div>
       <div class="input-group"><label>Color</label><input type="text" id="v-color" maxlength="40" placeholder="GT Silver"></div>
-      <div class="quiet-note form-full" id="v-autonote">These will fill in automatically with AI-verified accuracy once connected. Enter manually until then.</div>
     </div>
     <details id="v-dates" class="fin-only" style="margin-top:14px;">
       <summary>Dates and reminders (optional)</summary>
@@ -725,7 +733,7 @@ html,body{background:#07080A;}
   <div class="modal modal-lg">
     <div class="backbar"><button class="backbtn" onclick="closeModal('modal-vehicle-detail')">&larr; Back</button><span id="vd-tag"></span></div>
     <div id="vd-img-area"></div>
-    <div class="vhead"><h1 id="vd-title">Vehicle</h1><div id="vd-nickname"></div><p id="vd-sub"></p><div class="quiet-note" id="vd-autonote" style="display:none">These will fill in automatically with AI-verified accuracy once connected. Enter manually until then.</div></div>
+    <div class="vhead"><h1 id="vd-title">Vehicle</h1><div id="vd-nickname"></div><p id="vd-sub"></p><div class="quiet-note" id="vd-autonote" style="display:none">Year, make, model and color can be filled in from a photo when adding a vehicle. You can edit them any time.</div></div>
     <div id="vd-banner"></div>
     <div class="vval" id="vd-value"></div>
     <div class="grid2" id="vd-stats"></div>
@@ -3151,6 +3159,7 @@ function vehicleCardHTML(v,extra){
 var VEHICLE_FIELDS=['v-reg-expiry','v-ins-renewal','v-insp-expiry','v-last-service','v-next-service','v-next-service-miles','v-svc-months','v-svc-miles','v-year','v-make','v-model','v-trim','v-nickname','v-color','v-mileage','v-vin','v-purchase-price','v-purchase-date','v-insured-value','v-notes'];
 function resetImagePicker(){
   pendingVehicleImage=null;
+  if(typeof autoIdReset==='function')autoIdReset();
   var inp=document.getElementById('v-img-input');if(inp)inp.value='';
   showEl('v-img-preview',false);
   var ps=document.getElementById('v-img-preview-src');if(ps)ps.removeAttribute('src');
@@ -3290,6 +3299,7 @@ function handleVehicleImage(input){
       if(dataUrlBytes(out)>MAX_PHOTO_BYTES)out=canvas.toDataURL('image/jpeg',0.5);
       if(dataUrlBytes(out)>MAX_PHOTO_BYTES){showToast('Photo is still over 1.5 MB after resizing. Choose a different image.','error');return;}
       pendingVehicleImage=out;
+      autoIdIdentify(out);
       var ps=document.getElementById('v-img-preview-src');if(ps)ps.src=out;
       showEl('v-img-preview',true);
       showToast('Photo ready ('+Math.round(dataUrlBytes(out)/1024)+' KB)','success');
@@ -4695,6 +4705,92 @@ document.addEventListener('DOMContentLoaded',function(){
   initAuthEvents();
   retryBoot();
 });
+
+// ============ AUTO-IDENTIFY (photo -> year/make/model/color) ============
+// Calls the identify-vehicle Edge Function. Every failure path falls back to manual entry; nothing here can block Save.
+var AUTOID={state:'unknown',token:0,busy:false,filled:{}};
+var AUTOID_FIELDS=[['year','v-year'],['make','v-make'],['model','v-model'],['trim','v-trim'],['color','v-color']];
+var AUTOID_TXT={
+  idle:'Add a photo and the year, make, model and color fill in for you. You can change anything.',
+  loading:'Identifying your vehicle...',
+  off:'Auto-identify is not turned on yet - enter details manually.',
+  fail:'Could not identify this photo - enter details manually.',
+  limit:'Daily auto-identify limit reached - enter details manually.',
+  unsure:'Could not tell what this is from the photo - enter details manually.'
+};
+function autoIdNote(kind,text){
+  var n=document.getElementById('v-autonote');if(!n)return;
+  n.setAttribute('data-kind',kind);
+  n.textContent='';
+  if(kind==='loading'){var sp=document.createElement('span');sp.className='ai-spin';n.appendChild(sp);}
+  n.appendChild(document.createTextNode(text));
+}
+function autoIdClearTags(){
+  var tags=document.querySelectorAll('#modal-add-vehicle .ai-tag');
+  for(var i=0;i<tags.length;i++)if(tags[i].parentNode)tags[i].parentNode.removeChild(tags[i]);
+  AUTOID.filled={};
+}
+function autoIdReset(){
+  AUTOID.token++;AUTOID.busy=false;autoIdClearTags();
+  autoIdNote(AUTOID.state==='off'?'off':'idle',AUTOID.state==='off'?AUTOID_TXT.off:AUTOID_TXT.idle);
+}
+function autoIdTag(id,conf){
+  var el=document.getElementById(id);if(!el||!el.parentNode)return;
+  var t=document.createElement('div');t.className='ai-tag';t.setAttribute('data-for',id);
+  t.textContent='AI suggested - tap to edit'+(id==='v-year'||id==='v-model'?' ('+Math.round(conf*100)+'%)':'');
+  el.parentNode.appendChild(t);
+  AUTOID.filled[id]=true;
+  if(!el.__aiBound){el.__aiBound=true;el.addEventListener('input',function(){
+    var tg=document.querySelector('#modal-add-vehicle .ai-tag[data-for="'+id+'"]');if(tg&&tg.parentNode)tg.parentNode.removeChild(tg);delete AUTOID.filled[id];});}
+}
+function autoIdConfLabel(c){return c>=0.8?'High':(c>=0.5?'Medium':'Low');}
+function autoIdOffReason(err){
+  // returns 'off' (not deployed / no key / network), 'limit', or 'fail'
+  var st=err&&err.context&&err.context.status,nm=err&&err.name;
+  if(nm==='FunctionsFetchError'||nm==='FunctionsRelayError')return 'off';
+  if(st===404||st===503||st===401||st===403)return 'off';
+  if(st===429)return 'limit';
+  return 'fail';
+}
+function autoIdIdentify(dataUrl){
+  var my=++AUTOID.token;
+  autoIdClearTags();
+  if(typeof sb==='undefined'||!sb||!sb.functions||typeof sb.functions.invoke!=='function'){AUTOID.state='off';autoIdNote('off',AUTOID_TXT.off);return;}
+  var comma=String(dataUrl||'').indexOf(',');if(comma<0)return;
+  var vin=(typeof cleanVin==='function')?cleanVin():'';
+  var body={image_base64:dataUrl.slice(comma+1),mime:'image/jpeg'};
+  if(/^[A-HJ-NPR-Z0-9]{17}$/.test(vin))body.vin=vin;
+  AUTOID.busy=true;autoIdNote('loading',AUTOID_TXT.loading);
+  var call;
+  try{call=Promise.resolve(sb.functions.invoke('identify-vehicle',{body:body}));}
+  catch(e){call=Promise.resolve({data:null,error:{name:'FunctionsFetchError'}});}
+  var timer=new Promise(function(res){setTimeout(function(){res({data:null,error:{name:'Timeout'}});},30000);});
+  Promise.race([call,timer]).then(function(r){
+    if(my!==AUTOID.token)return;               // photo changed or form reset meanwhile
+    AUTOID.busy=false;
+    var data=r&&r.data,err=r&&r.error;
+    if(!err&&data&&data.error)err={context:{status:data.error==='not_configured'?503:(data.error==='rate_limited'?429:500)}};
+    if(err||!data||typeof data!=='object'){
+      var why=autoIdOffReason(err);
+      if(why==='off')AUTOID.state='off';
+      autoIdNote(why==='off'?'off':(why==='limit'?'limit':'fail'),AUTOID_TXT[why]);return;
+    }
+    AUTOID.state='on';
+    var conf=Number(data.confidence);if(!(conf>=0))conf=0;if(conf>1)conf=conf/100;
+    var vals={year:/^\d{4}$/.test(String(data.year||''))?String(data.year):'',make:cleanText(data.make,40),model:cleanText(data.model,60),trim:cleanText(data.trim,40),color:cleanText(data.color,40)};
+    if(!(vals.make||vals.model||vals.year)||conf<0.25){autoIdNote('fail',AUTOID_TXT.unsure);return;}
+    var n=0,i;
+    for(i=0;i<AUTOID_FIELDS.length;i++){
+      var k=AUTOID_FIELDS[i][0],id=AUTOID_FIELDS[i][1];
+      if(vals[k]&&!val(id).trim()){setVal(id,vals[k]);autoIdTag(id,conf);n++;}
+    }
+    if(data.vin&&typeof vinChanged==='function'&&!val('v-vin').trim()){setVal('v-vin',cleanText(data.vin,24));vinChanged();}
+    var msg=n?('AI suggested - tap any field to edit. Confidence: '+autoIdConfLabel(conf)+' ('+Math.round(conf*100)+'%).'):'Your entries were kept. Nothing was changed.';
+    if(n&&conf<0.5)msg+=' Not sure - please check the year and model.';
+    if(data.notes)msg+=' '+cleanText(data.notes,200);
+    autoIdNote(n&&conf<0.5?'low':'done',msg);
+  }).catch(function(){if(my!==AUTOID.token)return;AUTOID.busy=false;autoIdNote('fail',AUTOID_TXT.fail);});
+}
 
 </script>
 </body>
