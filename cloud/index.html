@@ -576,7 +576,7 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
       <div class="input-group form-full"><label>Client name</label><input type="text" id="nc-name" maxlength="80" placeholder="e.g. Smith Family Collection"></div>
       <div class="input-group"><label>Email</label><input type="email" id="nc-email" maxlength="120" placeholder="client@email.com"></div>
     </div>
-    <div class="disclaimer">Creates a one-time owner code to share privately. The client signs up, enters the code, and their collection links to your account.</div>
+    <div class="disclaimer">Creates a one-time owner code to share privately. The client signs up, enters the code, and their collection links to your account. Invitations are not emailed automatically - you share the code or link yourself.</div>
     <div class="flex gap-2 mt-4" style="justify-content:flex-end;">
       <button class="btn btn-ghost" onclick="closeModal('modal-add-client')">Cancel</button>
       <button class="btn btn-primary" onclick="addClient()">Create invite code</button>
@@ -590,9 +590,11 @@ body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-ri
     <div class="doc-meta" id="invite-client-name"></div>
     <div class="invite-code" id="invite-code-text">----</div>
     <div class="disclaimer" id="invite-expiry"></div>
-    <div class="disclaimer" id="invite-help"></div>
+    <div class="disclaimer" style="color:var(--gold);">Invitations are not emailed automatically - share this code/link yourself.</div><div class="disclaimer" id="invite-help"></div>
     <div class="flex gap-2 mt-4" style="justify-content:flex-end;">
       <button class="btn btn-ghost" onclick="copyInviteCode()">Copy code</button>
+      <button class="btn btn-ghost" onclick="shareInviteModal()">Share invite</button>
+      <a class="btn btn-ghost" id="invite-mailto" href="#">Email it</a>
       <button class="btn btn-primary" onclick="closeModal('modal-invite')">Done</button>
     </div>
   </div>
@@ -2030,16 +2032,71 @@ async function createInviteRpc(kind,vehicleId,email,label){
   if(!row||!row.code)throw new Error('no code returned');
   return row;
 }
+var NOTE=' Invitations are not emailed automatically - share this code or link yourself with Share invite, Copy code or Email it.';
+var APP_LINK='https://wade0764.github.io/EvoAI/cloud/';
+var lastInviteEmail='';
+var revealCodes={},revealTried={};
+function codeKey(c){return String(c||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function storedCodes(){try{return JSON.parse(localStorage.getItem('evo_invite_codes')||'{}')||{};}catch(e){return {};}}
+function saveInviteCode(id,code){if(!id||!code)return;revealCodes[id]=codeKey(code);try{var m=storedCodes();m[id]=codeKey(code);localStorage.setItem('evo_invite_codes',JSON.stringify(m));}catch(e){}}
+function forgetInviteCode(id){delete revealCodes[id];try{var m=storedCodes();delete m[id];localStorage.setItem('evo_invite_codes',JSON.stringify(m));}catch(e){}}
+function knownInviteCode(id){return revealCodes[id]||storedCodes()[id]||'';}
+// Optional owner-only RPC from migration_002_invites.sql. If it is not installed the app just uses codes saved on this device.
+var CAPREVEAL=true;
+async function revealMissingCodes(ids){
+  if(!sb||!CAPREVEAL)return;
+  var did=false;
+  for(var i=0;i<ids.length;i++){
+    var id=ids[i];if(knownInviteCode(id)||revealTried[id])continue;revealTried[id]=1;
+    try{
+      var r=await sb.rpc('get_invite_code',{p_invite_id:id});
+      if(r.error){if(r.error.code==='PGRST202'||/could not find the function|schema cache/i.test(String(r.error.message||''))){CAPREVEAL=false;return;}continue;}
+      if(r.data&&typeof r.data==='string'){revealCodes[id]=codeKey(r.data);did=true;}
+    }catch(e){}
+  }
+  if(did)refreshCurrent();
+}
+function inviteShareText(code,email){
+  return 'You are invited to EvoAI. Open '+APP_LINK+' , create an account using '+(email?('the email '+email):'the email this invite was sent to')+', then enter this invite code: '+groupCode(codeKey(code));
+}
+function inviteMailto(code,email){
+  return 'mailto:'+encodeURIComponent(email||'').replace(/%40/g,'@')+'?subject='+encodeURIComponent('Your EvoAI invite')+'&body='+encodeURIComponent(inviteShareText(code,email)+'\n\nInvitations are not emailed automatically by the app.');
+}
+function copyText(txt,msg){
+  function fb(){
+    try{var t=document.createElement('textarea');t.value=txt;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);showToast(msg,'success');}
+    catch(e){showToast('Press and hold the code to copy it','error');}
+  }
+  try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){showToast(msg,'success');},fb);else fb();}catch(e){fb();}
+}
+function shareInviteCode(code,email){
+  var text=inviteShareText(code,email);
+  if(navigator.share){navigator.share({title:'Your EvoAI invite',text:text}).catch(function(e){if(e&&e.name==='AbortError')return;copyText(text,'Invite message copied');});}
+  else copyText(text,'Invite message copied');
+}
+function copyInviteById(id){var c=knownInviteCode(id);if(c)copyText(groupCode(c),'Code copied');}
+function shareInviteById(id,email){var c=knownInviteCode(id);if(c)shareInviteCode(c,email);}
+function shareInviteModal(){if(lastInviteCode)shareInviteCode(lastInviteCode,lastInviteEmail);}
+function inviteRowExtras(id,email){
+  var c=knownInviteCode(id);
+  if(!c)return '<div class="doc-meta" style="margin-top:6px;">Code not saved on this device. Revoke it and create a new one to share.</div>';
+  return '<div class="invite-row-code" style="font-size:16px;letter-spacing:.08em;color:var(--gold);margin-top:6px;word-break:break-all;user-select:all;-webkit-user-select:all;">'+esc(groupCode(c))+'</div>'
+   +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;"><button class="btn btn-sm" onclick="copyInviteById(\''+jsId(id)+'\')">Copy code</button> <button class="btn btn-sm btn-primary" onclick="shareInviteById(\''+jsId(id)+'\',\''+jsId(email||'')+'\')">Share invite</button> <a class="btn btn-sm" href="'+esc(inviteMailto(c,email))+'">Email it</a></div>';
+}
 function showInviteResult(opts){
+  lastInviteEmail=opts.email||'';
+  if(opts.id)saveInviteCode(opts.id,opts.code);
   lastInviteCode=groupCode(opts.code);
   elText('invite-title',opts.title);
   elText('invite-client-name',opts.who||'');
   elText('invite-code-text',lastInviteCode);
   elText('invite-expiry','Expires '+fmtDate(String(opts.expires||'').slice(0,10))+' - single use');
   elText('invite-help',opts.help);
+  var ml=document.getElementById('invite-mailto');if(ml)ml.href=inviteMailto(opts.code,lastInviteEmail);
   openModal('modal-invite');
 }
 function copyInviteCode(){
+  if(lastInviteCode){copyText(lastInviteCode,'Code copied');return;}
   var code=lastInviteCode;if(!code)return;
   function fallback(){
     var el=document.getElementById('invite-code-text');
@@ -2055,7 +2112,7 @@ function inviteActive(inv){return inv&&!inv.redeemed_at&&!inv.revoked_at&&String
 async function revokeInviteById(id){
   if(!window.confirm('Revoke this invite code? It will stop working right away.'))return;
   try{
-    var r=await sb.rpc('revoke_invite',{p_invite_id:id});if(r.error)throw r.error;
+    var r=await sb.rpc('revoke_invite',{p_invite_id:id});if(r.error)throw r.error;forgetInviteCode(id);
     showToast('Invite code revoked','success');
     await loadAll();refreshCurrent();
   }catch(e){showToast(friendlyError(e),'error');}
@@ -2083,8 +2140,9 @@ function createInviteFromAccess(){
   var oid=ownerClientId()||myId();
   var kind=scope?'tech_vehicle':'tech_owner';
   createInviteRpc(kind,scope||null,email||null,null).then(function(row){
+    saveInviteCode(row.invite_id,row.code);
     var v=scope?byId(C.vehicles,scope):null;
-    showInviteResult({title:'Tech invite code',code:row.code,expires:row.expires_at,who:v?('Access to '+vFull(v)):'Access to all of your vehicles',help:'Share this code privately with the tech. They create an account (or enter it under Account > Redeem a code) and get access. You choose what they can see below. The code works once and expires in 14 days.'});
+    showInviteResult({title:'Tech invite code',id:row.invite_id,email:email,code:row.code,expires:row.expires_at,who:v?('Access to '+vFull(v)):'Access to all of your vehicles',help:'Share this code privately with the tech. They create an account (or enter it under Account > Redeem a code) and get access. You choose what they can see below. The code works once and expires in 14 days.'+NOTE});
     return loadAll().then(function(){renderAccess();});
   }).catch(function(e){showToast(friendlyError(e),'error');});
 }
@@ -2096,7 +2154,7 @@ function addClient(){
   createInviteRpc('client_owner',null,email||null,name).then(function(row){
     closeModal('modal-add-client');
     setVal('nc-name','');setVal('nc-email','');
-    showInviteResult({title:'Client invite code',code:row.code,expires:row.expires_at,who:'Client: '+name,help:'Share this code privately with the owner. They choose Owner, tap Create an account, and enter it (or enter it under Account > Redeem a code if they already have an account). It connects them to you. The code works once and expires in 14 days. You can add their vehicles after they connect.'});
+    showInviteResult({title:'Client invite code',id:row.invite_id,email:email,code:row.code,expires:row.expires_at,who:'Client: '+name,help:'Share this code privately with the owner. They choose Owner, tap Create an account, and enter it (or enter it under Account > Redeem a code if they already have an account). It connects them to you. The code works once and expires in 14 days. You can add their vehicles after they connect.'+NOTE});
     return loadAll().then(function(){refreshCurrent();});
   }).catch(function(e){showToast(friendlyError(e),'error');});
 }
@@ -2126,9 +2184,10 @@ function renderClients(){
     return '<div class="client-row" onclick="openClientDetail(\''+jsId(c.id)+'\')"><div class="client-info"><div class="client-name">'+esc(c.name)+'</div><div class="client-meta">'+cvs.length+' vehicle'+(cvs.length!==1?'s':'')+(archN?' / '+archN+' archived':'')+(c.email?' / '+esc(c.email):'')+'</div></div><div class="client-val">'+money(t.value)+(t.basis>0?'<div class="client-meta '+(t.gain>=0?'pos':'neg')+'" style="text-align:right;">'+esc(pct(t.pctGain))+'</div>':'')+'</div></div>';
   }).join('');
   h+=C.pending.map(function(p){
-    return '<div class="client-row" style="cursor:default;"><div class="client-info"><div class="client-name">'+esc(p.name)+'</div><div class="client-meta">Invite pending / expires '+esc(fmtDate(String(p.expiresAt).slice(0,10)))+(p.email?' / '+esc(p.email):'')+'</div></div><div class="client-val"><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(p.inviteId)+'\')">Revoke code</button></div></div>';
+    return '<div class="client-row" style="cursor:default;"><div class="client-info"><div class="client-name">'+esc(p.name)+'</div><div class="client-meta">Invite pending / expires '+esc(fmtDate(String(p.expiresAt).slice(0,10)))+(p.email?' / '+esc(p.email):'')+'</div>'+inviteRowExtras(p.inviteId,p.email)+'</div><div class="client-val"><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(p.inviteId)+'\')">Revoke code</button></div></div>';
   }).join('');
   el.innerHTML=h;
+  revealMissingCodes(C.pending.map(function(p){return p.inviteId;}));
 }
 function renderClientAccess(clientId){
   if(clientId!==currentClientId)return;
@@ -2204,10 +2263,11 @@ function renderAccess(){
   if(open.length){
     h+='<div class="sh"><h2>Open invite codes</h2></div>'+open.map(function(i){
       var v=i.vehicle_id?byId(C.vehicles,i.vehicle_id):null;
-      return '<div class="access-row"><div><div class="doc-meta">'+esc(v?vFull(v):'All vehicles')+' / expires '+esc(fmtDate(String(i.expires_at).slice(0,10)))+(i.email?' / '+esc(i.email):'')+'</div></div><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(i.id)+'\')">Revoke code</button></div>';
+      return '<div class="access-row"><div><div class="doc-meta">'+esc(v?vFull(v):'All vehicles')+' / expires '+esc(fmtDate(String(i.expires_at).slice(0,10)))+(i.email?' / '+esc(i.email):'')+'</div>'+inviteRowExtras(i.id,i.email)+'</div><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(i.id)+'\')">Revoke code</button></div>';
     }).join('');
   }
   elHTML('access-body',h);
+  revealMissingCodes(open.map(function(i){return i.id;}));
 }
 async function togglePerm(accessId,perm,value,vehicleId){
   try{
