@@ -403,6 +403,11 @@ html,body{background:#07080A;}
 .ph-item img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
 .ph-cover{position:absolute;left:6px;top:6px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;background:rgba(7,8,10,.75);color:var(--gold);padding:2px 6px;border-radius:8px}
 .link{color:var(--gold);cursor:pointer;border-bottom:1px solid var(--line2)}
+.badge-soft{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border:1px solid var(--line2);background:rgba(201,169,97,.08);padding:2px 8px;border-radius:10px;vertical-align:middle;white-space:nowrap}
+.managed-banner{margin-top:12px;padding:12px 14px;border:1px solid var(--line2);border-radius:12px;background:rgba(201,169,97,.05)}
+.invite-card{border:1px solid var(--line2);border-radius:14px;padding:14px 16px;margin-top:14px;background:rgba(201,169,97,.04)}
+.invite-card input{flex:1;min-width:0}
+.code-msg{min-height:18px;margin-top:8px}
 
 </style>
 </head>
@@ -514,7 +519,7 @@ html,body{background:#07080A;}
     </div>
     <div class="due-banner" id="due-banner"><span id="due-banner-text" onclick="goReminders()"></span><button class="modal-close" onclick="hideDueBanner(this)" aria-label="Dismiss">Dismiss</button></div>
 <div class="page active" id="page-dashboard">
-      <div class="topline"><span class="lab">Collection <span id="dash-date"></span></span><div class="head-actions"><button class="btn btn-sm" onclick="openModal('modal-add-client')">New client</button><button class="btn btn-sm btn-primary perm-addveh" onclick="openAddVehicleModal()">Add vehicle</button></div></div><div id="dash-empty"></div>
+      <div class="topline"><span class="lab">Collection <span id="dash-date"></span></span><div class="head-actions"><button class="btn btn-sm" onclick="openNewClient()">New client</button><button class="btn btn-sm btn-primary perm-addveh" onclick="openAddVehicleModal()">Add vehicle</button></div></div><div id="dash-empty"></div>
       <section class="hero" id="dash-hero">
         <div class="hero-grid">
           <div><div class="lab">Collection value</div><div class="num" id="ph-total-value">$0</div><div class="delta" id="ph-delta"></div></div>
@@ -534,7 +539,7 @@ html,body{background:#07080A;}
       <section class="sec" id="dash-act-sec"><div class="sh first"><h2>Recent activity</h2></div><div id="dash-activity"></div></section>
     </div>
 <div class="page" id="page-client-portal">
-      <div id="cp-welcome"></div><div class="topline"><span class="lab" id="cp-title">My collection</span><div class="head-actions"><button class="btn btn-sm btn-primary" onclick="openAddVehicleModal()">Add vehicle</button></div></div><div id="cp-banner"></div>
+      <div id="cp-welcome"></div><div id="cp-redeem"></div><div class="topline"><span class="lab" id="cp-title">My collection</span><div class="head-actions"><button class="btn btn-sm btn-primary" onclick="openAddVehicleModal()">Add vehicle</button></div></div><div id="cp-banner"></div>
       <section class="hero" id="cp-hero">
         <div class="hero-grid">
           <div><div class="lab">Collection value</div><div class="num" id="cp-total-value">$0</div><div class="delta" id="cp-delta"></div></div>
@@ -553,10 +558,10 @@ html,body{background:#07080A;}
       <section class="sec" id="cp-veh-sec"><div class="sh first"><h2>Vehicles</h2><a id="cp-archive-link" onclick="openArchivesPage()"></a></div><div class="car-grid" id="cp-vehicles"></div></section>
       <section class="sec" id="cp-act-sec"><div class="sh first"><h2>Recent activity</h2></div><div id="cp-activity"></div></section>
     </div>
-<div class="page" id="page-clients"><div class="page-header"><div><div class="page-title">Clients</div><div class="page-subtitle">Collection owners you work with</div></div><div class=head-actions><button class="btn btn-sm btn-primary" onclick="openModal('modal-add-client')">Invite client</button></div></div><div id="clients-list"></div></div>
+<div class="page" id="page-clients"><div class="page-header"><div><div class="page-title">Clients</div><div class="page-subtitle">Collection owners you work with</div></div><div class=head-actions><button class="btn btn-sm btn-primary" onclick="openNewClient()">New client</button></div></div><div id="clients-list"></div></div>
 <div class="page" id="page-client-detail">
       <div class="backbar"><button class="backbtn" onclick="showPage('clients')">&larr; Clients</button></div>
-      <div class="page-header"><div><div class="page-title" id="cd-name">Client</div><div class="page-subtitle" id="cd-meta"></div></div>
+      <div class="page-header"><div><div class="page-title" id="cd-name">Client</div><div class="page-subtitle" id="cd-meta"></div><div id="cd-managed"></div></div>
         <div class="head-actions"><button class="btn btn-sm btn-primary perm-addveh" onclick="openAddVehicleModal()">Add vehicle</button><button class="btn btn-sm" onclick="openClientArchives()">Archives</button></div></div>
       <div class="stats-grid" id="cd-stats"></div>
       <div class="cols2" style="margin-top:0">
@@ -590,22 +595,53 @@ html,body{background:#07080A;}
 <div class="page" id="page-audit"><div class="page-header"><div><div class="page-title">Activity</div><div class="page-subtitle">Every change by advisors and owners, newest first</div></div></div><div class="input-group" style="max-width:340px;"><label>Client</label><select id="audit-client-select" onchange="renderAudit()"><option value="">All clients</option></select></div><div id="audit-list"></div></div>
 <div class="page" id="page-team"><div class="page-header"><div><div class="page-title">Team</div><div class="page-subtitle">Everyone signed up as a tech or admin</div></div></div><div id="team-list"></div></div>
 <div class="page" id="page-access"><div class="page-header"><div><div class="page-title">Techs</div><div class="page-subtitle">Choose who can help with your collection, and exactly what they can see and do</div></div></div><div id="access-body"></div></div>
-<div class="page" id="page-client-link"><div class="page-header"><div><div class="page-title">Link your collection</div><div class="page-subtitle">Enter the one-time invite code from your advisor</div></div></div><div style="max-width:420px;"><div class="input-group"><label>Invite code</label><input type="text" id="link-code" placeholder="Paste your code" autocapitalize="characters" autocomplete="off"></div><button class="btn btn-primary" onclick="redeemCodeFrom('link-code')">Link collection</button></div></div>
+<div class="page" id="page-client-link"><div class="page-header"><div><div class="page-title">Link your collection</div><div class="page-subtitle">Enter the one-time invite code from your advisor</div></div></div><div style="max-width:420px;"><div class="input-group"><label>Invite code</label><input type="text" id="link-code" placeholder="Paste your code" autocapitalize="characters" autocomplete="off"></div><button class="btn btn-primary" onclick="redeemCodeFrom('link-code','link-code-msg')">Enter invite code</button><div class="doc-meta code-msg" id="link-code-msg" role="status"></div></div></div>
   </main>
 </div>
 <!-- MODALS -->
-<!-- ADD CLIENT -->
+<!-- NEW CLIENT (managed client: no invite needed) -->
 <div class="modal-overlay" id="modal-add-client">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">Invite client</div><button class="modal-close" onclick="closeModal('modal-add-client')">&#10005;</button></div>
+    <div class="modal-header"><div class="modal-title">New client</div><button class="modal-close" onclick="closeModal('modal-add-client')">&#10005;</button></div>
     <div class="form-grid">
-      <div class="input-group form-full"><label>Client name</label><input type="text" id="nc-name" maxlength="80" placeholder="e.g. Smith Family Collection"></div>
-      <div class="input-group"><label>Email</label><input type="email" id="nc-email" maxlength="120" placeholder="client@email.com"></div>
+      <div class="input-group form-full"><label>Client name</label><input type="text" id="nc-name" maxlength="120" placeholder="e.g. Smith Family Collection" autocomplete="off"></div>
+      <div class="input-group"><label>Email (optional)</label><input type="email" id="nc-email" maxlength="200" placeholder="client@email.com" autocomplete="off"></div>
+      <div class="input-group"><label>Phone (optional)</label><input type="tel" id="nc-phone" maxlength="40" placeholder="(904) 555-0100" autocomplete="off"></div>
+      <div class="input-group form-full"><label>Notes (optional)</label><input type="text" id="nc-notes" maxlength="500" placeholder="Anything to remember" autocomplete="off"></div>
     </div>
-    <div class="disclaimer">Creates a one-time owner code to share privately. The client signs up, enters the code, and their collection links to your account. Invitations are not emailed automatically - you share the code or link yourself.</div>
-    <div class="flex gap-2 mt-4" style="justify-content:flex-end;">
+    <div class="disclaimer">No invite needed. You can add their vehicles right away. When they join the app with the same email (or enter a code), everything moves to their account and you keep your access.</div>
+    <div class="doc-meta code-msg" id="nc-error" role="alert" style="color:var(--red,#e07070);"></div>
+    <div class="flex gap-2 mt-4" style="justify-content:flex-end;flex-wrap:wrap;">
       <button class="btn btn-ghost" onclick="closeModal('modal-add-client')">Cancel</button>
-      <button class="btn btn-primary" onclick="addClient()">Create invite code</button>
+      <button class="btn btn-primary" id="nc-save-btn" onclick="addClient()">Add client</button>
+    </div>
+    <div style="margin-top:14px;"><span class="link" onclick="closeModal('modal-add-client');openModal('modal-invite-client')">Prefer to send an invite code only? Invite by code</span></div>
+  </div>
+</div>
+<!-- CLIENT CREATED -->
+<div class="modal-overlay" id="modal-client-created">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Client added</div><button class="modal-close" onclick="closeModal('modal-client-created')">&#10005;</button></div>
+    <div style="font-size:20px;font-weight:300;" id="cc-name"></div>
+    <div class="doc-meta" style="margin-top:6px;"><span class="badge-soft">Not on app yet</span> You can add their vehicles now.</div>
+    <div class="flex gap-2 mt-4" style="flex-wrap:wrap;">
+      <button class="btn btn-primary" id="cc-add-btn" onclick="clientCreatedAddVehicle()">Add vehicle</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-client-created')">Later</button>
+    </div>
+  </div>
+</div>
+<!-- INVITE CLIENT BY CODE (optional old flow) -->
+<div class="modal-overlay" id="modal-invite-client">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Invite client by code</div><button class="modal-close" onclick="closeModal('modal-invite-client')">&#10005;</button></div>
+    <div class="form-grid">
+      <div class="input-group form-full"><label>Client name</label><input type="text" id="ic-name" maxlength="80" placeholder="e.g. Smith Family Collection"></div>
+      <div class="input-group"><label>Email</label><input type="email" id="ic-email" maxlength="120" placeholder="client@email.com"></div>
+    </div>
+    <div class="disclaimer">Creates a one-time owner code to share privately. The client signs up, enters the code, and links to your account. Invitations are not emailed automatically - you share the code or link yourself.</div>
+    <div class="flex gap-2 mt-4" style="justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-invite-client')">Cancel</button>
+      <button class="btn btn-primary" onclick="inviteClientOnly()">Create invite code</button>
     </div>
   </div>
 </div>
@@ -639,7 +675,7 @@ html,body{background:#07080A;}
     
     <div class="section-title" style="margin-top:28px;margin-bottom:14px;">Vehicle</div>
     <div class="form-grid">
-      <div class="input-group form-full"><label>Client</label><select id="v-client"><option value="">Select client</option></select></div>
+      <div class="input-group form-full"><label>Client</label><select id="v-client" onchange="vehicleClientChanged()"><option value="">Select client</option></select></div>
       <div class="input-group"><label>Year</label><input type="number" id="v-year" placeholder="2022" inputmode="numeric"></div>
       <div class="input-group"><label>Make</label><input type="text" id="v-make" maxlength="40" placeholder="Porsche"></div>
       <div class="input-group"><label>Model</label><input type="text" id="v-model" maxlength="60" placeholder="911 GT3"></div>
@@ -937,10 +973,11 @@ html,body{background:#07080A;}
       <button class="btn btn-sm" id="acct-export-btn" onclick="exportData()">Download my data (JSON)</button>
     </div>
     <div class="disclaimer" id="acct-export-note"></div>
-    <div class="redeem-sec">
-      <div class="sh"><h2>Redeem a code</h2></div>
-      <div class="flex gap-2" style="margin-top:12px;"><input type="text" id="acct-code" placeholder="Paste your code" autocapitalize="characters" autocomplete="off"><button class="btn btn-sm" onclick="redeemCodeFrom('acct-code')">Redeem</button></div>
-      <div class="disclaimer">Enter an invite code from an owner or a transfer code from a seller.</div>
+    <div class="redeem-sec invite-card">
+      <div class="sh"><h2>Enter invite code</h2></div>
+      <div class="doc-meta">Got a code from your tech or from a seller? Paste it here to connect.</div>
+      <div class="flex gap-2" style="margin-top:12px;"><input type="text" id="acct-code" placeholder="Paste your code" autocapitalize="characters" autocomplete="off" aria-label="Invite code"><button class="btn btn-primary" id="acct-redeem-btn" onclick="redeemCodeFrom('acct-code','acct-code-msg')">Redeem</button></div>
+      <div class="doc-meta code-msg" id="acct-code-msg" role="status"></div>
     </div>
     <div class="sh"><h2>Change password</h2></div>
     <div style="margin-top:16px;">
@@ -1050,8 +1087,23 @@ function nz(s){s=(s===undefined||s===null)?'':String(s).trim();return s===''?nul
 function chk(res){if(res&&res.error)throw res.error;return res;}
 function myId(){return session&&session.account?session.account.id:'';}
 function displayName(p){return p?(p.display_name||p.email||'Someone'):'Someone';}
+var NEEDS_BACKEND='Needs one backend update - Appy is applying it';
+function rpcMissing(err){
+  var m=String((err&&(err.message||err.error_description||err))||''),c=String((err&&err.code)||'');
+  return c==='PGRST202'||/could not find the function|schema cache/i.test(m)||(c==='404'&&/rpc/i.test(m));
+}
 function friendlyError(err){
   var m=String((err&&(err.message||err.error_description||err))||''),c=String((err&&err.code)||'');
+  if(rpcMissing(err))return NEEDS_BACKEND+'.';
+  if(/client_already_on_app/.test(m))return 'That person already has an EvoAI account. Use Invite to app with their email instead.';
+  if(/managed_client_exists/.test(m))return 'You already have a client with that email.';
+  if(/name_required/.test(m))return 'Enter the client name.';
+  if(/invalid_email/.test(m))return 'That email address does not look right.';
+  if(/client_has_vehicles/.test(m))return 'Remove or move this client\'s vehicles first.';
+  if(/vin_conflict/.test(m))return 'A vehicle with the same VIN is already in the account. Ask Wade to sort out the duplicate.';
+  if(/cannot_claim_own_client/.test(m))return 'You cannot claim a client you created.';
+  if(/only techs can add clients/.test(m))return 'Only techs can add clients.';
+  if(/too_many_managed_clients/.test(m))return 'That is the maximum number of clients not yet on the app.';
   if(/failed to fetch|networkerror|load failed|network request failed|fetch/i.test(m)&&!c)return 'You seem to be offline. That change was not saved. Please try again when you are back online.';
   if(c==='42501'||/row-level security|permission denied/i.test(m))return 'You do not have permission to make that change.';
   if(c==='23505'||/duplicate key/i.test(m))return /vin/i.test(m)?'A vehicle with that VIN is already in this collection.':'That already exists.';
@@ -1084,10 +1136,16 @@ function extOf(mime,name){
 // ---- permissions (UI mirrors the database rules; the database is the real gate) ----
 var PERM_KEYS=['view_service_records','view_expenses','view_documents','view_reminders','view_value_estimate','view_health_estimate','view_purchase_info','view_photos','can_add_service','can_add_documents','can_add_expenses','can_create_advisories'];
 function isRealOwnerOf(v){return !!(v&&v.clientId&&v.clientId===myId());}
+// A client the tech created that is not on the app yet: the tech acts as the owner until the client claims it (database rule: private.is_managing_tech).
+function managedMine(clientId){
+  if(!session||!clientId)return false;
+  var c=byId(C.clients,clientId);
+  return !!(c&&c.managed&&!c.claimed&&c.managedBy===myId());
+}
 function can(v,perm){
   if(!v||!session)return false;
   if(realAdmin())return perm!=='can_create_advisories';
-  if(isRealOwnerOf(v))return perm!=='can_create_advisories';
+  if(isRealOwnerOf(v)||managedMine(v.clientId))return perm!=='can_create_advisories';
   var row=C.vis[v.id];return !!(row&&row[perm]);
 }
 function canAny(perm,list){
@@ -1095,12 +1153,13 @@ function canAny(perm,list){
   for(i=0;i<vs.length;i++)if(can(vs[i],perm))return true;
   return false;
 }
-function canEditVehicle(v){return !!(v&&session&&(realAdmin()||isRealOwnerOf(v)));}
+function canEditVehicle(v){return !!(v&&session&&(realAdmin()||isRealOwnerOf(v)||managedMine(v.clientId)));}
 function canManageReminders(v){return canEditVehicle(v);}
 function canAddVehicleFor(clientId){
   if(!session||!clientId)return false;
   if(realAdmin())return true;
   if(clientId===myId())return true;
+  if(managedMine(clientId))return true;
   var cl=byId(C.clients,clientId);return !!(cl&&cl.canAdd);
 }
 function isRealTech(){return !!(session&&session.account&&session.account.role==='tech');}
@@ -1268,8 +1327,8 @@ var KIND={
       var c=vCore(v),row={id:v.id,owner_id:v.clientId,year:c.year,make:c.make,model:c.model,color:c.color,nickname:c.nickname,vin:c.vin,mileage:c.mileage,notes:c.notes,archived:false};
       chk(await sb.from('vehicles').insert(row));
       if(canEditVehicle(v)||canAddVehicleFor(v.clientId)){
-        if(Number(v.purchasePrice)>0||v.purchaseDate){if(realAdmin()||isRealOwnerOf(v))await finSave(v,null);}
-        if(realAdmin()||isRealOwnerOf(v))await remSync(v,null);
+        if(Number(v.purchasePrice)>0||v.purchaseDate){if(canEditVehicle(v))await finSave(v,null);}
+        if(canEditVehicle(v))await remSync(v,null);
       }
       await imgSync(v,null);
       await svcSync(v,null);
@@ -1366,7 +1425,7 @@ async function docUpload(d){
   }
   var path=d.clientId+'/'+d.vehicleId+'/'+uid()+'.'+extOf(mime,name);
   chk(await sb.storage.from('vehicle-documents').upload(path,blob,{contentType:mime,upsert:false}));
-  var ownerOnly=!!(d.type==='insurance'||d.type==='title')&&(realAdmin()||d.clientId===myId());
+  var ownerOnly=!!(d.type==='insurance'||d.type==='title')&&(realAdmin()||d.clientId===myId()||managedMine(d.clientId));
   try{
     chk(await sb.from('documents').insert({id:d.id,vehicle_id:d.vehicleId,uploaded_by:myId(),kind:kind,title:packX(String(d.name||'Document').slice(0,120),{type:d.type,exp:d.expiry,notes:d.notes}),storage_path:path,mime_type:mime,size_bytes:blob.size||null,owner_only:ownerOnly}));
   }catch(e){await removeObject('vehicle-documents',path);throw e;}
@@ -1538,13 +1597,15 @@ async function loadAll(){
   function addClientRow(p,canAdd){
     if(!p||seenC[p.id]){if(p&&canAdd){var ex0=byId(cl,p.id);if(ex0)ex0.canAdd=true;}return;}
     seenC[p.id]=1;
-    cl.push({id:p.id,name:displayName(p),email:p.email||'',phone:p.phone||'',location:'',since:String(p.created_at||'').slice(0,7),createdAt:p.created_at,linked:true,canAdd:!!canAdd});
+    if(p.managed&&p.claimed_by)return;   // claimed placeholder: its data now belongs to the real account
+    cl.push({id:p.id,name:displayName(p),email:p.email||'',phone:p.phone||'',location:'',since:String(p.created_at||'').slice(0,7),createdAt:p.created_at,linked:true,canAdd:!!canAdd,
+      managed:!!p.managed,claimed:!!p.claimed_by,managedBy:p.managed_by||'',notes:p.notes||''});
   }
   if(mine.role==='owner'){addClientRow(mine,true);}
   else if(mine.role==='tech'){
-    for(i=0;i<rows.acc.length;i++){var ac=rows.acc[i];if(ac.tech_id===me0&&ac.status==='active')addClientRow(profMap[ac.owner_id],ac.vehicle_id===null);}
+    for(i=0;i<rows.acc.length;i++){var ac=rows.acc[i];if(ac.tech_id===me0&&ac.status==='active')addClientRow(profMap[ac.owner_id],ac.vehicle_id===null||(profMap[ac.owner_id]&&profMap[ac.owner_id].managed));}
   }else{
-    for(var pid in profMap)if(profMap.hasOwnProperty(pid)&&profMap[pid].role==='owner')addClientRow(profMap[pid],true);
+    for(var pid in profMap)if(profMap.hasOwnProperty(pid)&&profMap[pid].role==='owner'&&!(profMap[pid].managed&&profMap[pid].claimed_by))addClientRow(profMap[pid],true);
     var ownsAny=false;for(i=0;i<vehicles.length;i++)if(vehicles[i].clientId===me0)ownsAny=true;
     if(ownsAny)addClientRow(mine,true);
   }
@@ -1556,6 +1617,7 @@ async function loadAll(){
   var now=new Date().toISOString();
   for(i=0;i<rows.inv.length;i++){
     var iv=rows.inv[i];
+    if(iv.kind==='client_owner'&&!iv.redeemed_at&&!iv.revoked_at&&iv.expires_at>now&&iv.created_by===me0&&iv.owner_id&&byId(cl,iv.owner_id)){byId(cl,iv.owner_id).inviteId=iv.id;byId(cl,iv.owner_id).inviteExpires=iv.expires_at;continue;}
     if(iv.kind==='client_owner'&&!iv.redeemed_at&&!iv.revoked_at&&iv.expires_at>now&&iv.created_by===me0)nc.pending.push({id:'inv_'+iv.id,inviteId:iv.id,name:iv.label||iv.email||'Invited client',email:iv.email||'',expiresAt:iv.expires_at,pending:true});
   }
   // access + permissions
@@ -1853,7 +1915,7 @@ function applyPerms(){
   setDisp('.perm-expense',ownerLike||canAny('can_add_expenses',vs));
   setDisp('.perm-doc',ownerLike||canAny('can_add_documents',vs));
   setDisp('.perm-adv',!!(tech&&canAny('can_create_advisories',vs)));
-  setDisp('.perm-rem',ownerLike);
+  setDisp('.perm-rem',ownerLike||C.clients.some(function(c){return managedMine(c.id);}));
   var canAddAny=ownerLike,i;
   if(!canAddAny)for(i=0;i<C.clients.length;i++)if(C.clients[i].canAdd)canAddAny=true;
   setDisp('.perm-addveh',canAddAny);
@@ -1995,7 +2057,7 @@ function retryBoot(){
   showLoading(true,'Loading your collection');
   sb.auth.getSession().then(function(r){
     if(r.data&&r.data.session&&r.data.session.user)bootWithUser(r.data.session.user);
-    else{showLoading(false);authPanels('login');}
+    else{showLoading(false);authPanels('login');applyInviteToAuth();}
   }).catch(function(e){showRetry(netMsg(e));});
 }
 async function bootWithUser(user){
@@ -2013,14 +2075,28 @@ async function bootWithUser(user){
   }
   setAccountFromProfile(user);
   var pend=user.user_metadata&&user.user_metadata.pending_invite;
-  if(pend){
-    try{
-      await sb.rpc('redeem_invite',{p_code:String(pend)}).then(function(r){if(r.error)throw r.error;});
-      showToast('Your invite code was applied.','success');
-    }catch(e){showToast(friendlyError(e),'error');}
-    try{await sb.auth.updateUser({data:{pending_invite:null}});}catch(e2){}
+  var urlCode=pendingInviteCode(),codes=[];
+  if(pend)codes.push(codeKey(pend));
+  if(urlCode&&codes.indexOf(urlCode)<0)codes.push(urlCode);
+  if(codes.length){
+    var applied=0,lastErr=null,lastRes=null,ci;
+    for(ci=0;ci<codes.length;ci++){
+      try{
+        var rr=await sb.rpc('redeem_invite',{p_code:codes[ci]});if(rr.error)throw rr.error;
+        applied++;lastRes=rr.data;
+      }catch(e){lastErr=e;}
+    }
+    if(applied)showToast(inviteDoneText(lastRes)||'Your invite code was applied.','success');
+    else if(lastErr)showToast(inviteErrorText(lastErr),'error');
+    clearPendingInvite();
+    if(pend){try{await sb.auth.updateUser({data:{pending_invite:null}});}catch(e2){}}
     try{await loadAll();setAccountFromProfile(user);}catch(e3){}
   }
+  // a tech may have added vehicles for this person before they joined: claim them by verified email (no-op otherwise)
+  try{
+    var nClaimed=await autoClaim();
+    if(nClaimed){await loadAll();setAccountFromProfile(user);showToast('Vehicles your tech already added for you are now in your collection.','success');}
+  }catch(e4){}
   booting=false;
   showLoading(false);
   viewAsRestore(session.account);
@@ -2074,6 +2150,61 @@ function initAuthEvents(){
     },0);
   });
 }
+// ============ INVITE LINK (?invite=CODE), AUTO-CLAIM, FRIENDLY CODE ERRORS ============
+var INVITE_KEY='evo_pending_invite';
+function pendingInviteCode(){try{return localStorage.getItem(INVITE_KEY)||'';}catch(e){return '';}}
+function clearPendingInvite(){try{localStorage.removeItem(INVITE_KEY);}catch(e){}}
+function readUrlInvite(){
+  try{
+    var q=new URLSearchParams(window.location.search||''),c=q.get('invite');
+    if(c===null)return;
+    var k=String(c).toLowerCase().replace(/[^a-z0-9]/g,'');
+    if(k.length>=16&&k.length<=64)localStorage.setItem(INVITE_KEY,k);
+    q.delete('invite');
+    var qs=q.toString();
+    if(window.history&&history.replaceState)history.replaceState(null,'',window.location.pathname+(qs?'?'+qs:'')+(window.location.hash||''));
+  }catch(e){}
+}
+// not signed in + a code in the link/storage: open Create account with the code filled in (owner side)
+function applyInviteToAuth(){
+  var k=pendingInviteCode();
+  if(!k)return;
+  try{showSignup(true);selectRole('client');setVal('su-code',groupCode(k));showToast('Invite code added. Create your account, or sign in if you already have one.','success');}catch(e){}
+}
+function inviteErrorText(e){
+  var m=String((e&&(e.message||e.error_description||e))||'');
+  if(rpcMissing(e))return NEEDS_BACKEND+'.';
+  if(/failed to fetch|network|load failed/i.test(m))return 'You seem to be offline. Try again when you are back online.';
+  if(/invalid_or_expired_invite/.test(m))return 'That code did not work. Check that you pasted all of it. A code works once and expires after 14 days, so ask for a new one if needed.';
+  if(/cannot_redeem_own_invite/.test(m))return 'You made this code, so you cannot use it. It has to be redeemed from the other person\'s own account.';
+  if(/role_not_eligible/.test(m))return 'This account cannot use that kind of code. Client codes work on owner accounts. Tech codes only work on a new account with no vehicles.';
+  if(/vin_conflict/.test(m))return 'A vehicle with the same VIN is already in this account, so the transfer stopped. Ask your tech to remove the duplicate and send a new code.';
+  if(/not_authenticated|JWT/i.test(m))return 'Your session ended. Please sign in again.';
+  return 'That code could not be used right now. Please try again in a moment.';
+}
+function inviteDoneText(d){
+  if(!d)return '';
+  var n=0,i,cl=d.claimed||[];
+  for(i=0;i<cl.length;i++)n+=Number(cl[i]&&cl[i].vehicles)||0;
+  if(d.kind==='client_owner')return n?('Connected. '+n+' vehicle'+(n===1?'':'s')+' your tech already added '+(n===1?'is':'are')+' now in your collection.'):'Connected. Your tech can now see your collection.';
+  if(d.kind==='transfer')return 'The vehicle is now in your collection.';
+  return 'Access added. Look under Clients.';
+}
+var CAPCLAIM=true;
+async function autoClaim(){
+  if(!CAPCLAIM||!sb||!session||session.account.role!=='owner')return 0;
+  try{
+    var r=await sb.rpc('claim_managed_clients');
+    if(r.error){if(rpcMissing(r.error))CAPCLAIM=false;return 0;}
+    return Number(r.data&&r.data.count)||0;
+  }catch(e){return 0;}
+}
+function redeemCardHTML(pref){
+  var c=pendingInviteCode();
+  return '<div class="invite-card"><div class="sh first"><h2>Enter invite code</h2></div><div class="doc-meta">Got a code from your tech? Paste it here to connect.</div>'
+   +'<div class="flex gap-2" style="margin-top:12px;"><input type="text" id="'+pref+'-code" value="'+esc(c?groupCode(c):'')+'" placeholder="Paste your code" autocapitalize="characters" autocomplete="off" aria-label="Invite code"><button class="btn btn-primary" onclick="redeemCodeFrom(\''+pref+'-code\',\''+pref+'-code-msg\')">Redeem</button></div>'
+   +'<div class="doc-meta code-msg" id="'+pref+'-code-msg" role="status"></div></div>';
+}
 // ============ INVITE CODES (create_invite / redeem_invite / revoke_invite) ============
 var CAP={inviteLabel:true};
 var lastInviteCode='';
@@ -2115,7 +2246,7 @@ async function revealMissingCodes(ids){
   if(did)refreshCurrent();
 }
 function inviteShareText(code,email){
-  return 'You are invited to EvoAI. Open '+APP_LINK+' , create an account using '+(email?('the email '+email):'the email this invite was sent to')+', then enter this invite code: '+groupCode(codeKey(code));
+  return 'You are invited to EvoAI. Open '+APP_LINK+'?invite='+codeKey(code)+' , create an account using '+(email?('the email '+email):'the email this invite was sent to')+', then enter this invite code: '+groupCode(codeKey(code));
 }
 function inviteMailto(code,email){
   return 'mailto:'+encodeURIComponent(email||'').replace(/%40/g,'@')+'?subject='+encodeURIComponent('Your EvoAI invite')+'&body='+encodeURIComponent(inviteShareText(code,email)+'\n\nInvitations are not emailed automatically by the app.');
@@ -2175,22 +2306,26 @@ async function revokeInviteById(id){
     await loadAll();refreshCurrent();
   }catch(e){showToast(friendlyError(e),'error');}
 }
-async function redeemCodeFrom(inputId){
+async function redeemCodeFrom(inputId,msgId){
   if(!session)return;
+  var say=function(t,bad){if(msgId){var m=document.getElementById(msgId);if(m){m.textContent=t||'';m.style.color=bad?'var(--red,#e07070)':'var(--gold)';}}};
+  say('');
   if(viewAsActive()){showToast('Not available while viewing as another role.','error');return;}
   var code=val(inputId),k=code.toLowerCase().replace(/[^a-z0-9]/g,'');
-  if(k.length<16){showToast('Paste the whole invite code.','error');return;}
+  if(!k){say('Paste the invite code first.',true);showToast('Paste the invite code first.','error');return;}
+  if(k.length<16){say('That looks too short. Paste the whole code.',true);showToast('Paste the whole invite code.','error');return;}
+  say('Checking the code...');
   try{
     var r=await sb.rpc('redeem_invite',{p_code:k});
     if(r.error)throw r.error;
-    var kind=(r.data&&r.data.kind)||'transfer';
+    clearPendingInvite();
     setVal(inputId,'');closeModal('modal-account');
     await loadAll();
     var u=(await sb.auth.getUser()).data.user;
     if(u)setAccountFromProfile(u);
-    showToast(kind==='client_owner'?'Connected. Your tech can now see your collection.':(kind==='transfer'?'The vehicle is now in your collection.':'Access added. Look under Clients.'),'success');
+    showToast(inviteDoneText(r.data||{kind:'transfer'}),'success');
     enterApp();
-  }catch(e){showToast(friendlyError(e),'error');}
+  }catch(e){var t=inviteErrorText(e);say(t,true);showToast(t,'error');}
 }
 function createInviteFromAccess(){
   var scope=val('inv-scope'),email=normEmail(val('inv-email'));
@@ -2205,16 +2340,86 @@ function createInviteFromAccess(){
   }).catch(function(e){showToast(friendlyError(e),'error');});
 }
 // ============ CLIENTS (tech / admin) ============
-function addClient(){
-  var name=val('nc-name').trim(),email=normEmail(val('nc-email'));
+function inviteClientOnly(){
+  var name=val('ic-name').trim(),email=normEmail(val('ic-email'));
   if(!name){showToast('Client name is required','error');return;}
   if(email&&!validEmail(email)){showToast('Client email looks invalid','error');return;}
   createInviteRpc('client_owner',null,email||null,name).then(function(row){
-    closeModal('modal-add-client');
-    setVal('nc-name','');setVal('nc-email','');
-    showInviteResult({title:'Client invite code',id:row.invite_id,email:email,code:row.code,expires:row.expires_at,who:'Client: '+name,help:'Share this code privately with the owner. They choose Owner, tap Create an account, and enter it (or enter it under Account > Redeem a code if they already have an account). It connects them to you. The code works once and expires in 14 days. You can add their vehicles after they connect.'+NOTE});
+    closeModal('modal-invite-client');
+    setVal('ic-name','');setVal('ic-email','');
+    showInviteResult({title:'Client invite code',id:row.invite_id,email:email,code:row.code,expires:row.expires_at,who:'Client: '+name,help:'Share this code privately with the owner. They choose Owner, tap Create an account, and enter it (or enter it under Account > Enter invite code if they already have an account). It connects them to you. The code works once and expires in 14 days.'+NOTE});
     return loadAll().then(function(){refreshCurrent();});
   }).catch(function(e){showToast(friendlyError(e),'error');});
+}
+// New client: a managed client (no invite needed). The tech can add vehicles right away; the client claims them later.
+async function addClient(){
+  var name=val('nc-name').trim(),email=normEmail(val('nc-email')),phone=val('nc-phone').trim(),notes=val('nc-notes').trim();
+  elText('nc-error','');
+  if(!name){elText('nc-error','Client name is required.');return;}
+  if(email&&!validEmail(email)){elText('nc-error','That email address does not look right.');return;}
+  var btn=document.getElementById('nc-save-btn');if(btn)btn.disabled=true;
+  try{
+    var r=await sb.rpc('create_managed_client',{p_name:name,p_email:email||null,p_phone:phone||null,p_notes:notes||null});
+    if(r.error)throw r.error;
+    var row=Object.prototype.toString.call(r.data)==='[object Array]'?r.data[0]:r.data;
+    if(!row||!row.owner_id)throw new Error('no client returned');
+    closeModal('modal-add-client');
+    setVal('nc-name','');setVal('nc-email','');setVal('nc-phone','');setVal('nc-notes','');
+    await loadAll();refreshCurrent();
+    showClientCreated(row.owner_id,name);
+  }catch(e){
+    var t=friendlyError(e);
+    elText('nc-error',t);
+    showToast(t,'error');
+  }
+  if(btn)btn.disabled=false;
+}
+function openNewClient(){
+  elText('nc-error','');
+  openModal('modal-add-client');
+}
+function showClientCreated(id,name){
+  currentClientId=id;
+  elText('cc-name',name);
+  var b=document.getElementById('cc-add-btn');if(b)b.textContent='Add vehicle for '+name;
+  var ib=document.getElementById('cc-add-btn');if(ib)ib.setAttribute('data-id',id);
+  openModal('modal-client-created');
+}
+function clientCreatedAddVehicle(){
+  var b=document.getElementById('cc-add-btn'),id=b?b.getAttribute('data-id'):currentClientId;
+  closeModal('modal-client-created');
+  openAddVehicleFor(id);
+}
+// optional: connect a managed client to the app with the normal invite-code flow
+async function inviteManagedClient(clientId){
+  var c=byId(C.clients,clientId);if(!c||!c.managed)return;
+  try{
+    var r=await sb.rpc('create_managed_client_invite',{p_managed_id:clientId,p_email:c.email||null});
+    if(r.error)throw r.error;
+    var row=Object.prototype.toString.call(r.data)==='[object Array]'?r.data[0]:r.data;
+    if(!row||!row.code)throw new Error('no code returned');
+    showInviteResult({title:'Invite '+c.name+' to the app',id:row.invite_id,email:c.email||'',code:row.code,expires:row.expires_at,who:'Client: '+c.name,help:'Share this link or code privately with '+c.name+'. When they sign up or enter it, the vehicles and records you added move into their own account and you keep access. The code works once and expires in 14 days.'+NOTE});
+    await loadAll();refreshCurrent();
+  }catch(e){showToast(friendlyError(e),'error');}
+}
+function managedRowActions(c){
+  if(!c||!c.managed||c.claimed)return '';
+  var h='<div class="flex gap-2" style="flex-wrap:wrap;margin-top:8px;" onclick="event.stopPropagation()"><button class="btn btn-sm btn-primary" onclick="openAddVehicleFor(\''+jsId(c.id)+'\')">Add vehicle</button>';
+  if(!c.inviteId)h+='<button class="btn btn-sm" onclick="inviteManagedClient(\''+jsId(c.id)+'\')">Invite to app</button>';
+  h+='</div>';
+  if(c.inviteId)h+='<div onclick="event.stopPropagation()"><div class="doc-meta" style="margin-top:6px;">Invite pending'+(c.inviteExpires?' / expires '+esc(fmtDate(String(c.inviteExpires).slice(0,10))):'')+'</div>'+inviteRowExtras(c.inviteId,c.email)+'</div>';
+  return h;
+}
+function managedBadgeHTML(c){return (c&&c.managed&&!c.claimed)?'<span class="badge-soft" title="This client has no account yet. Your records are held for them.">Not on app yet</span>':'';}
+function managedBannerHTML(c){
+  if(!c||!c.managed||c.claimed)return '';
+  var h='<div class="managed-banner"><div>'+managedBadgeHTML(c)+'<span class="doc-meta"> Held under your account until they join.'+(c.email?' It moves to them automatically when they sign up with '+esc(c.email)+'.':'')+'</span></div>';
+  if(c.notes)h+='<div class="doc-meta" style="margin-top:6px;">Notes: '+esc(c.notes)+'</div>';
+  h+='<div class="flex gap-2" style="flex-wrap:wrap;margin-top:10px;"><button class="btn btn-sm btn-primary" onclick="openAddVehicleFor(\''+jsId(c.id)+'\')">Add vehicle for '+esc(c.name)+'</button>';
+  if(!c.inviteId)h+='<button class="btn btn-sm" onclick="inviteManagedClient(\''+jsId(c.id)+'\')">Invite to app</button>';
+  h+='</div>';
+  if(c.inviteId)h+='<div class="doc-meta" style="margin-top:8px;">Invite pending'+(c.inviteExpires?' / expires '+esc(fmtDate(String(c.inviteExpires).slice(0,10))):'')+'</div>'+inviteRowExtras(c.inviteId,c.email);
+  return h+'</div>';
 }
 function openClientDetail(clientId){
   if(String(clientId).indexOf('inv_')===0)return;
@@ -2233,19 +2438,19 @@ async function leaveOrRevokeAccess(accessId){
 function renderClients(){
   var clients=getClients(),vehicles=getVehicles();
   var el=document.getElementById('clients-list');if(!el)return;
-  if(!clients.length&&!C.pending.length){el.innerHTML=emptyCard('No clients yet. Create an invite for your first collection owner. Once they connect, add their vehicles.<div><button class="btn btn-primary" onclick="openModal(\'modal-add-client\')">Invite first client</button></div>');return;}
+  if(!clients.length&&!C.pending.length){el.innerHTML=emptyCard('No clients yet. Add your first client, then add their vehicles. They can join the app later.<div><button class="btn btn-primary" onclick="openModal(\'modal-add-client\')">New client</button></div>');return;}
   var h=clients.map(function(c){
     var owned=vehicles.filter(function(v){return v.clientId===c.id;});
     var cvs=owned.filter(function(v){return !isArchivedVehicle(v);});
     var archN=owned.length-cvs.length;
     var t=portfolioTotals(cvs);
-    return '<div class="client-row" onclick="openClientDetail(\''+jsId(c.id)+'\')"><div class="client-info"><div class="client-name">'+esc(c.name)+'</div><div class="client-meta">'+cvs.length+' vehicle'+(cvs.length!==1?'s':'')+(archN?' / '+archN+' archived':'')+(c.email?' / '+esc(c.email):'')+'</div></div><div class="client-val">'+money(t.value)+(t.basis>0?'<div class="client-meta '+(t.gain>=0?'pos':'neg')+'" style="text-align:right;">'+esc(pct(t.pctGain))+'</div>':'')+'</div></div>';
+    return '<div class="client-row" onclick="openClientDetail(\''+jsId(c.id)+'\')"><div class="client-info"><div class="client-name">'+esc(c.name)+' '+managedBadgeHTML(c)+'</div><div class="client-meta">'+cvs.length+' vehicle'+(cvs.length!==1?'s':'')+(archN?' / '+archN+' archived':'')+(c.email?' / '+esc(c.email):'')+'</div>'+managedRowActions(c)+'</div><div class="client-val">'+money(t.value)+(t.basis>0?'<div class="client-meta '+(t.gain>=0?'pos':'neg')+'" style="text-align:right;">'+esc(pct(t.pctGain))+'</div>':'')+'</div></div>';
   }).join('');
   h+=C.pending.map(function(p){
     return '<div class="client-row" style="cursor:default;"><div class="client-info"><div class="client-name">'+esc(p.name)+'</div><div class="client-meta">Invite pending / expires '+esc(fmtDate(String(p.expiresAt).slice(0,10)))+(p.email?' / '+esc(p.email):'')+'</div>'+inviteRowExtras(p.inviteId,p.email)+'</div><div class="client-val"><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(p.inviteId)+'\')">Revoke code</button></div></div>';
   }).join('');
   el.innerHTML=h;
-  revealMissingCodes(C.pending.map(function(p){return p.inviteId;}));
+  revealMissingCodes(C.pending.map(function(p){return p.inviteId;}).concat(C.clients.filter(function(c){return c.inviteId;}).map(function(c){return c.inviteId;})));
 }
 function renderClientAccess(clientId){
   if(clientId!==currentClientId)return;
@@ -2415,7 +2620,8 @@ function openAccountModal(){
   elText('acct-email',a.email||'');
   elText('acct-role',isOwner()?'Owner':(isAdmin()?'Admin':'Advisor / Tech'));
   elText('acct-export-note','Downloads a copy of everything you can see in EVOai as a JSON file. Keep it somewhere private.');
-  setVal('pw-current','');setVal('pw-new','');setVal('acct-code','');
+  setVal('pw-current','');setVal('pw-new','');setVal('acct-code',pendingInviteCode()?groupCode(pendingInviteCode()):'');
+  elText('acct-code-msg','');
   setDisp('.redeem-sec',!realAdmin());
   openModal('modal-account');
 }
@@ -2633,7 +2839,7 @@ function populateClientSelect(id,selected,addOnly){
   var sel=document.getElementById(id);if(!sel)return;
   var clients=getClients().filter(function(c){return !addOnly||canAddVehicleFor(c.id);}),h='<option value="">Select client</option>';
   if(!selected&&clients.length===1)selected=clients[0].id;
-  for(var i=0;i<clients.length;i++)h+='<option value="'+esc(clients[i].id)+'"'+(clients[i].id===selected?' selected':'')+'>'+esc(clients[i].name)+'</option>';
+  for(var i=0;i<clients.length;i++)h+='<option value="'+esc(clients[i].id)+'"'+(clients[i].id===selected?' selected':'')+'>'+esc(clients[i].name)+(clients[i].managed&&!clients[i].claimed?' (not on app yet)':'')+'</option>';
   sel.innerHTML=h;
 }
 
@@ -2871,11 +3077,11 @@ function garageEmptyHTML(){
   var h='<div class="empty" style="padding:44px 0;">';
   h+='<div style="font-size:30px;font-weight:200;letter-spacing:-.02em;color:var(--text);margin-bottom:10px;">No vehicles yet</div>';
   if(!nClients){
-    h+='<div>Step 1: invite your first client. Step 2: once they connect, add their vehicles.</div>';
-    h+='<button class="btn btn-primary" onclick="openModal(\'modal-add-client\')">Invite first client</button>';
+    h+='<div>Step 1: add your first client (no invite needed). Step 2: add their vehicles.</div>';
+    h+='<button class="btn btn-primary" onclick="openModal(\'modal-add-client\')">New client</button>';
   }else{
     h+='<div>'+nClients+' client'+(nClients===1?'':'s')+' saved. Next, add the first vehicle.'+(nArch?' Archived vehicles stay in Archives.':'')+'</div>';
-    h+='<div class="flex gap-2" style="flex-wrap:wrap;"><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button><button class="btn" onclick="openModal(\'modal-add-client\')">Add client</button></div>';
+    h+='<div class="flex gap-2" style="flex-wrap:wrap;"><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button><button class="btn" onclick="openNewClient()">New client</button></div>';
   }
   return h+'</div>';
 }
@@ -2896,6 +3102,7 @@ function renderOverview(owner,vehicles){
   elHTML(p+'-attention',attentionHTML(vehicles,5));
   elHTML(p+'-brief',collectionBrief(vehicles));
   elHTML(p+'-vehicles',vehicles.length?vehicles.map(function(v){return vehicleCardHTML(v);}).join(''):emptyCard(owner?'Your collection is empty. Add your first vehicle to get started.<div><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button></div>':'No vehicles yet.','grid-column:1/-1;'));
+  if(owner)elHTML('cp-redeem',vehicles.length?'':redeemCardHTML('ov'));
   var al=document.getElementById(p+'-archive-link');if(al){al.textContent=archN?archN+' archived':'';al.style.display=archN?'':'none';}
   elHTML(p+'-activity',auditHTML(overviewActivity(owner),owner?'Nothing yet. Services, values, expenses and documents your advisor records are listed here.':'No activity yet. Add a vehicle or log a service to start the record.'));
 }
@@ -2917,6 +3124,7 @@ function renderClientDetail(){
   var t=portfolioTotals(vehicles);
   elText('cd-name',c.name);
   elText('cd-meta',[c.location,c.email,c.phone].filter(function(x){return x;}).join(' / '));
+  elHTML('cd-managed',managedBannerHTML(c));
   elHTML('cd-stats',
     '<div class="stat-card"><div class="stat-value">'+totalMoney(t)+'</div><div class="stat-label">Collection value</div>'+(t.basis>0?'<div class="stat-delta '+(t.gain>=0?'':'neg')+'">'+esc(pct(t.pctGain))+'</div>':'')+'</div>'+
     '<div class="stat-card"><div class="stat-value">'+(t.basisAll>0?money(t.basisAll):'--')+'</div><div class="stat-label">Cost basis</div></div>'+
@@ -2925,7 +3133,7 @@ function renderClientDetail(){
   elHTML('cd-attention',attentionHTML(vehicles,6));
   elHTML('cd-brief',collectionBrief(vehicles));
   elHTML('cd-archive-note',archN?'<div class="doc-meta" style="padding:12px 0 0;">'+archN+' archived vehicle'+(archN===1?' is':'s are')+' kept in Archives and not included in the totals above.</div>':'');
-  elHTML('cd-vehicles',vehicles.length?vehicles.map(function(v){return vehicleCardHTML(v);}).join(''):emptyCard(archN?'No active vehicles. Archived copies are in Archives.':'No vehicles yet for this client.<div><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button></div>','grid-column:1/-1;'));
+  elHTML('cd-vehicles',vehicles.length?vehicles.map(function(v){return vehicleCardHTML(v);}).join(''):emptyCard(archN?'No active vehicles. Archived copies are in Archives.':'No vehicles yet for this client.<div><button class="btn btn-primary" onclick="openAddVehicleFor(\''+jsId(c.id)+'\')">Add first vehicle for '+esc(c.name)+'</button></div>','grid-column:1/-1;'));
 }
 
 // ============ VEHICLE CARDS ============
@@ -2947,17 +3155,17 @@ function resetImagePicker(){
   showEl('v-img-preview',false);
   var ps=document.getElementById('v-img-preview-src');if(ps)ps.removeAttribute('src');
 }
-function openAddVehicleModal(){
+function openAddVehicleModal(presetClientId){
   if(!requireAdvisor())return;
   var addable=getClients().filter(function(c){return canAddVehicleFor(c.id);});
-  if(!addable.length){showToast('Invite a client first. You can add their vehicles after they connect.','error');if(isAdvisor())openModal('modal-add-client');return;}
+  if(!addable.length){showToast('Add a client first (New client), then add their vehicles.','error');if(isAdvisor())openModal('modal-add-client');return;}
   editingVehicleId=null;
   resetImagePicker();
   elText('av-title','Add vehicle');
   var onClientPage=document.getElementById('page-client-detail');
-  populateClientSelect('v-client',onClientPage&&onClientPage.classList.contains('active')?currentClientId:null,true);
+  populateClientSelect('v-client',(typeof presetClientId==='string'&&presetClientId)||(onClientPage&&onClientPage.classList.contains('active')?currentClientId:null),true);
   var cgrp=document.getElementById('v-client');if(cgrp&&cgrp.parentNode)cgrp.parentNode.style.display=(addable.length===1)?'none':'';
-  toggleFinFields();
+  vehicleClientChanged();
   for(var i=0;i<VEHICLE_FIELDS.length;i++)setVal(VEHICLE_FIELDS[i],'');
   setVal('v-ins-repeat','yearly');
   var vdt=document.getElementById('v-dates');if(vdt)vdt.open=false;
@@ -4437,9 +4645,21 @@ async function deleteVehiclePhoto(pid){
     closeModal('modal-image-view');await loadAll();refreshCurrent();refreshDetailIfOpen();showToast('Photo deleted','success');
   }catch(e){showToast(friendlyError(e),'error');}
 }
-function toggleFinFields(){
-  var on=!!(session&&(realAdmin()||session.account.role==='owner'));
+function toggleFinFields(clientId){
+  var on=!!(session&&(realAdmin()||session.account.role==='owner'||(clientId?managedMine(clientId):C.clients.some(function(c){return managedMine(c.id);}))));
   setDisp('.fin-only',on);
+}
+// 'Add vehicle for <client>': opens the add-vehicle form with the client preselected
+function openAddVehicleFor(clientId){
+  var c=byId(getClients(),clientId);
+  if(!c||!canAddVehicleFor(clientId)){showToast('You cannot add vehicles for this client.','error');return;}
+  currentClientId=clientId;
+  openAddVehicleModal(clientId);
+}
+function vehicleClientChanged(){
+  var id=val('v-client'),c=byId(getClients(),id);
+  elText('av-title',c&&!editingVehicleId&&c.id!==myId()?('Add vehicle for '+c.name):'Add vehicle');
+  toggleFinFields(id||null);
 }
 var wasOffline=false;
 function wireNet(){
@@ -4470,6 +4690,7 @@ function dismissA2HS(){DB.set('evoai_a2hs',true);showEl('a2hs-card',false);}
 document.addEventListener('DOMContentLoaded',function(){
   selectRole('advisor');wireNet();registerSW();showA2HS();
   if(/type=recovery/.test(location.hash||''))recoveryMode=true;
+  readUrlInvite();
   if(!initClient()){authPanels('login');return;}
   initAuthEvents();
   retryBoot();
