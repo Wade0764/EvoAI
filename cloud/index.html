@@ -637,6 +637,31 @@ body.pfl-open,body.pfa-open{overflow:hidden}
 .whl-lvchip{right:auto;left:14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);padding:5px 10px}
 .whl-lvchip b{font-weight:500;color:var(--gold);margin-left:4px}
 
+/* ===== dz: safe area, client title, edge swipe-back ===== */
+.backbtn{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;padding:10px 16px 10px 2px;font-size:13px;letter-spacing:.12em;color:var(--text-secondary,#b9b9b9);-webkit-tap-highlight-color:transparent}
+.backbtn .ba{font-size:18px;letter-spacing:0;line-height:1;color:var(--gold)}
+.modal-close{min-height:44px;min-width:44px}
+#modal-vehicle-detail .modal{padding-top:0!important;max-height:none!important}
+html,body{overscroll-behavior-x:none}
+#modal-vehicle-detail .backbar{position:sticky;top:0;z-index:40;margin:0 -32px 14px;padding:calc(var(--sat) + 8px) 32px 8px;background:linear-gradient(180deg,rgba(7,8,10,.97),rgba(7,8,10,.86));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid rgba(201,170,107,.14)}
+@media(max-width:899px){#modal-vehicle-detail .backbar{margin:0 -22px 12px;padding:calc(var(--sat) + 8px) 22px 8px}}
+.sheet{max-height:calc(100vh - var(--sat) - 24px)}
+.pfl-x,.pfl-nav{min-width:44px;min-height:44px}
+/* client title */
+.topline.has-ct{align-items:flex-end;gap:18px;margin-bottom:38px}
+.ctitle{flex:1 1 100%;min-width:0;padding:6px 0 2px}
+.ctitle-eyebrow{font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);opacity:.85;font-weight:500;margin-bottom:12px}
+.ctitle-name{font-family:'Cormorant Garamond','Playfair Display',Didot,'Bodoni 72',Georgia,'Times New Roman',serif;font-weight:400;font-size:38px;line-height:1.12;letter-spacing:.01em;color:#F3EBDD;margin:0;overflow-wrap:anywhere}
+.ctitle-rule{display:flex;align-items:center;gap:10px;margin-top:16px;max-width:240px}
+.ctitle-rule i{flex:1;height:1px;background:linear-gradient(90deg,var(--gold),rgba(201,170,107,0))}
+.ctitle-rule b{width:5px;height:5px;transform:rotate(45deg);border:1px solid var(--gold);flex:none}
+.topline.has-ct .head-actions{margin-left:auto}
+#page-client-detail .ctitle-name{font-size:40px}
+@media(min-width:900px){.ctitle-name{font-size:48px}#page-client-detail .ctitle-name{font-size:48px}}
+/* swipe back */
+.swb-shadow{box-shadow:-18px 0 36px rgba(0,0,0,.55)}
+#swb-edge{position:fixed;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,transparent,rgba(201,170,107,.6),transparent);opacity:0;pointer-events:none;z-index:99998;transition:opacity .15s}
+
 </style>
 </head>
 <body>
@@ -788,7 +813,7 @@ body.pfl-open,body.pfa-open{overflow:hidden}
     </div>
 <div class="page" id="page-clients"><div class="page-header"><div><div class="page-title">Clients</div><div class="page-subtitle">Collection owners you work with</div></div><div class=head-actions><button class="btn btn-sm btn-primary" onclick="openNewClient()">New client</button></div></div><div id="clients-list"></div></div>
 <div class="page" id="page-client-detail">
-      <div class="backbar"><button class="backbtn" onclick="showPage('clients')">&larr; Clients</button></div>
+      <div class="backbar"><button class="backbtn" onclick="showPage('clients')"><span class="ba" aria-hidden="true">&larr;</span> Clients</button></div>
       <div class="page-header"><div><div class="page-title" id="cd-name">Client</div><div class="page-subtitle" id="cd-meta"></div><div id="cd-managed"></div></div>
         <div class="head-actions"><button class="btn btn-sm btn-primary perm-addveh" onclick="openAddVehicleModal()">Add vehicle</button><button class="btn btn-sm" onclick="openClientArchives()">Archives</button></div></div>
       <div class="stats-grid" id="cd-stats"></div>
@@ -951,7 +976,7 @@ body.pfl-open,body.pfa-open{overflow:hidden}
 <!-- VEHICLE DETAIL -->
 <div class="modal-overlay" id="modal-vehicle-detail">
   <div class="modal modal-lg">
-    <div class="backbar"><button class="backbtn" onclick="closeModal('modal-vehicle-detail')">&larr; Back</button><span id="vd-tag"></span></div>
+    <div class="backbar"><button class="backbtn" onclick="closeModal('modal-vehicle-detail')"><span class="ba" aria-hidden="true">&larr;</span> Back</button><span id="vd-tag"></span></div>
     <div id="vd-img-area"></div>
     <div class="vhead"><h1 id="vd-title">Vehicle</h1><div id="vd-nickname"></div><p id="vd-sub"></p><div class="quiet-note" id="vd-autonote" style="display:none">Year, make, model and color can be filled in from a photo when adding a vehicle. You can edit them any time.</div></div>
     <div id="vd-pf"></div>
@@ -3293,7 +3318,7 @@ function renderClientDetail(){
   var vehicles=owned.filter(function(v){return !isArchivedVehicle(v);});
   var archN=owned.length-vehicles.length;
   var t=portfolioTotals(vehicles);
-  elText('cd-name',c.name);
+  ctitleSet('cd-name',c.name);
   elText('cd-meta',[c.location,c.email,c.phone].filter(function(x){return x;}).join(' / '));
   elHTML('cd-managed',managedBannerHTML(c));
   elHTML('cd-stats',
@@ -4096,7 +4121,7 @@ function renderClientPortal(){
   var client=ownerClient();
   if(!client){showPage('client-link');return;}
   var vehicles=visibleVehicles();
-  elText('cp-title',client.name);
+  ctitleSet('cp-title',client.name);
   var open=getRecs().filter(function(r){return r.clientId===client.id&&r.status==='open'&&recordIsActive(r);}).length;
   elHTML('cp-banner',open?'<div class="banner" onclick="showPage(\'recommendations\')">'+open+' '+(open!==1?'advisories await':'advisory awaits')+' your response. Review</div>':'');
   var hr=new Date().getHours(),greet=hr<12?'Good morning':(hr<18?'Good afternoon':'Good evening');
@@ -6072,6 +6097,77 @@ function wheelInit(root,vehicles){
   root._api=api;
   return api;
 }
+// ============ dz: client title + edge swipe-back ============
+function ctitleName(n){
+  n=String(n||'').trim();if(!n)return 'My Collection';
+  var small={'&':1,'and':1,'of':1,'the':1,'de':1};
+  return n.split(/\s+/).map(function(w,i){var l=w.toLowerCase();if(i&&small[l])return l;return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');
+}
+function ctitleHTML(n){
+  var t=ctitleName(n),coll=/\b(collection|collective|garage|stable)\b/i.test(t);
+  if(!coll)t='The '+t.replace(/^the\s+/i,'')+' Collection';
+  return '<div class="ctitle-eyebrow">'+(coll?'The Private Collection':'Private Collection')+'</div><h2 class="ctitle-name">'+esc(t)+'</h2><div class="ctitle-rule" aria-hidden="true"><b></b><i></i></div>';
+}
+function ctitleSet(id,n){
+  var el=document.getElementById(id);if(!el)return;
+  var box=el.closest?el.closest('.ctitle'):null;
+  if(!box){box=document.createElement('div');box.className='ctitle';el.parentNode.insertBefore(box,el);box.appendChild(el);if(box.parentNode.classList)box.parentNode.classList.add('has-ct');}
+  el.className='ctitle-inner';el.innerHTML=ctitleHTML(n);
+  el.setAttribute('data-name',String(n||''));
+}
+// ---- swipe from the left edge = Back ----
+var SWB={edge:24,on:null};
+function swbTarget(){
+  try{if(window.PF&&PF.lb){if(PF.lb.s>1.02)return null;return {el:PF.lb.el,act:function(){pfCloseLightbox();}};}}catch(e){}
+  try{if(typeof SHEET_EL!=='undefined'&&SHEET_EL){var s=SHEET_EL.querySelector('.sheet')||SHEET_EL;return {el:s,act:function(){sheetClose();}};}}catch(e){}
+  var ms=[].slice.call(document.querySelectorAll('.modal-overlay')).filter(function(m){return m._open||m.classList.contains('active');});
+  if(ms.length){ms.sort(function(a,b){return (+getComputedStyle(a).zIndex||0)-(+getComputedStyle(b).zIndex||0);});var m=ms[ms.length-1];
+    var bb=m.querySelector('.backbtn')||m.querySelector('.modal-close');var box=m.querySelector('.modal')||m;
+    return {el:box,act:function(){if(bb)bb.click();else closeModal(m.id);}};}
+  var pg=document.querySelector('.page.active');if(pg){var b=pg.querySelector('.backbar .backbtn');if(b&&b.offsetParent)return {el:pg,act:function(){b.click();}};}
+  return null;
+}
+function swbInit(){
+  if(SWB.init)return;SWB.init=1;
+  var bar=document.createElement('div');bar.id='swb-edge';document.body.appendChild(bar);
+  function sal(){var v=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sal'))||0;return v;}
+  window.addEventListener('pointerdown',function(e){
+    if(e.pointerType==='mouse')return;
+    if(e.clientX>SWB.edge+sal())return;
+    var t=swbTarget();if(!t)return;
+    SWB.claim={t:t,x:e.clientX,y:e.clientY};e.stopPropagation();
+  },true);
+  window.addEventListener('touchstart',function(e){
+    if(e.touches.length>1){if(SWB.on)swbEnd(false);SWB.claim=null;return;}
+    var p=e.touches[0];if(p.clientX>SWB.edge+sal()){SWB.claim=null;return;}
+    var t=(SWB.claim&&SWB.claim.t)||swbTarget();SWB.claim=null;if(!t)return;
+    SWB.on={t:t,x0:p.clientX,y0:p.clientY,dx:0,mode:0,t0:Date.now()};e.stopPropagation();
+  },{capture:true,passive:true});
+  window.addEventListener('touchmove',function(e){
+    var S=SWB.on;if(!S)return;
+    if(e.touches.length>1){swbEnd(false);return;}
+    var p=e.touches[0],dx=p.clientX-S.x0,dy=p.clientY-S.y0;
+    if(!S.mode){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;
+      if(dx>0&&dx>Math.abs(dy)*1.4){S.mode=1;S.el=S.t.el;S.el.style.transition='none';S.el.style.willChange='transform';S.el.classList.add('swb-shadow');document.getElementById('swb-edge').style.opacity='1';}
+      else{SWB.on=null;return;}}
+    e.preventDefault();e.stopPropagation();
+    S.dx=Math.max(0,dx);S.el.style.transform='translate3d('+S.dx+'px,0,0)';
+  },{capture:true,passive:false});
+  function endH(e){var S=SWB.on;if(!S)return;if(S.mode){e.stopPropagation();var v=S.dx/Math.max(1,Date.now()-S.t0);swbEnd(S.dx>Math.min(110,innerWidth*.3)||(v>.5&&S.dx>40));}else SWB.on=null;}
+  window.addEventListener('touchend',endH,true);
+  window.addEventListener('touchcancel',function(){if(SWB.on)swbEnd(false);},true);
+}
+function swbEnd(go){
+  var S=SWB.on;SWB.on=null;if(!S||!S.el){return;}
+  var el=S.el;document.getElementById('swb-edge').style.opacity='0';
+  el.style.transition='transform .2s ease';
+  el.style.transform=go?'translate3d('+innerWidth+'px,0,0)':'translate3d(0,0,0)';
+  setTimeout(function(){
+    if(go){try{S.t.act();}catch(e){}SWB.last=Date.now();}
+    el.style.transition='';el.style.transform='';el.style.willChange='';el.classList.remove('swb-shadow');
+  },go?190:210);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',swbInit);else swbInit();
 
 </script>
 </body>
