@@ -416,6 +416,47 @@ html,body{background:#07080A;}
 #v-autonote[data-kind="low"]{color:var(--gold)}
 .ai-spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line2);border-top-color:var(--gold);border-radius:50%;margin-right:8px;vertical-align:-2px;animation:bspin .9s linear infinite}
 .ai-tag{margin-top:4px;font-size:11px;letter-spacing:.02em;color:var(--gold)}
+.est-chip{display:inline-block;margin-left:6px;padding:1px 7px;border:1px solid var(--line2);border-radius:999px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);vertical-align:1px}
+.est-line{font-size:13px;color:var(--text-secondary);margin-bottom:3px}
+.est-line.neg{color:var(--red)}
+.val-note{font-size:13px;color:var(--text-secondary)}
+.val-note[data-kind="fail"],.val-note[data-kind="limit"]{color:var(--gold)}
+#val-panel a{color:var(--gold);text-decoration:underline;text-underline-offset:2px}
+
+/* ---- remove client (swipe), confirmation sheet, undo bar, My team ---- */
+.swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.swipe-wrap .client-row{border-bottom:0}
+.swipe-fg{position:relative;background:var(--bg);transition:transform .2s ease;touch-action:pan-y;will-change:transform}
+.swipe-fg.drag{transition:none}
+.swipe-act{position:absolute;top:0;right:0;bottom:0;width:96px;background:#7a2d22;color:#fff;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:500 11px/1 inherit;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.swipe-act svg{width:22px;height:22px}
+.swipe-trash{display:inline-flex;margin-left:12px;background:transparent;border:1px solid rgba(224,138,116,.4);color:var(--red);width:34px;height:34px;border-radius:2px;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.swipe-trash svg{width:17px;height:17px}
+@media (hover:none) and (pointer:coarse){.swipe-trash{display:none}}
+.sheet-ov{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:900;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s}
+.sheet-ov.on{opacity:1}
+.sheet{background:#0C0E11;border-top:1px solid var(--line2);width:100%;max-width:560px;max-height:88vh;overflow:auto;padding:22px 20px calc(22px + env(safe-area-inset-bottom));transform:translateY(24px);transition:transform .22s ease;box-sizing:border-box}
+.sheet-ov.on .sheet{transform:none}
+@media (min-width:700px){.sheet-ov{align-items:center}.sheet{border:1px solid var(--line2)}}
+.sheet h3{margin:0 0 6px;font-size:21px;font-weight:300}
+.sheet .sheet-sub{color:var(--muted,#9a9a9a);font-size:14px;margin-bottom:12px}
+.sheet ul{margin:10px 0 12px;padding-left:0;list-style:none}
+.sheet li{padding:9px 0 9px 22px;border-bottom:1px solid var(--line);font-size:15px;line-height:1.4;position:relative}
+.sheet li:before{content:"-";position:absolute;left:4px;color:var(--gold)}
+.sheet li.warn:before{content:"!";color:var(--red)}
+.sheet .sheet-btns{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.sheet .sheet-btns .btn{flex:1;min-width:130px;text-align:center}
+.btn-solid-danger{background:#8a3224;border-color:#8a3224;color:#fff}
+.btn-solid-danger[disabled]{opacity:.4}
+.sheet input[type=text]{width:100%;box-sizing:border-box;margin-top:8px}
+#undo-bar{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));max-width:520px;margin:0 auto;background:#16191d;border:1px solid var(--line2);padding:12px 14px;display:flex;align-items:center;gap:12px;z-index:950;font-size:14px}
+#undo-bar span{flex:1}
+.removed-sec{margin-top:26px}
+.ended-note{border:1px solid rgba(201,170,107,.4);padding:12px 14px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start;font-size:14px}
+.ended-note div{flex:1}
+.team-card{border:1px solid var(--line);padding:14px 16px;margin-bottom:14px}
+.team-card .team-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.team-pill{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line2);padding:2px 7px;margin-top:6px;color:var(--muted,#9a9a9a)}
 
 </style>
 </head>
@@ -500,7 +541,7 @@ html,body{background:#07080A;}
     <div class="nav-item" data-page="recommendations" onclick="showPage('recommendations')"><span>Advisories</span><span class="nav-badge" id="recs-badge" style="display:none">0</span></div>
     <div class="nav-item" data-page="archives" onclick="openArchivesPage()"><span>Archives</span></div>
     <div class="nav-item advisor-only" data-page="audit" onclick="showPage('audit')"><span>Activity</span></div>
-    <div class="nav-item client-only" data-page="access" onclick="showPage('access')" style="display:none"><span>Techs</span></div>
+    <div class="nav-item client-only" data-page="access" onclick="showPage('access')" style="display:none"><span>My team</span></div>
     <div class="nav-item admin-only" data-page="team" onclick="showPage('team')" style="display:none"><span>Team</span></div>
     <div class="nav-item" data-page="account" onclick="openAccountModal()"><span>Account</span></div>
     <div class="sidebar-footer">
@@ -602,7 +643,7 @@ html,body{background:#07080A;}
 <div class="page" id="page-reminders"><div class="page-header"><div><div class="page-title">Reminders</div><div class="page-subtitle">Registration, insurance, inspection, service and your own dates in one list</div></div><div class=head-actions><button class="btn btn-sm" onclick="downloadAllICS()">Add all to calendar</button><button class="btn btn-sm btn-primary perm-rem" onclick="openReminderModal()">Add reminder</button></div></div><div id="rem-body"></div></div>
 <div class="page" id="page-audit"><div class="page-header"><div><div class="page-title">Activity</div><div class="page-subtitle">Every change by advisors and owners, newest first</div></div></div><div class="input-group" style="max-width:340px;"><label>Client</label><select id="audit-client-select" onchange="renderAudit()"><option value="">All clients</option></select></div><div id="audit-list"></div></div>
 <div class="page" id="page-team"><div class="page-header"><div><div class="page-title">Team</div><div class="page-subtitle">Everyone signed up as a tech or admin</div></div></div><div id="team-list"></div></div>
-<div class="page" id="page-access"><div class="page-header"><div><div class="page-title">Techs</div><div class="page-subtitle">Choose who can help with your collection, and exactly what they can see and do</div></div></div><div id="access-body"></div></div>
+<div class="page" id="page-access"><div class="page-header"><div><div class="page-title">My team</div><div class="page-subtitle">Invite a tech or advisor, choose exactly what they can see and do, and remove access any time</div></div></div><div id="access-body"></div></div>
 <div class="page" id="page-client-link"><div class="page-header"><div><div class="page-title">Link your collection</div><div class="page-subtitle">Enter the one-time invite code from your advisor</div></div></div><div style="max-width:420px;"><div class="input-group"><label>Invite code</label><input type="text" id="link-code" placeholder="Paste your code" autocapitalize="characters" autocomplete="off"></div><button class="btn btn-primary" onclick="redeemCodeFrom('link-code','link-code-msg')">Enter invite code</button><div class="doc-meta code-msg" id="link-code-msg" role="status"></div></div></div>
   </main>
 </div>
@@ -688,6 +729,7 @@ html,body{background:#07080A;}
       <div class="input-group"><label>Year</label><input type="number" id="v-year" placeholder="2022" inputmode="numeric"></div>
       <div class="input-group"><label>Make</label><input type="text" id="v-make" maxlength="40" placeholder="Porsche"></div>
       <div class="input-group"><label>Model</label><input type="text" id="v-model" maxlength="60" placeholder="911 GT3"></div>
+      <div class="input-group form-full"><label>Nickname (optional)</label><input type="text" id="v-nickname" maxlength="40" placeholder="The Ghost"></div>
       <div class="input-group"><label>Color</label><input type="text" id="v-color" maxlength="40" placeholder="GT Silver"></div>
     </div>
     <details id="v-dates" class="fin-only" style="margin-top:14px;">
@@ -712,11 +754,10 @@ html,body{background:#07080A;}
           <div id="v-vin-row" style="display:none;margin-top:8px;"><button class="btn btn-ghost btn-sm" id="v-vin-btn" onclick="fillFromVin()">Fill from VIN</button></div>
           <div id="v-vin-msg" style="display:none;margin-top:8px;font-size:0.82rem;line-height:1.5;"></div></div>
         <div class="input-group"><label>Trim</label><input type="text" id="v-trim" maxlength="40" placeholder="Touring"></div>
-        <div class="input-group"><label>Nickname</label><input type="text" id="v-nickname" maxlength="40" placeholder="The Ghost"></div>
         <div class="input-group"><label>Mileage</label><input type="number" id="v-mileage" placeholder="1850" min="0" inputmode="numeric"></div>
         <div class="input-group fin-only"><label>Purchase price ($)</label><input type="number" id="v-purchase-price" placeholder="229000" min="0" inputmode="numeric"></div>
         <div class="input-group fin-only"><label>Purchase date</label><input type="date" id="v-purchase-date"></div>
-<div class="input-group form-full"><div class="doc-meta">Current value and health score are calculated by AI once connected. They are read-only and cannot be typed in.</div></div>
+<div class="input-group form-full"><div class="doc-meta">Value is an AI estimate from market prices and the health score is calculated from your records. Both are read-only and can never be typed in.</div></div>
 
         <div class="input-group"><label>Insured agreed value ($)</label><input type="number" id="v-insured-value" placeholder="290000" min="0" inputmode="numeric"></div>
         <div class="input-group form-full"><label>Notes</label><textarea id="v-notes" rows="2" maxlength="1000" placeholder="Provenance, storage, service context..."></textarea></div>
@@ -1501,6 +1542,12 @@ async function loadAll(){
   var rows={veh:res[0],fin:res[1],rem:res[2],svc:res[3],exp:res[4],doc:res[5],pho:res[6],adv:res[7],est:res[8],acc:res[9],perm:res[10],inv:res[11],xfer:res[12],arc:res[13],vis:res[14]};
   var nc=emptyCache();
   nc.profile=mine;nc.profiles=profMap;
+  var archOwners={},keepV={};
+  for(i=0;i<prof.length;i++)if(prof[i].archived_at)archOwners[prof[i].id]=1;
+  rows.veh=rows.veh.filter(function(r){if(archOwners[r.owner_id])return false;keepV[r.id]=1;return true;});
+  ['fin','rem','svc','exp','doc','pho','adv','est'].forEach(function(k){rows[k]=(rows[k]||[]).filter(function(r){return !r.vehicle_id||keepV[r.vehicle_id];});});
+  nc.removed=prof.filter(function(p){return p.managed&&p.archived_at&&!p.claimed_by&&(mine.role==='admin'||p.managed_by===me0);});
+  nc.ended=C.ended||null;
   // signed urls
   var photoPaths=[],docPaths=[];
   for(i=0;i<rows.pho.length;i++)photoPaths.push(rows.pho[i].storage_path);
@@ -1564,14 +1611,11 @@ async function loadAll(){
     for(j=0;j<est.length;j++){
       var e=est[j];
       if(e.kind==='value'&&e.value_low!==null&&e.value_high!==null){
-        var mid=Math.round((Number(e.value_low)+Number(e.value_high))/2);
+        var mid=(e.value_mid!==null&&e.value_mid!==undefined&&Number(e.value_mid)>0)?Math.round(Number(e.value_mid)):Math.round((Number(e.value_low)+Number(e.value_high))/2);var prevAi=v.aiValue;
         v.valueLog.push({date:String(e.as_of).slice(0,10),value:mid,source:'AI',ai:true});
-        v.aiValue={value:mid,low:Math.round(Number(e.value_low)),high:Math.round(Number(e.value_high)),asOf:String(e.as_of).slice(0,10),sources:strList(e.sources,8),confidence:e.confidence===null?'':Number(e.confidence)};
-      }else if(e.kind==='health'&&e.health_score!==null){
-        v.aiHealth={score:e.health_score,reasons:strList(e.reasons,8),asOf:String(e.as_of).slice(0,10)};
+        v.aiValue={value:mid,low:Math.round(Number(e.value_low)),high:Math.round(Number(e.value_high)),asOf:String(e.as_of).slice(0,10),sources:srcObjList(e.sources,8),notes:cleanText(e.notes,400),confidence:e.confidence===null?'':Number(e.confidence),prev:prevAi?prevAi.value:null,prevAsOf:prevAi?prevAi.asOf:''};
       }
     }
-    if(v.aiHealth)v.status=v.aiHealth.score>=85?'green':(v.aiHealth.score>=60?'yellow':'red');
     vehicles.push(v);
   }
   nc.vehicles=vehicles;
@@ -1605,6 +1649,7 @@ async function loadAll(){
   function addClientRow(p,canAdd){
     if(!p||seenC[p.id]){if(p&&canAdd){var ex0=byId(cl,p.id);if(ex0)ex0.canAdd=true;}return;}
     seenC[p.id]=1;
+    if(p.archived_at)return;   // removed client
     if(p.managed&&p.claimed_by)return;   // claimed placeholder: its data now belongs to the real account
     cl.push({id:p.id,name:displayName(p),email:p.email||'',phone:p.phone||'',location:'',since:String(p.created_at||'').slice(0,7),createdAt:p.created_at,linked:true,canAdd:!!canAdd,
       managed:!!p.managed,claimed:!!p.claimed_by,managedBy:p.managed_by||'',notes:p.notes||''});
@@ -2337,7 +2382,7 @@ async function redeemCodeFrom(inputId,msgId){
 }
 function createInviteFromAccess(){
   var scope=val('inv-scope'),email=normEmail(val('inv-email'));
-  if(email&&!validEmail(email)){showToast('That email looks invalid','error');return;}
+  if(!email||!validEmail(email)){showToast('Enter your tech\'s email address','error');return;}
   var oid=ownerClientId()||myId();
   var kind=scope?'tech_vehicle':'tech_owner';
   createInviteRpc(kind,scope||null,email||null,null).then(function(row){
@@ -2427,7 +2472,7 @@ function managedBannerHTML(c){
   if(!c.inviteId)h+='<button class="btn btn-sm" onclick="inviteManagedClient(\''+jsId(c.id)+'\')">Invite to app</button>';
   h+='</div>';
   if(c.inviteId)h+='<div class="doc-meta" style="margin-top:8px;">Invite pending'+(c.inviteExpires?' / expires '+esc(fmtDate(String(c.inviteExpires).slice(0,10))):'')+'</div>'+inviteRowExtras(c.inviteId,c.email);
-  return h+'</div>';
+  return h+deleteClientBtnHTML(c)+'</div>';
 }
 function openClientDetail(clientId){
   if(String(clientId).indexOf('inv_')===0)return;
@@ -2446,7 +2491,7 @@ async function leaveOrRevokeAccess(accessId){
 function renderClients(){
   var clients=getClients(),vehicles=getVehicles();
   var el=document.getElementById('clients-list');if(!el)return;
-  if(!clients.length&&!C.pending.length){el.innerHTML=emptyCard('No clients yet. Add your first client, then add their vehicles. They can join the app later.<div><button class="btn btn-primary" onclick="openModal(\'modal-add-client\')">New client</button></div>');return;}
+  if(!clients.length&&!C.pending.length&&!(C.removed||[]).length){if(isRealTech())loadEnded();el.innerHTML='<div id="ended-notices"></div>'+emptyCard('No clients yet. Add your first client, then add their vehicles. They can join the app later.<div><button class="btn btn-primary" onclick="openModal(\'modal-add-client\')">New client</button></div>');return;}
   var h=clients.map(function(c){
     var owned=vehicles.filter(function(v){return v.clientId===c.id;});
     var cvs=owned.filter(function(v){return !isArchivedVehicle(v);});
@@ -2457,7 +2502,7 @@ function renderClients(){
   h+=C.pending.map(function(p){
     return '<div class="client-row" style="cursor:default;"><div class="client-info"><div class="client-name">'+esc(p.name)+'</div><div class="client-meta">Invite pending / expires '+esc(fmtDate(String(p.expiresAt).slice(0,10)))+(p.email?' / '+esc(p.email):'')+'</div>'+inviteRowExtras(p.inviteId,p.email)+'</div><div class="client-val"><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(p.inviteId)+'\')">Revoke code</button></div></div>';
   }).join('');
-  el.innerHTML=h;
+  el.innerHTML='<div id="ended-notices"></div>'+h+removedClientsHTML();decorateClientRows(el);renderEndedNotices();if(isRealTech())loadEnded();
   revealMissingCodes(C.pending.map(function(p){return p.inviteId;}).concat(C.clients.filter(function(c){return c.inviteId;}).map(function(c){return c.inviteId;})));
 }
 function renderClientAccess(clientId){
@@ -2481,7 +2526,7 @@ var PERM_LABELS=[
     ['view_documents','Documents and invoices'],
     ['view_photos','Photos (also lets them add photos)'],
     ['view_reminders','Reminders'],
-    ['view_health_estimate','AI health score'],
+    ['view_health_estimate','Health score'],
     ['view_value_estimate','AI value estimate'],
     ['view_expenses','Expenses'],
     ['view_purchase_info','Purchase price and date']]],
@@ -2498,48 +2543,6 @@ function permRowFor(accessId,vehicleId){
   return {def:def,ov:ov,eff:ov||def};
 }
 function pmScopeChange(accessId,sel){PM_SCOPE[accessId]=sel.value||'';renderAccess();var d=document.getElementById('pm-'+jsId(accessId));if(d)d.open=true;}
-function renderAccess(){
-  var oid=ownerClientId()||myId();
-  var rows=C.access.filter(function(a){return a.owner_id===oid&&a.status==='active';});
-  var myVeh=C.vehicles.filter(function(v){return v.clientId===oid&&!v.archived;});
-  var h='';
-  h+='<div class="sh first"><h2>Your techs</h2></div>';
-  if(!rows.length)h+=emptyCard('No tech has access yet. Create an invite code below and share it privately with your tech.');
-  rows.forEach(function(a){
-    var tp=C.profiles[a.tech_id],veh=a.vehicle_id?byId(C.vehicles,a.vehicle_id):null,aid=jsId(a.id);
-    var scope=PM_SCOPE[a.id]||'';
-    if(scope&&a.vehicle_id&&scope!==a.vehicle_id)scope='';
-    var pr=permRowFor(a.id,scope),eff=pr.eff||{};
-    var covered=a.vehicle_id?(veh?[veh]:[]):myVeh;
-    h+='<div class="access-card"><div class="access-row" style="border-bottom:0;"><div><div style="font-size:17px;font-weight:300;">'+esc(displayName(tp))+'</div><div class="doc-meta">'+esc((tp&&tp.email)||'')+' / '+esc(a.vehicle_id?('Only '+(veh?vFull(veh):'one vehicle')):'All your vehicles')+'</div></div><button class="btn btn-danger btn-sm" onclick="leaveOrRevokeAccess(\''+aid+'\')">Remove access</button></div>';
-    h+='<details class="more" id="pm-'+aid+'"><summary>Permissions</summary><div style="padding-top:10px;">';
-    if(covered.length>1||(covered.length===1&&!a.vehicle_id)){
-      h+='<div class="input-group"><label>Settings apply to</label><select onchange="pmScopeChange(\''+aid+'\',this)"><option value="">All vehicles (default)</option>'+covered.map(function(v){return '<option value="'+esc(v.id)+'"'+(scope===v.id?' selected':'')+'>'+esc(vName(v))+' only'+(permRowFor(a.id,v.id).ov?' (custom)':'')+'</option>';}).join('')+'</select></div>';
-    }
-    if(scope&&pr.ov)h+='<div class="doc-meta" style="margin-bottom:8px;">This vehicle has its own settings. <span class="link" onclick="resetPermOverride(\''+aid+'\',\''+jsId(scope)+'\')">Reset to default</span></div>';
-    PERM_LABELS.forEach(function(g){
-      h+='<div class="lab" style="margin:14px 0 6px;">'+esc(g[1])+'</div>';
-      g[2].forEach(function(p){
-        h+='<label class="tgl"><input type="checkbox" id="pm-'+aid+'-'+p[0]+'"'+(eff[p[0]]?' checked':'')+' onchange="togglePerm(\''+aid+'\',\''+p[0]+'\',this.checked,\''+jsId(scope)+'\')"><span class="tgl-ui"></span><span class="tgl-t">'+esc(p[1])+'</span></label>';
-      });
-    });
-    h+='<div class="doc-meta" style="margin-top:12px;">Insurance and title documents that you upload are always private to you. Changes apply immediately.</div>';
-    h+='</div></details></div>';
-  });
-  var open=C.invites.filter(function(i){return (i.kind==='tech_owner'||i.kind==='tech_vehicle')&&inviteActive(i)&&i.created_by===myId();});
-  h+='<div class="sh"><h2>Invite a tech</h2></div><div style="max-width:420px;">';
-  h+='<div class="input-group"><label>Access to</label><select id="inv-scope"><option value="">All my vehicles</option>'+myVeh.map(function(v){return '<option value="'+esc(v.id)+'">'+esc(vFull(v))+' only</option>';}).join('')+'</select></div>';
-  h+='<div class="input-group"><label>Lock to an email (optional)</label><input type="email" id="inv-email" maxlength="120" placeholder="tech@email.com" autocapitalize="none"></div>';
-  h+='<button class="btn btn-gold btn-sm" onclick="createInviteFromAccess()">Create invite code</button></div>';
-  if(open.length){
-    h+='<div class="sh"><h2>Open invite codes</h2></div>'+open.map(function(i){
-      var v=i.vehicle_id?byId(C.vehicles,i.vehicle_id):null;
-      return '<div class="access-row"><div><div class="doc-meta">'+esc(v?vFull(v):'All vehicles')+' / expires '+esc(fmtDate(String(i.expires_at).slice(0,10)))+(i.email?' / '+esc(i.email):'')+'</div>'+inviteRowExtras(i.id,i.email)+'</div><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(i.id)+'\')">Revoke code</button></div>';
-    }).join('');
-  }
-  elHTML('access-body',h);
-  revealMissingCodes(open.map(function(i){return i.id;}));
-}
 async function togglePerm(accessId,perm,value,vehicleId){
   try{
     var args={p_access_id:accessId,p_permission:perm,p_value:!!value};
@@ -2582,7 +2585,6 @@ function renderTeam(){
 function addTech(){showToast('Techs create their own account and use an invite code.','error');}
 function removeTech(){showToast('Remove a tech from the owner\'s access list.','error');}
 
-function refreshAI(){showToast('AI estimates are calculated for you once the AI service is connected.','error');}
 
 function deleteMyAccount(){
   showToast('To delete your account, email your advisor. We keep this simple and safe for now.','error');
@@ -2945,12 +2947,7 @@ function refreshCurrent(){
 }
 
 // ============ VALUE / PORTFOLIO MATH ============
-var AI_PENDING='Calculated by AI once connected';
-function aiVal(v){var a=v&&v.aiValue;return (a&&Number(a.value)>0)?Number(a.value):null;}
-function aiHealth(v){var a=v&&v.aiHealth;if(a&&a.score!==undefined&&a.score!==null&&a.score!==''&&isFinite(Number(a.score)))return clamp(Math.round(Number(a.score)),0,100);return null;}
-function aiConfigured(){return !!(AI_VALUE_ENDPOINT||AI_HEALTH_ENDPOINT);}
-function pendingBig(){return '<span style="font-size:.34em;color:var(--text-muted);letter-spacing:0;">'+AI_PENDING+'</span>';}
-function totalMoney(t){return (t.nValued||!t.nPending)?money(t.value):'Pending';}
+var AI_PENDING='No estimate yet';
 function vehicleGain(v,exs){
   var pp=Number(v.purchasePrice)||0,cv=aiVal(v);
   var addBasis=0;
@@ -2961,23 +2958,12 @@ function vehicleGain(v,exs){
   return {basis:basis,value:cv,hasValue:true,gain:cv-basis,hasGain:true,pctGain:basis?((cv-basis)/basis)*100:0};
 }
 // Vehicles with no AI value are not counted as zero and never feed gain. basis/gain cover only vehicles that have both.
-function portfolioTotals(vehicles){
-  var value=0,basis=0,basisAll=0,gain=0,nValued=0,nPending=0,exs=getExpenses();
-  for(var i=0;i<vehicles.length;i++){
-    var g=vehicleGain(vehicles[i],exs);
-    basisAll+=g.basis;
-    if(g.hasValue){value+=g.value;nValued++;}else nPending++;
-    if(g.hasGain){basis+=g.basis;gain+=g.gain;}
-  }
-  return {value:value,basis:basis,basisAll:basisAll,gain:gain,pctGain:basis?(gain/basis)*100:0,nValued:nValued,nPending:nPending};
-}
 function ytdCosts(vehicles){
   var ids={},i;for(i=0;i<vehicles.length;i++)ids[vehicles[i].id]=1;
   var year=String(new Date().getFullYear()),total=0,exs=getExpenses();
   for(i=0;i<exs.length;i++){var e=exs[i];if(ids[e.vehicleId]&&e.date&&String(e.date).slice(0,4)===year)total+=Number(e.amount)||0;}
   return total;
 }
-function avgHealth(vs){var n=0,sum=0;for(var i=0;i<vs.length;i++){var h=aiHealth(vs[i]);if(h!==null){sum+=h;n++;}}return n?Math.round(sum/n):null;}
 // Dated value points for one vehicle. valueLog entries are the source of truth.
 // Legacy valueHistory (12 monthly numbers from older builds) is dated backward
 // month by month from the log entry it ends on, so old data still charts.
@@ -3065,13 +3051,6 @@ function areaChartDated(pts,w,h,color){
 }
 // ============ ALERT ENGINE ============
 // ============ DASHBOARD ============
-function deltaText(t){if(!t.nValued)return AI_PENDING;if(!(t.basis>0))return 'Add purchase prices to see gain or loss';return (t.gain>=0?'+':'')+money(t.gain)+' ('+pct(t.pctGain)+') unrealized';}
-function pendingNote(t){return t.nPending?(t.nValued?' <span style="color:var(--text-muted);margin-left:6px;">'+t.nPending+' pending</span>':''):'';}
-function deltaHTML(t){
-  if(!t.nValued)return '<span class="muted">'+(t.nPending?'Pending. '+AI_PENDING:'')+'</span>';
-  if(!(t.basis>0))return '<span class="muted">Add purchase prices to see gain or loss</span>'+pendingNote(t);
-  return (t.gain>=0?'<span>+'+money(t.gain)+' above cost basis</span>':'<span class="neg">'+money(t.gain)+' below cost basis</span>')+' <span style="color:var(--text-muted);margin-left:6px;">'+esc(pct(t.pctGain))+'</span>'+pendingNote(t);
-}
 function bigNum(n){return '<small>$</small>'+Math.round(Number(n)||0).toLocaleString('en-US');}
 var CAR_SVG='<svg viewBox="0 0 160 64" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 46h8M44 46h72M142 46h8"/><path d="M10 46v-9c0-3 2-5 5-6l26-6 20-12c3-2 6-3 10-3h20c5 0 9 2 12 5l14 13 26 5c4 1 6 3 6 6v7"/><path d="M56 20l-8 11h74l-16-12"/><circle cx="31" cy="46" r="11"/><circle cx="129" cy="46" r="11"/></svg>';
 function carFrame(v){
@@ -3100,13 +3079,13 @@ function overviewActivity(owner){
 function renderOverview(owner,vehicles){
   var p=owner?'cp':'dash',n=owner?'cp':'ph',t=portfolioTotals(vehicles),att=attentionItems(vehicles);
   var archN=visibleArchives().length;
-  elHTML(n+'-total-value',(t.nValued||!t.nPending)?bigNum(t.value):pendingBig());
+  elHTML(n+'-total-value',valueOverviewNum(t));valueEnsureProbe();
   elHTML(n+'-delta',deltaHTML(t));
   elHTML(n+'-chart',portfolioChartHTML(vehicles,t.gain));
   elText(n+'-vehicle-count',String(vehicles.length));
   var ac=document.getElementById(n+'-attn-count');
   if(ac){ac.textContent=String(att.length);ac.className=att.length?'hot':'';}
-  var ahv=avgHealth(vehicles);elText(n+'-avg-health',ahv===null?(vehicles.length?'Pending':'--'):String(ahv));
+  var ahv=avgHealth(vehicles);elText(n+'-avg-health',ahv===null?'--':String(ahv));
   elHTML(p+'-attention',attentionHTML(vehicles,5));
   elHTML(p+'-brief',collectionBrief(vehicles));
   elHTML(p+'-vehicles',vehicles.length?vehicles.map(function(v){return vehicleCardHTML(v);}).join(''):emptyCard(owner?'Your collection is empty. Add your first vehicle to get started.<div><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button></div>':'No vehicles yet.','grid-column:1/-1;'));
@@ -3153,7 +3132,7 @@ function vehicleCardHTML(v,extra){
   var hasV=aiVal(v)!==null;
   return '<div class="item'+(arch?' arch':'')+'" onclick="openVehicleDetail(\''+jsId(v.id)+'\')">'+carFrame(v)+
     '<div class="cap"><div style="min-width:0;"><div class="nm">'+esc(title)+'</div>'+nickHTML(v)+(sub?'<div class="tt">'+esc(sub)+'</div>':'')+'</div>'+
-    '<div><div class="vl"'+(hasV?'':' style="color:var(--text-muted);font-size:14px;"')+'>'+(hasV?money(aiVal(v)):'Pending')+'</div>'+cardStatusLine(v)+'</div></div>'+(extra?'<div class="meta2">'+extra+'</div>':'')+'</div>';
+    '<div><div class="vl"'+(hasV?'':' style="color:var(--text-muted);font-size:14px;"')+'>'+(hasV?money(aiVal(v)):'No estimate')+'</div>'+cardStatusLine(v)+'</div></div>'+(extra?'<div class="meta2">'+extra+'</div>':'')+'</div>';
 }
 // ============ ADD / EDIT VEHICLE ============
 var VEHICLE_FIELDS=['v-reg-expiry','v-ins-renewal','v-insp-expiry','v-last-service','v-next-service','v-next-service-miles','v-svc-months','v-svc-miles','v-year','v-make','v-model','v-trim','v-nickname','v-color','v-mileage','v-vin','v-purchase-price','v-purchase-date','v-insured-value','v-notes'];
@@ -3373,7 +3352,7 @@ function openVehicleDetail(vehicleId){
   elHTML('vd-tag',archived?'<span class="read-only-tag">Read-only archive</span>':'');
   elHTML('vd-img-area',carFrame(v));
   var hasPP=Number(v.purchasePrice)>0,hasV=g.hasValue;
-  elHTML('vd-value','<div class="lab">Current value</div><div class="num">'+(hasV?bigNum(g.value):pendingBig())+'</div>'+(hasV&&hasPP?'<div class="delta">'+(g.gain>=0?'+'+money(g.gain)+' above cost basis':'<span class="neg">'+money(g.gain)+' below cost basis</span>')+' <span style="color:var(--text-muted);margin-left:6px;">'+esc(pct(g.pctGain))+'</span></div>':'<div class="delta muted">'+(hasV?(owner?'Cost basis not on file':'Add a purchase price to see gain or loss'):'')+'</div>')+(hasV?'<div class="doc-meta" style="margin-top:6px;">'+esc(aiValueMeta(v))+'</div>':''));
+  elHTML('vd-value',valueHeadHTML(v,g)+(hasV&&hasPP?'<div class="delta">'+(g.gain>=0?'+'+money(g.gain)+' above cost basis':'<span class="neg">'+money(g.gain)+' below cost basis</span>')+' <span style="color:var(--text-muted);margin-left:6px;">'+esc(pct(g.pctGain))+'</span></div>':'<div class="delta muted">'+(hasV?(owner?'Cost basis not on file':'Add a purchase price to see gain or loss'):'')+'</div>')+'');
   var insGap=v.insuredValue&&hasV&&g.value>v.insuredValue*1.05;
   var hs=aiHealth(v);
   elHTML('vd-ai',aiPanelHTML(v));
@@ -3382,7 +3361,7 @@ function openVehicleDetail(vehicleId){
   elHTML('vd-stats',
     cell('Cost basis',hasPP?money(g.basis):'--')+
     cell('Miles',v.mileage?fmtNum(v.mileage):'--')+
-    cell('Health',hs===null?'Pending':hs+' / 100')+
+    cell('Health',hs===null?'--':hs+' / 100')+
     cell('Insured value',v.insuredValue?money(v.insuredValue)+(insGap?' <span style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;">gap</span>':''):'--',insGap?'color:var(--red);':''));
   var items=archived?[]:reminderItems([v]);
   var nextH='';
@@ -3397,7 +3376,7 @@ function openVehicleDetail(vehicleId){
     row('Acquired',esc(v.purchaseDate?fmtDate(v.purchaseDate):'--'))+
     row('Purchase price',hasPP?money(v.purchasePrice):'--')+
     row('Cost basis (includes value-adding work)',hasPP?money(g.basis):'--')+
-    row('Unrealized gain / loss',(hasPP&&hasV)?'<span class="'+(g.gain>=0?'pos':'neg')+'">'+money(g.gain)+' ('+esc(pct(g.pctGain))+')</span>':'Pending')+
+    row('Unrealized gain / loss',(hasPP&&hasV)?'<span class="'+(g.gain>=0?'pos':'neg')+'">'+money(g.gain)+' ('+esc(pct(g.pctGain))+')</span>':'--')+
     row('Insured agreed value',v.insuredValue?money(v.insuredValue)+(insGap?' (market value is higher)':''):'--',insGap?'color:var(--red);':'')+
     (v.vin?row('VIN','<span class="mono">'+esc(v.vin)+'</span>'):'')+
     (dateField(v,'lastServiceDate')?row('Last service',esc(fmtDate(v.lastServiceDate))):'')+
@@ -3502,8 +3481,8 @@ function renderValuations(){
   var vehicles=visibleVehicles(),exs=getExpenses(),adv=isAdvisor();
   var t=portfolioTotals(vehicles);
   elHTML('val-stats',
-    '<div class="stat-card"><div class="stat-value">'+totalMoney(t)+'</div><div class="stat-label">Collection value</div>'+(t.nPending?'<div class="stat-delta muted">'+t.nPending+' pending</div>':'')+'</div>'+
-    '<div class="stat-card"><div class="stat-value '+(t.gain>=0?'pos':'neg')+'">'+(t.basis>0?money(t.gain):'Pending')+'</div><div class="stat-label">Unrealized gain / loss</div>'+(t.basis>0?'<div class="stat-delta '+(t.gain>=0?'':'neg')+'">'+esc(pct(t.pctGain))+'</div>':'')+'</div>'+
+    '<div class="stat-card"><div class="stat-value">'+totalMoney(t)+'</div><div class="stat-label">Collection value</div>'+(t.nPending?'<div class="stat-delta muted">'+t.nPending+' without an estimate</div>':(t.nValued?'<div class="stat-delta muted">Estimate, range '+money(t.low)+' to '+money(t.high)+'</div>':''))+'</div>'+
+    '<div class="stat-card"><div class="stat-value '+(t.gain>=0?'pos':'neg')+'">'+(t.basis>0?money(t.gain):'--')+'</div><div class="stat-label">Unrealized gain / loss</div>'+(t.basis>0?'<div class="stat-delta '+(t.gain>=0?'':'neg')+'">'+esc(pct(t.pctGain))+'</div>':'')+'</div>'+
     '<div class="stat-card"><div class="stat-value">'+(t.basisAll>0?money(t.basisAll):'--')+'</div><div class="stat-label">Cost basis</div></div>');
   var rows='';
   for(var i=0;i<vehicles.length;i++){
@@ -3513,7 +3492,7 @@ function renderValuations(){
       '<td>'+esc(vFull(v))+nickHTML(v)+'</td>'+
       '<td>'+esc(v.purchaseDate?fmtDate(v.purchaseDate):'--')+'</td>'+
       '<td>'+(hasPP?money(g.basis):'--')+'</td>'+
-      '<td>'+(g.hasValue?money(g.value)+'<small>'+esc('Updated '+fmtDate(v.aiValue.asOf))+'</small>':'<span style="color:var(--text-muted);">Pending</span><small>'+AI_PENDING+'</small>')+'</td>'+
+      '<td>'+(g.hasValue?money(g.value)+'<small>'+esc('Estimate, as of '+fmtDate(v.aiValue.asOf))+'</small>':'<span style="color:var(--text-muted);">--</span><small>'+esc(noValueText(t))+'</small>')+'</td>'+
       '<td class="'+(g.hasGain?(g.gain>=0?'pos':'neg'):'')+'">'+(g.hasGain?money(g.gain)+'<small>'+esc(pct(g.pctGain))+'</small>':'--')+'</td>'+
       '<td>'+(pts.length>=2?sparkline(pts,90,24,g.gain>=0?GOLD_HEX:RED_HEX):'--')+'</td>'+
       '</tr>';
@@ -3525,29 +3504,6 @@ function fmtConfidence(c){
   if(c===null||c===undefined||c==='')return '';
   if(typeof c==='number'){var p=c<=1?c*100:c;return Math.round(clamp(p,0,100))+'% confidence';}
   return String(c).slice(0,20)+' confidence';
-}
-function aiValueMeta(v){
-  var a=v.aiValue;if(!a)return '';
-  var bits=['Updated '+fmtDate(a.asOf)];
-  if(Number(a.low)>0&&Number(a.high)>0)bits.push('range '+money(a.low)+' to '+money(a.high));
-  var c=fmtConfidence(a.confidence);if(c)bits.push(c);
-  return bits.join(' / ');
-}
-function aiPanelHTML(v){
-  var a=v.aiValue,h=v.aiHealth,out='';
-  out+='<div class="brief" style="margin-top:22px;"><div class="brief-head"><div class="brief-title">AI value estimate</div><span class="brief-chip">Estimate, not an appraisal</span></div>';
-  if(aiVal(v)!==null){
-    out+='<p>'+esc(aiValueMeta(v))+'.</p>';
-    if(a.sources&&a.sources.length)out+='<p style="color:var(--text-muted);">Sources: '+a.sources.map(function(x){return esc(x);}).join(', ')+'</p>';
-  }else out+='<p style="color:var(--text-muted);">'+AI_PENDING+'.</p>';
-  out+='</div>';
-  out+='<div class="brief" style="margin-top:14px;"><div class="brief-head"><div class="brief-title">AI health score</div><span class="brief-chip">Estimate</span></div>';
-  if(aiHealth(v)!==null){
-    out+='<p>Score '+aiHealth(v)+' of 100. Updated '+esc(fmtDate(h.asOf))+'.</p>';
-    if(h.reasons&&h.reasons.length)out+='<ul style="margin:6px 0 0 18px;padding:0;">'+h.reasons.map(function(r){return '<li>'+esc(r)+'</li>';}).join('')+'</ul>';
-  }else out+='<p style="color:var(--text-muted);">'+AI_PENDING+'.</p>';
-  out+='</div>';
-  return out;
 }
 function aiPayload(v){
   var docs=getDocs().filter(function(d){return d.vehicleId===v.id;}),types={},exp=[],i;
@@ -4438,7 +4394,7 @@ function vehicleBrief(v){
   var p1=[],p2=[],p3=[],facts=[],missing=[],i;
   var cv=aiVal(v)||0,pp=Number(v.purchasePrice)||0,ins=Number(v.insuredValue)||0;
   if(cv>0)p1.push(name+' is carried at '+money(cv)+'.');
-  else{p1.push('The current value of '+name+' is calculated by AI once connected.');missing.push('AI value (pending)');}
+  else{p1.push(aiVal(v)===null?(noValueText()+' for '+name+'.'):('The current value of '+name+' is an estimate.'));missing.push('value estimate');}
   if(pp>0&&cv>0)p1.push('Against a cost basis of '+money(g.basis)+' (purchase price plus work added to basis), that is an unrealized '+(g.gain>=0?'gain':'loss')+' of '+money(Math.abs(g.gain))+' ('+pct(g.pctGain)+').');
   else if(pp<=0){p1.push('No purchase price is recorded, so gain or loss cannot be worked out.');missing.push('purchase price');}
   if(pts.length>=2){
@@ -4474,7 +4430,7 @@ function vehicleBrief(v){
   if(Number(v.mileage)>0)facts.push('Mileage: '+fmtNum(v.mileage));else missing.push('mileage');
   var sl=(v.serviceLog||[]).filter(function(s){return Number(s.mileage)>0;});
   if(sl.length&&Number(v.mileage)>0){var lm=Number(sl[sl.length-1].mileage);if(Number(v.mileage)>=lm)facts.push('Miles since last logged service: '+fmtNum(Number(v.mileage)-lm));}
-  if(aiHealth(v)!==null)facts.push('Health score (AI): '+aiHealth(v)+' of 100');else facts.push('Health score: pending');
+  if(aiHealth(v)!==null)facts.push('Health score: '+aiHealth(v)+' of 100 (calculated from records)');else facts.push('Health score: not shared');
   facts.push('Documents on file: '+docs.length);
   if(ins>0)facts.push('Insured agreed value: '+money(ins));
   if(pp>0)facts.push('Purchase price: '+money(pp)+(v.purchaseDate?' on '+fmtDate(v.purchaseDate):''));
@@ -4494,8 +4450,8 @@ function collectionBrief(vs){
     if(pts.length>=2)withTrend.push({v:v,a:pts[0].value,b:pts[pts.length-1].value});
   }
   var p1=[],p2=[],p3=[],facts=[],missing=[];
-  if(nPend<vs.length)p1.push('The collection holds '+vs.length+' '+plural(vs.length,'vehicle','vehicles')+'; the '+(vs.length-nPend)+' with an AI value total '+money(value)+(nPend?', and '+nPend+' '+plural(nPend,'is','are')+' pending':'')+'.');
-  else p1.push('The collection holds '+vs.length+' '+plural(vs.length,'vehicle','vehicles')+'. Values are '+AI_PENDING.toLowerCase()+'.');
+  if(nPend<vs.length)p1.push('The collection holds '+vs.length+' '+plural(vs.length,'vehicle','vehicles')+'; the '+(vs.length-nPend)+' with an estimated value total '+money(value)+(nPend?', and '+nPend+' '+plural(nPend,'is','are')+' pending':'')+'.');
+  else p1.push('The collection holds '+vs.length+' '+plural(vs.length,'vehicle','vehicles')+'. '+noValueText()+'.');
   if(nB){var gn=valueB-basis;p1.push('For the '+nB+' '+plural(nB,'vehicle','vehicles')+' with a purchase price and an AI value, cost basis is '+money(basis)+', an unrealized '+(gn>=0?'gain':'loss')+' of '+money(Math.abs(gn))+' ('+pct(basis?gn/basis*100:0)+').');}
   if(noPP)missing.push('purchase price for '+noPP+' '+plural(noPP,'vehicle','vehicles'));
   if(withTrend.length){
@@ -4507,7 +4463,7 @@ function collectionBrief(vs){
     p1.push('Across '+withTrend.length+' '+plural(withTrend.length,'vehicle','vehicles')+' with dated value history, recorded values moved from '+money(sa)+' to '+money(sb)+' ('+pct(sa?(sb-sa)/sa*100:0)+').');
     if(best&&best.p>0)p1.push('Strongest: '+vName(best.v)+' ('+pct(best.p)+').');
     if(worst&&worst!==best&&worst.p<0)p1.push('Softest: '+vName(worst.v)+' ('+pct(worst.p)+').');
-  }else{p1.push('There is not enough dated value history yet to show a trend. Values are calculated by AI once connected.');}
+  }else{p1.push('There is not enough dated value history yet to show a trend.');}
   var items=reminderItems(vs),over=items.filter(function(it){return remBucket(it)==='over';}),soon=items.filter(function(it){return remBucket(it)==='soon';});
   function withVeh(it){var vv=byId(vs,it.vid);return (vv?vName(vv)+': ':'')+remPhrase(it);}
   if(over.length)p2.push(over.length+' '+plural(over.length,'item is','items are')+' overdue: '+over.slice(0,3).map(withVeh).join('; ')+'.');
@@ -4525,7 +4481,7 @@ function collectionBrief(vs){
   }
   if(noReg)missing.push('registration date for '+noReg+' '+plural(noReg,'vehicle','vehicles'));
   if(noIns)missing.push('insurance renewal date for '+noIns+' '+plural(noIns,'vehicle','vehicles'));
-  var ahb=avgHealth(vs);facts.push(ahb===null?'Average health score: pending':'Average health score (AI): '+ahb+' of 100');
+  var ahb=avgHealth(vs);facts.push(ahb===null?'Average health score: not available':'Average health score: '+ahb+' of 100 (calculated from records)');
   var miles=0;for(i=0;i<vs.length;i++)miles+=Number(vs[i].mileage)||0;
   if(miles>0)facts.push('Combined mileage: '+fmtNum(miles));
   if(gap)facts.push(gap+' '+plural(gap,'vehicle is','vehicles are')+' valued above its insured amount');
@@ -4813,6 +4769,537 @@ function autoIdSuccess(my,data){
     if(data.notes)msg+=' '+cleanText(data.notes,200);
     autoIdNote(n&&conf<0.5?'low':'done',msg);
   })();
+}
+// ============ HEALTH SCORE (calculated on the device, $0) + AI VALUE ESTIMATE (estimate-value Edge Function) ============
+// Rule: health and value are NEVER typed in by anyone. Health is computed here from the records the viewer can see.
+// Value comes only from ai_estimates rows (written by the Edge Function with the service role). Nothing here writes either.
+var HEALTH_KEY='evoai_health_v1';
+var HEALTH_SNAP=null;
+function healthSnaps(){
+  if(HEALTH_SNAP)return HEALTH_SNAP;
+  try{var s=JSON.parse(localStorage.getItem(HEALTH_KEY)||'{}');HEALTH_SNAP=(s&&typeof s==='object'&&!s.length)?s:{};}catch(e){HEALTH_SNAP={};}
+  return HEALTH_SNAP;
+}
+function monthsBetween(a,b){return (b.getTime()-a.getTime())/86400000/30.44;}
+function monYear(d){return d.toLocaleDateString('en-US',{month:'short',year:'numeric'});}
+function plur(n,one,many){return n+' '+(n===1?one:many);}
+// Pure scoring: 100 minus penalties. ctx={today:Date, docs:[], insp:[], items:[], seeRem:bool, seeDocs:bool}
+function healthCompute(v,ctx){
+  var pen=[],i,today=ctx.today;
+  function add(pts,text,group){pen.push({pts:pts,text:text,group:group});}
+  // ---- service history ----
+  var recs=[];
+  for(i=0;i<(v.serviceLog||[]).length;i++){var s=v.serviceLog[i];var d=parseDate(s.date);if(d)recs.push({d:d,miles:Number(s.mileage)||0});}
+  for(i=0;i<ctx.insp.length;i++){var d2=parseDate(ctx.insp[i].date);if(d2)recs.push({d:d2,miles:Number(ctx.insp[i].mileageEnd)||0});}
+  recs.sort(function(a,b){return a.d.getTime()-b.d.getTime();});
+  var nRec=recs.length,im=svcMonths(v),mi=svcMiles(v);
+  var created=v.createdAt?new Date(v.createdAt):null;
+  if(!nRec){
+    var fresh=created&&!isNaN(created.getTime())&&monthsBetween(created,today)<1;
+    add(fresh?10:25,fresh?'No service history has been added yet.':'There is no service history on file.','service');
+  }else{
+    var last=recs[nRec-1],mSince=monthsBetween(last.d,today),r=0,why='';
+    if(im>0&&mSince/im>r){r=mSince/im;why='The last service was '+plur(Math.max(0,Math.floor(mSince)),'month','months')+' ago (every '+im+' is planned).';}
+    var lastMiles=0;for(i=nRec-1;i>=0;i--)if(recs[i].miles>0){lastMiles=recs[i].miles;break;}
+    var cur=Number(v.mileage)||0;
+    if(mi>0&&lastMiles>0&&cur>lastMiles&&(cur-lastMiles)/mi>r){r=(cur-lastMiles)/mi;why=fmtNum(cur-lastMiles)+' miles since the last logged service (every '+fmtNum(mi)+' is planned).';}
+    if(r>1)add(r<=1.5?8:(r<=2?15:22),why,'service');
+    // gaps inside the history
+    var gapMax=Math.max(2*(im||6),12),gaps=0,worst=null;
+    for(i=1;i<nRec;i++){var g=monthsBetween(recs[i-1].d,recs[i].d);if(g>gapMax){gaps++;if(!worst||g>worst.g)worst={g:g,a:recs[i-1].d,b:recs[i].d};}}
+    if(gaps)add(Math.min(10,5*gaps),'There is a gap of '+plur(Math.round(worst.g),'month','months')+' in the service history ('+monYear(worst.a)+' to '+monYear(worst.b)+').','gap');
+    var age=v.year?(today.getFullYear()-Number(v.year)):0;
+    if(nRec===1&&age>=3)add(4,'Only one service record for a '+age+'-year-old car.','gap');
+  }
+  // ---- reminders ----
+  var nItems=0;
+  if(ctx.seeRem){
+    var over=0;nItems=ctx.items.length;
+    for(i=0;i<ctx.items.length;i++){
+      var it=ctx.items[i];
+      if(it.sortDays<0&&over<35){
+        var p=(it.kind==='insurance'||it.kind==='registration')?15:8;p=Math.min(p,35-over);over+=p;
+        add(p,remPhrase(it)+'.','overdue');
+      }
+    }
+    if(!dateField(v,'nextServiceDate')&&!(Number(v.nextServiceMiles)>0))add(6,'No next service is scheduled.','unscheduled');
+  }
+  // ---- documents ----
+  var nDocs=ctx.docs.length;
+  if(ctx.seeDocs){
+    var hasIns=!!dateField(v,'insRenewal'),hasReg=!!dateField(v,'regExpiry');
+    for(i=0;i<ctx.docs.length;i++){if(ctx.docs[i].type==='insurance')hasIns=true;if(ctx.docs[i].type==='registration')hasReg=true;}
+    if(!hasIns)add(8,'No insurance is on file.','docs');
+    if(!hasReg)add(5,'No registration is on file.','docs');
+  }
+  var total=0;for(i=0;i<pen.length;i++)total+=pen[i].pts;
+  var score=clamp(Math.round(100-total),0,100);
+  pen.sort(function(a,b){return b.pts-a.pts;});
+  var reasons=pen.slice(0,5).map(function(x){return x.text;});
+  if(!reasons.length)reasons.push('Service history, reminders and documents all look current.');
+  var basis='Based on '+plur(nRec,'service record','service records')+(ctx.seeRem?', '+plur(nItems,'reminder','reminders'):'')+(ctx.seeDocs?' and '+plur(nDocs,'document','documents'):'')+'.';
+  if(!ctx.seeRem||!ctx.seeDocs)basis+=' Some details are not shared with you, so the score only uses what you can see.';
+  return {score:score,label:score>=85?'Strong':(score>=60?'Fair':'Needs attention'),reasons:reasons,basis:basis,counts:{records:nRec,reminders:nItems,documents:nDocs}};
+}
+// Wrapper: gathers the viewer's data, computes, and stores {score, reasons} per account+vehicle; asOf = the day the result last CHANGED.
+function healthInfo(v){
+  if(!v||isArchivedVehicle(v)||!session)return null;
+  if(!can(v,'view_health_estimate'))return null;
+  var seeRem=can(v,'view_reminders'),seeDocs=can(v,'view_documents');
+  var docs=seeDocs?getDocs().filter(function(d){return d&&d.vehicleId===v.id;}):[];
+  var insp=getInspections().filter(function(x){return x&&x.vehicleId===v.id;});
+  var items=seeRem?reminderItems([v]):[];
+  var h=healthCompute(v,{today:new Date(),docs:docs,insp:insp,items:items,seeRem:seeRem,seeDocs:seeDocs});
+  var key=myId()+':'+v.id,sig=h.score+'|'+h.reasons.join('~')+'|'+h.basis,sn=healthSnaps(),cur=sn[key];
+  if(!cur||cur.sig!==sig){cur=sn[key]={sig:sig,score:h.score,asOf:todayISO()};try{localStorage.setItem(HEALTH_KEY,JSON.stringify(sn));}catch(e){}}
+  h.asOf=cur.asOf;
+  return h;
+}
+function aiHealth(v){var h=healthInfo(v);return h?h.score:null;}
+
+// ---------- value ----------
+var VALUE={state:'unknown',probed:false,busy:{},note:{}};   // state: unknown | on | off
+(function(){try{var o=getUI().valueOff;if(o&&Date.now()-Number(o)<12*3600000)VALUE.state='off';}catch(e){}})();
+function aiVal(v){
+  if(!v||!session||!can(v,'view_value_estimate'))return null;
+  var a=v.aiValue;return (a&&Number(a.value)>0)?Number(a.value):null;
+}
+function aiConfigured(){return VALUE.state==='on';}
+function valueSetOff(on){
+  VALUE.state=on?'off':'on';
+  try{var u=getUI();if(on)u.valueOff=Date.now();else delete u.valueOff;localStorage.setItem('evoai_ui',JSON.stringify(u));}catch(e){}
+}
+function noValueText(t){
+  if(t&&t.perm===false)return 'Value is not shared with you';
+  return VALUE.state==='off'?'Value estimates are not turned on yet':'No value estimates yet';
+}
+function valueSrcLinks(list){
+  var out=[],i;
+  for(i=0;i<(list||[]).length&&i<8;i++){
+    var s=list[i];if(!s)continue;
+    var title=esc(s.title||s.url||'source'),url=String(s.url||'');
+    out.push(/^https:\/\//i.test(url)?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+title+'</a>':title);
+  }
+  return out.join(', ');
+}
+function valueDeltaText(a){
+  if(!a||!(Number(a.prev)>0))return '';
+  var d=Math.round(a.value-a.prev);
+  if(d===0)return 'No change since '+fmtDate(a.prevAsOf);
+  return (d>0?'+':'-')+money(Math.abs(d)).replace('-','')+' since '+fmtDate(a.prevAsOf);
+}
+function portfolioTotals(vehicles){
+  var value=0,low=0,high=0,basis=0,basisAll=0,gain=0,nValued=0,nPending=0,dsum=0,nDelta=0,perm=false,exs=getExpenses();
+  for(var i=0;i<vehicles.length;i++){
+    var v=vehicles[i],g=vehicleGain(v,exs);
+    if(can(v,'view_value_estimate'))perm=true;
+    basisAll+=g.basis;
+    if(g.hasValue){value+=g.value;nValued++;var a=v.aiValue;low+=Number(a.low)>0?Number(a.low):g.value;high+=Number(a.high)>0?Number(a.high):g.value;if(Number(a.prev)>0){dsum+=a.value-a.prev;nDelta++;}}else nPending++;
+    if(g.hasGain){basis+=g.basis;gain+=g.gain;}
+  }
+  return {value:value,low:low,high:high,basis:basis,basisAll:basisAll,gain:gain,pctGain:basis?(gain/basis)*100:0,nValued:nValued,nPending:nPending,nTotal:vehicles.length,delta:dsum,nDelta:nDelta,perm:vehicles.length?perm:true};
+}
+function totalMoney(t){return t.nValued?money(t.value):(t.nPending?'--':money(0));}
+function pendingBig(){return '<span style="font-size:.34em;color:var(--text-muted);letter-spacing:0;">'+esc(noValueText())+'</span>';}
+function valueOverviewNum(t){
+  if(t.nValued)return bigNum(t.value);
+  if(!t.nPending)return bigNum(0);
+  return '<span style="font-size:.34em;color:var(--text-muted);letter-spacing:0;">'+esc(noValueText(t))+'</span>';
+}
+function pendingNote(t){return (t.nPending&&t.nValued)?' <span style="color:var(--text-muted);margin-left:6px;">'+t.nPending+' without an estimate</span>':'';}
+function deltaText(t){if(!t.nValued)return noValueText(t);if(!(t.basis>0))return 'Add purchase prices to see gain or loss';return (t.gain>=0?'+':'')+money(t.gain)+' ('+pct(t.pctGain)+') unrealized';}
+function deltaHTML(t){
+  if(!t.nValued)return t.nPending?'<span class="muted">'+(t.perm===false||VALUE.state==='off'?'':'Open a vehicle and tap Get estimate.')+'</span>':'';
+  var out='<div class="est-line"><span class="est-chip">Estimate</span> range '+money(t.low)+' to '+money(t.high)+(t.nPending?' ('+t.nValued+' of '+t.nTotal+' vehicles)':'')+'</div>';
+  if(t.nDelta)out+='<div class="est-line '+(t.delta<0?'neg':'')+'">'+(t.delta>=0?'+':'-')+money(Math.abs(t.delta)).replace('-','')+' since the last estimate</div>';
+  if(!(t.basis>0))return out+'<span class="muted">Add purchase prices to see gain or loss</span>'+pendingNote(t);
+  return out+(t.gain>=0?'<span>+'+money(t.gain)+' above cost basis</span>':'<span class="neg">'+money(t.gain)+' below cost basis</span>')+' <span style="color:var(--text-muted);margin-left:6px;">'+esc(pct(t.pctGain))+'</span>'+pendingNote(t);
+}
+function avgHealth(vs){var n=0,sum=0;for(var i=0;i<vs.length;i++){var h=aiHealth(vs[i]);if(h!==null){sum+=h;n++;}}return n?Math.round(sum/n):null;}
+function valueHeadHTML(v,g){
+  var perm=can(v,'view_value_estimate');
+  var h='<div class="lab">Estimated value'+(g.hasValue?' <span class="est-chip">Estimate</span>':'')+'</div><div class="num">';
+  if(g.hasValue)h+=bigNum(g.value);
+  else h+='<span style="font-size:.34em;color:var(--text-muted);letter-spacing:0;">'+esc(perm?noValueText():'Value is not shared with you')+'</span>';
+  h+='</div>';
+  if(g.hasValue){
+    var a=v.aiValue,dl=valueDeltaText(a);
+    h+='<div class="doc-meta" style="margin-top:6px;">'+(Number(a.low)>0?'Range '+money(a.low)+' to '+money(a.high)+' / ':'')+'as of '+esc(fmtDate(a.asOf))+(dl?' / '+esc(dl):'')+'</div>';
+  }
+  return h;
+}
+function aiValueMeta(v){
+  var a=v.aiValue;if(!a)return '';
+  var bits=['As of '+fmtDate(a.asOf)];
+  if(Number(a.low)>0&&Number(a.high)>0)bits.push('range '+money(a.low)+' to '+money(a.high));
+  var c=fmtConfidence(a.confidence);if(c)bits.push(c);
+  return bits.join(' / ');
+}
+function valueRefreshedToday(vid){
+  try{var m=getUI().valRef||{},t=Number(m[vid]);return !!(t&&Date.now()-t<86400000);}catch(e){return false;}
+}
+function valueButtonHTML(v,has){
+  if(isArchivedVehicle(v)||!can(v,'view_value_estimate'))return '';
+  var busy=!!VALUE.busy[v.id],done=valueRefreshedToday(v.id);
+  var label=busy?'Working...':(has?'Refresh estimate':'Get estimate');
+  return '<div style="margin-top:10px;"><button class="btn btn-sm" id="val-refresh-btn" onclick="refreshValue(\''+jsId(v.id)+'\')"'+((busy||done)?' disabled':'')+'>'+label+'</button>'+
+    (done&&!busy?' <span class="doc-meta">You can refresh once a day per vehicle. Try again tomorrow.</span>':'')+'</div>';
+}
+function aiPanelHTML(v){
+  var a=v.aiValue,out='',perm=can(v,'view_value_estimate'),hv=aiVal(v)!==null,nt=VALUE.note[v.id];
+  out+='<div class="brief" style="margin-top:22px;" id="val-panel"><div class="brief-head"><div class="brief-title">Value estimate</div><span class="brief-chip">Estimate, not an appraisal</span></div>';
+  if(hv){
+    out+='<p>'+esc(money(a.value))+' estimated. '+esc(aiValueMeta(v))+'.</p>';
+    var dl=valueDeltaText(a);if(dl)out+='<p class="'+(a.value<a.prev?'neg':'')+'">'+esc(dl)+'.</p>';
+    if(a.notes)out+='<p style="color:var(--text-muted);">'+esc(a.notes)+'</p>';
+    out+='<p style="color:var(--text-muted);">Sources: '+(a.sources&&a.sources.length?valueSrcLinks(a.sources):'none listed')+'</p>';
+    out+='<p class="doc-meta">Found with Google Search and updated weekly. Market prices for this year, make, model and trim, adjusted for the mileage and condition on file. Nobody can type a value in.</p>';
+  }else if(!perm){
+    out+='<p style="color:var(--text-muted);">The owner has not shared the value estimate with you.</p>';
+  }else if(VALUE.state==='off'){
+    out+='<p style="color:var(--text-muted);" id="val-off">Value estimates are not turned on yet. Nothing is wrong with your vehicle or your data. The estimate will appear here once it is switched on.</p>';
+  }else out+='<p style="color:var(--text-muted);">No estimate yet. Tap Get estimate to look up current market prices.</p>';
+  if(nt)out+='<p class="val-note" data-kind="'+esc(nt.kind)+'">'+esc(nt.text)+'</p>';
+  out+=valueButtonHTML(v,hv);
+  out+='</div>';
+  var h=healthInfo(v);
+  out+='<div class="brief" style="margin-top:14px;" id="health-panel"><div class="brief-head"><div class="brief-title">Health score</div><span class="brief-chip">Calculated from your records</span></div>';
+  if(h){
+    out+='<p><b>'+h.score+' of 100</b> ('+esc(h.label)+'). Updated '+esc(fmtDate(h.asOf))+'.</p>';
+    out+='<ul style="margin:6px 0 0 18px;padding:0;">'+h.reasons.map(function(r){return '<li>'+esc(r)+'</li>';}).join('')+'</ul>';
+    out+='<p class="doc-meta" style="margin-top:8px;">'+esc(h.basis)+' Worked out on this device from service history and intervals, reminders, documents and gaps. It updates when your records change and cannot be typed in.</p>';
+  }else out+='<p style="color:var(--text-muted);">The owner has not shared the health score with you.</p>';
+  out+='</div>';
+  return out;
+}
+// ---- calling the Edge Function ----
+function valueRerender(){try{refreshCurrent();refreshDetailIfOpen();}catch(e){}}
+function valueEnsureProbe(){
+  if(VALUE.probed||!session||typeof sb==='undefined'||!sb||!sb.functions||typeof sb.functions.invoke!=='function')return;
+  if(!canAny('view_value_estimate'))return;
+  VALUE.probed=true;
+  var call;try{call=Promise.resolve(sb.functions.invoke('estimate-value',{body:{probe:true}}));}catch(e){return;}
+  call.then(function(r){
+    var err=r&&r.error;
+    if(!err){if(VALUE.state!=='off')VALUE.state='on';return;}
+    var st=err.context&&err.context.status;
+    if(st===404||st===503){VALUE.state='off';valueRerender();}
+  },function(){});
+}
+function valueFail(err,body){
+  var st=err&&err.context&&err.context.status,nm=err&&err.name,bc=body&&(body.error||body.code),code=String(st||nm||bc||'unknown');
+  if(nm==='Timeout')return {kind:'fail',text:'The estimate took too long. Try again in a little while (code: timeout).'};
+  if(nm==='FunctionsFetchError')return {kind:'fail',text:'Could not reach the estimate service (offline, or blocked by the browser) (code: net).'};
+  if(st===404&&(!body||!body.error))return {kind:'off',text:''};
+  if(st===503)return {kind:'off',text:''};
+  if(st===401)return {kind:'fail',text:'Your sign-in has expired - sign out and back in, then try again (code: 401).'};
+  if(st===403)return {kind:'fail',text:'The owner has not shared value estimates with you (code: 403).'};
+  if(st===404)return {kind:'fail',text:'This vehicle could not be found (code: 404).'};
+  if(st===429&&bc==='refresh_limited')return {kind:'limit',text:'This vehicle was already refreshed today. You can refresh once a day.',limit:true};
+  if(st===429)return {kind:'limit',text:'Daily estimate limit reached. Try again tomorrow (code: 429).'};
+  if(st===400&&bc==='incomplete_vehicle')return {kind:'fail',text:'Add the year, make and model first, then try again.'};
+  if(st===502)return {kind:'fail',text:'Could not get an estimate right now. Try again later (code: '+String(body&&body.code||'502')+').'};
+  return {kind:'fail',text:'Could not get an estimate right now (code: '+code+').'};
+}
+function refreshValue(vid){
+  var v=byId(getVehicles(),vid);if(!v||isArchivedVehicle(v))return;
+  if(!can(v,'view_value_estimate')){showToast('The owner has not shared value estimates with you.','error');return;}
+  if(VALUE.busy[vid]||valueRefreshedToday(vid))return;
+  if(typeof sb==='undefined'||!sb||!sb.functions||typeof sb.functions.invoke!=='function'){valueSetOff(true);valueRerender();return;}
+  VALUE.busy[vid]=true;delete VALUE.note[vid];valueRerender();
+  var call;try{call=Promise.resolve(sb.functions.invoke('estimate-value',{body:{vehicle_id:vid}}));}
+  catch(e){call=Promise.resolve({data:null,error:{name:'FunctionsFetchError'}});}
+  var timer=new Promise(function(res){setTimeout(function(){res({data:null,error:{name:'Timeout'}});},90000);});
+  function done(){VALUE.busy[vid]=false;}
+  Promise.race([call,timer]).then(function(r){
+    var data=r&&r.data,err=r&&r.error;
+    if(!err&&data&&data.error)err={context:{status:data.error==='not_enabled'||data.error==='not_configured'?503:500}};
+    if(err)return autoIdFail(err).then(function(b){
+      done();var f=valueFail(err,b||(data&&typeof data==='object'?data:null));
+      if(f.kind==='off'){valueSetOff(true);}
+      else{VALUE.note[vid]={kind:f.kind,text:f.text};if(f.limit){try{var u=getUI(),m=u.valRef||{};m[vid]=Date.now();u.valRef=m;localStorage.setItem('evoai_ui',JSON.stringify(u));}catch(e){}}}
+      valueRerender();
+    });
+    done();
+    if(!data||typeof data!=='object'||!(Number(data.mid)>0)){
+      VALUE.note[vid]={kind:'fail',text:(data&&data.notes)?String(data.notes).slice(0,200):'No reliable market prices were found for this vehicle yet.'};valueRerender();return;
+    }
+    valueSetOff(false);
+    try{var u2=getUI(),m2=u2.valRef||{};m2[vid]=Date.now();u2.valRef=m2;localStorage.setItem('evoai_ui',JSON.stringify(u2));}catch(e){}
+    VALUE.note[vid]={kind:'done',text:data.cached?'Updated from this week\'s market data for this model, adjusted for your mileage and condition.':'Updated with fresh market prices.'};
+    return reloadAll(true).then(valueRerender);
+  }).catch(function(){done();VALUE.note[vid]={kind:'fail',text:'Could not get an estimate right now (code: exception).'};valueRerender();});
+}
+function srcObjList(a,max){
+  var out=[],i;
+  if(Object.prototype.toString.call(a)!=='[object Array]')return out;
+  for(i=0;i<a.length&&out.length<max;i++){
+    var x=a[i];if(!x)continue;
+    if(typeof x==='string'){x={title:x,url:''};}
+    var t=String(x.title||x.name||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,120),u=String(x.url||x.uri||'').trim().slice(0,600);
+    if(u&&!/^https:\/\//i.test(u))u='';
+    if(t||u)out.push({title:t||u,url:u});
+  }
+  return out;
+}
+// ===== remove client (admin / tech who created it), owner My team, ended-access notices (needs migration_005b) =====
+var SHEET_EL=null;
+function sheetClose(){
+  var o=SHEET_EL;if(!o)return;SHEET_EL=null;o.classList.remove('on');
+  setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o);},220);
+}
+function sheetOpen(o){
+  sheetClose();
+  var ov=document.createElement('div');ov.className='sheet-ov';ov.id='evo-sheet';
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
+  var h='<div class="sheet"><h3>'+esc(o.title)+'</h3>'+(o.sub?'<div class="sheet-sub">'+esc(o.sub)+'</div>':'')+(o.html||'')+'<div class="sheet-btns" id="evo-sheet-btns"></div></div>';
+  ov.innerHTML=h;
+  ov.addEventListener('click',function(e){if(e.target===ov)sheetClose();});
+  document.body.appendChild(ov);SHEET_EL=ov;
+  sheetButtons(o.buttons||[]);
+  setTimeout(function(){ov.classList.add('on');},10);
+}
+function sheetButtons(list){
+  var b=document.getElementById('evo-sheet-btns');if(!b)return;b.innerHTML='';
+  list.forEach(function(x){
+    var el=document.createElement('button');el.type='button';el.className='btn '+(x.cls||'btn-ghost');el.textContent=x.label;if(x.id)el.id=x.id;if(x.disabled)el.disabled=true;
+    el.addEventListener('click',function(){if(!el.disabled)x.fn();});b.appendChild(el);
+  });
+}
+function sheetBody(html){var s=SHEET_EL&&SHEET_EL.querySelector('.sheet-sub');var d=SHEET_EL&&SHEET_EL.querySelector('#sheet-dyn');if(d)d.innerHTML=html;}
+var UNDO_TIMER=null;
+function showUndo(msg,fn,ms){
+  hideUndo();
+  var b=document.createElement('div');b.id='undo-bar';b.setAttribute('role','status');
+  b.innerHTML='<span>'+esc(msg)+'</span><button type="button" class="btn btn-sm btn-gold" id="undo-btn">Undo</button>';
+  document.body.appendChild(b);
+  document.getElementById('undo-btn').addEventListener('click',function(){hideUndo();fn();});
+  UNDO_TIMER=setTimeout(hideUndo,ms||10000);
+}
+function hideUndo(){if(UNDO_TIMER){clearTimeout(UNDO_TIMER);UNDO_TIMER=null;}var b=document.getElementById('undo-bar');if(b&&b.parentNode)b.parentNode.removeChild(b);}
+function pluralN(n,w,pl){return n+' '+(n===1?w:(pl||w+'s'));}
+var TRASH_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12M9 7V4h6v3"/></svg>';
+// who may remove (the database re-checks every time)
+function clientRemovable(c){return !!(c&&c.managed&&!c.claimed&&(realAdmin()||(isRealTech()&&c.managedBy===myId())));}
+function rpcRow(r){if(r.error)throw r.error;return Object.prototype.toString.call(r.data)==='[object Array]'?r.data[0]:r.data;}
+// ---- swipe-left rows ----
+var SWIPE_W=96;
+function swipeCloseAll(except){var l=document.querySelectorAll('.swipe-fg.open'),i;for(i=0;i<l.length;i++)if(l[i]!==except){l[i].classList.remove('open');l[i].style.transform='';}}
+function decorateClientRows(root){
+  var rows=root.querySelectorAll('.client-row[onclick^="openClientDetail"]'),i;
+  for(i=0;i<rows.length;i++){
+    (function(row){
+      var m=/openClientDetail\('([A-Za-z0-9_-]+)'\)/.exec(row.getAttribute('onclick')||'');if(!m)return;
+      var id=m[1],c=byId(C.clients,id);
+      if(!c||!(realAdmin()||clientRemovable(c)))return;
+      var wrap=document.createElement('div');wrap.className='swipe-wrap';wrap.setAttribute('data-client',id);
+      var act=document.createElement('button');act.type='button';act.className='swipe-act';act.setAttribute('aria-label','Remove '+c.name);act.innerHTML=TRASH_SVG+'<span>Remove</span>';
+      act.addEventListener('click',function(e){e.stopPropagation();swipeCloseAll();openRemoveClient(id);});
+      row.parentNode.insertBefore(wrap,row);wrap.appendChild(act);
+      var fg=document.createElement('div');fg.className='swipe-fg';wrap.appendChild(fg);fg.appendChild(row);
+      var tb=document.createElement('button');tb.type='button';tb.className='swipe-trash';tb.title='Remove client';tb.setAttribute('aria-label','Remove '+c.name);tb.innerHTML=TRASH_SVG;
+      tb.addEventListener('click',function(e){e.stopPropagation();openRemoveClient(id);});row.appendChild(tb);
+      var x0=0,y0=0,dx=0,mode='',base=0;
+      fg.addEventListener('touchstart',function(e){var t=e.touches[0];x0=t.clientX;y0=t.clientY;dx=0;mode='';base=fg.classList.contains('open')?-SWIPE_W:0;swipeCloseAll(fg);},{passive:true});
+      fg.addEventListener('touchmove',function(e){
+        var t=e.touches[0],ddx=t.clientX-x0,ddy=t.clientY-y0;
+        if(!mode){if(Math.abs(ddx)>8&&Math.abs(ddx)>Math.abs(ddy)*1.4)mode='h';else if(Math.abs(ddy)>8)mode='v';}
+        if(mode!=='h')return;
+        dx=ddx;fg.classList.add('drag');fg.style.transform='translateX('+Math.max(-SWIPE_W-24,Math.min(0,base+dx))+'px)';
+      },{passive:true});
+      fg.addEventListener('touchend',function(){
+        fg.classList.remove('drag');if(mode!=='h')return;
+        var pos=base+dx;
+        if(pos<-SWIPE_W/2){fg.classList.add('open');fg.style.transform='translateX(-'+SWIPE_W+'px)';}else{fg.classList.remove('open');fg.style.transform='';}
+        fg._swiped=Date.now();
+      });
+      row.addEventListener('click',function(e){
+        if(fg._swiped&&Date.now()-fg._swiped<350){e.stopImmediatePropagation();e.preventDefault();return;}
+        if(fg.classList.contains('open')){e.stopImmediatePropagation();e.preventDefault();swipeCloseAll();}
+      },true);
+    })(rows[i]);
+  }
+}
+// ---- remove client: confirmation sheet ----
+function removalLines(s,mine){
+  var l=[];
+  if(s.vehicles>0)l.push('<li>'+pluralN(s.vehicles,'vehicle')+' will be archived and hidden from every list. Nothing is erased.</li>');
+  else l.push('<li>This client has no vehicles yet.</li>');
+  var kept=[];
+  if(s.records)kept.push(pluralN(s.records,'service record'));if(s.documents)kept.push(pluralN(s.documents,'document'));
+  if(s.photos)kept.push(pluralN(s.photos,'photo'));if(s.expenses)kept.push(pluralN(s.expenses,'expense'));if(s.reminders)kept.push(pluralN(s.reminders,'reminder'));
+  if(kept.length)l.push('<li>Kept, but hidden with the vehicles: '+esc(kept.join(', '))+'.</li>');
+  if(s.open_invites>0)l.push('<li>'+pluralN(s.open_invites,'open invite code')+' will stop working. The client cannot sign up and pick up this data until you restore them.</li>');
+  l.push('<li>You can undo for 10 seconds right after, or later under Removed clients on the Clients page.</li>');
+  l.push(mine?'<li>Only an admin can erase a client permanently.</li>':'<li>To erase permanently you will find the option under Removed clients. You must type the client name.</li>');
+  return '<ul>'+l.join('')+'</ul>';
+}
+async function openRemoveClient(id){
+  var c=byId(C.clients,id);if(!c)return;
+  sheetOpen({title:'Remove '+c.name+'?',sub:'Checking what is stored...',html:'<div id="sheet-dyn"></div>',buttons:[{label:'Cancel',fn:sheetClose}]});
+  var s;
+  try{s=rpcRow(await sb.rpc('client_removal_summary',{p_id:id}));}
+  catch(e){
+    sheetBody('<ul><li class="warn">'+esc(rpcMissing(e)?'Removing clients is not switched on yet (a database update is pending).':friendlyError(e))+'</li></ul>');
+    if(SHEET_EL)SHEET_EL.querySelector('.sheet-sub').textContent='';return;
+  }
+  if(!SHEET_EL)return;
+  var sub=SHEET_EL.querySelector('.sheet-sub');
+  if(!s.removable){
+    sub.textContent='';
+    sheetBody('<ul><li class="warn">'+esc(s.reason==='has_own_account'?(c.name+' has their own EvoAI account. Their cars and records belong to them, so they cannot be removed here.'):'You can only remove clients that you created yourself.')+'</li>'+(s.reason==='has_own_account'?'<li>To end a tech\'s access instead, open the client and use Remove access.</li>':'')+'</ul>');
+    sheetButtons([{label:'Close',fn:sheetClose}]);return;
+  }
+  sub.textContent='This archives the client. It does not erase anything yet.';
+  sheetBody(removalLines(s,!realAdmin()));
+  sheetButtons([{label:'Cancel',fn:sheetClose},{label:'Remove client',cls:'btn-solid-danger',id:'rm-confirm',fn:function(){doRemoveClient(id,c.name);}}]);
+}
+async function doRemoveClient(id,name){
+  var b=document.getElementById('rm-confirm');if(b){b.disabled=true;b.textContent='Removing...';}
+  try{
+    rpcRow(await sb.rpc('archive_client',{p_id:id}));
+    sheetClose();
+    if(currentClientId===id){currentClientId=null;}
+    await loadAll();
+    if(document.getElementById('page-client-detail')&&document.getElementById('page-client-detail').classList.contains('active'))showPage('clients');else refreshCurrent();
+    showUndo(name+' was removed.',function(){undoRemoveClient(id,name);},10000);
+  }catch(e){sheetClose();showToast(friendlyError(e),'error');}
+}
+async function undoRemoveClient(id,name){
+  try{rpcRow(await sb.rpc('restore_client',{p_id:id}));await loadAll();refreshCurrent();showToast((name||'Client')+' is back','success');}
+  catch(e){showToast(friendlyError(e),'error');}
+}
+// ---- removed clients: restore, admin permanent delete ----
+function removedClientsHTML(){
+  var rm=C.removed||[];if(!rm.length)return '';
+  var h='<div class="removed-sec"><div class="sh"><h2>Removed clients</h2></div><div class="doc-meta" style="margin-bottom:6px;">Hidden from your lists. Restore any time'+(realAdmin()?', or erase permanently.':'.')+'</div>';
+  rm.forEach(function(p){
+    h+='<div class="access-row"><div><div style="font-size:16px;font-weight:300;">'+esc(displayName(p))+'</div><div class="doc-meta">Removed '+esc(fmtDate(String(p.archived_at).slice(0,10)))+'</div></div><div class="flex gap-2"><button class="btn btn-sm" onclick="undoRemoveClient(\''+jsId(p.id)+'\',\''+jsId(displayName(p)).slice(0,0)+'\')">Restore</button>'+(realAdmin()?'<button class="btn btn-sm btn-danger" onclick="openPurgeClient(\''+jsId(p.id)+'\')">Delete permanently</button>':'')+'</div></div>';
+  });
+  return h+'</div>';
+}
+async function openPurgeClient(id){
+  var p=C.profiles[id];if(!p||!realAdmin())return;var name=displayName(p);
+  sheetOpen({title:'Erase '+name+' permanently?',sub:'Checking what is stored...',html:'<div id="sheet-dyn"></div>',buttons:[{label:'Cancel',fn:sheetClose}]});
+  var s;try{s=rpcRow(await sb.rpc('client_removal_summary',{p_id:id}));}catch(e){sheetBody('<ul><li class="warn">'+esc(friendlyError(e))+'</li></ul>');return;}
+  if(!SHEET_EL)return;
+  SHEET_EL.querySelector('.sheet-sub').textContent='';
+  var l=['<li class="warn">This cannot be undone. There is no backup to restore from in the app.</li>',
+    '<li class="warn">Permanently erased: '+esc([pluralN(s.vehicles,'vehicle'),pluralN(s.records,'service record'),pluralN(s.documents,'document'),pluralN(s.photos,'photo'),pluralN(s.expenses,'expense'),pluralN(s.reminders,'reminder')].join(', '))+', and every photo and document file.</li>',
+    '<li>The client record and tech access are deleted too.</li></ul><div class="doc-meta" style="margin-top:10px;">Type the client name exactly to confirm:</div><input type="text" id="purge-name" autocomplete="off" autocapitalize="none" placeholder="'+esc(name)+'" aria-label="Type the client name">'];
+  sheetBody('<ul>'+l.join(''));
+  var inp=document.getElementById('purge-name');
+  sheetButtons([{label:'Cancel',fn:sheetClose},{label:'Erase permanently',cls:'btn-solid-danger',id:'purge-confirm',disabled:true,fn:function(){doPurgeClient(id,name);}}]);
+  inp.addEventListener('input',function(){var b=document.getElementById('purge-confirm');if(b)b.disabled=(inp.value.trim()!==String(name).trim()||!inp.value.trim());});
+}
+async function doPurgeClient(id,name){
+  var typed=val('purge-name'),b=document.getElementById('purge-confirm');if(b){b.disabled=true;b.textContent='Erasing...';}
+  try{
+    var pr=await sb.rpc('client_storage_paths',{p_id:id});if(pr.error)throw pr.error;
+    var by={},i,rows=pr.data||[];
+    for(i=0;i<rows.length;i++){(by[rows[i].bucket]=by[rows[i].bucket]||[]).push(rows[i].path);}
+    for(var bk in by){if(!by.hasOwnProperty(bk))continue;
+      for(i=0;i<by[bk].length;i+=50){var rr=await sb.storage.from(bk).remove(by[bk].slice(i,i+50));if(rr&&rr.error)throw rr.error;}}
+    rpcRow(await sb.rpc('purge_client',{p_id:id,p_confirm_name:typed}));
+    sheetClose();await loadAll();refreshCurrent();showToast(name+' was erased permanently','success');
+  }catch(e){sheetClose();showToast(/name_mismatch/.test(String(e&&e.message))?'The name did not match. Nothing was erased.':friendlyError(e),'error');}
+}
+function deleteClientBtnHTML(c){
+  if(!clientRemovable(c))return '';
+  return '<div style="margin-top:12px;"><button class="btn btn-sm btn-danger" id="cd-delete-btn" onclick="openRemoveClient(\''+jsId(c.id)+'\')">Delete client</button><div class="doc-meta" style="margin-top:6px;">You created this client, so you can delete it. You will see exactly what is affected first.</div></div>';
+}
+// ---- tech: access ended notices ----
+var ENDED_AT=0;
+function endedDismissed(){try{return JSON.parse(localStorage.getItem('evoai_ended_dismissed')||'[]');}catch(e){return [];}}
+function endedKey(n){return String(n.owner_name)+'|'+String(n.revoked_at);}
+function dismissEnded(k){var d=endedDismissed();d.push(k);try{localStorage.setItem('evoai_ended_dismissed',JSON.stringify(d.slice(-50)));}catch(e){}renderEndedNotices();}
+function renderEndedNotices(){
+  var el=document.getElementById('ended-notices');if(!el)return;
+  var d=endedDismissed(),list=(C.ended||[]).filter(function(n){return d.indexOf(endedKey(n))<0;});
+  el.innerHTML=list.map(function(n){var k=endedKey(n);
+    return '<div class="ended-note"><div><strong>Access ended.</strong> '+esc(n.ended_by==='owner'?(n.owner_name+' ended your access'):'Your access to '+n.owner_name+' was ended')+' on '+esc(fmtDate(String(n.revoked_at).slice(0,10)))+'. Their cars and records are no longer visible to you. Anything you entered stays with the car.</div><button class="btn btn-sm btn-ghost" onclick="dismissEnded(\''+jsId(k.replace(/[^A-Za-z0-9_-]/g,'_'))+'\')" data-k="'+esc(k)+'">OK</button></div>';
+  }).join('');
+  var bs=el.querySelectorAll('button[data-k]'),i;
+  for(i=0;i<bs.length;i++)(function(b){b.onclick=function(){dismissEnded(b.getAttribute('data-k'));};})(bs[i]);
+}
+async function loadEnded(){
+  if(!sb||!session||!isRealTech())return;
+  if(Date.now()-ENDED_AT<30000&&C.ended){renderEndedNotices();return;}
+  ENDED_AT=Date.now();
+  try{var r=await sb.rpc('list_ended_access');if(r.error)throw r.error;C.ended=r.data||[];}catch(e){C.ended=C.ended||[];}
+  renderEndedNotices();
+}
+// ---- owner: My team ----
+function teamGroups(oid){
+  var rows=C.access.filter(function(a){return a.owner_id===oid&&a.status==='active';}),g={},order=[];
+  rows.forEach(function(a){if(!g[a.tech_id]){g[a.tech_id]={techId:a.tech_id,grants:[]};order.push(a.tech_id);}g[a.tech_id].grants.push(a);});
+  return order.map(function(k){return g[k];});
+}
+function renderAccess(){
+  var oid=ownerClientId()||myId();
+  var groups=teamGroups(oid);
+  var myVeh=C.vehicles.filter(function(v){return v.clientId===oid&&!v.archived;});
+  var h='';
+  h+='<div class="sh first"><h2>Your team</h2></div>';
+  if(!groups.length)h+=emptyCard('Nobody has access to your collection yet. Invite your tech or advisor below. You choose exactly what they can see.');
+  groups.forEach(function(g){
+    var tp=C.profiles[g.techId],tn=displayName(tp),tid=jsId(g.techId);
+    var scopes=g.grants.map(function(a){var v=a.vehicle_id?byId(C.vehicles,a.vehicle_id):null;return a.vehicle_id?('Only '+(v?vFull(v):'one vehicle')):'All your vehicles';});
+    h+='<div class="team-card" data-team="'+tid+'"><div class="team-head"><div><div style="font-size:18px;font-weight:300;">'+esc(tn)+'</div><div class="doc-meta">'+esc((tp&&tp.email)||'')+(tp&&tp.business_name?' / '+esc(tp.business_name):'')+'</div><div class="doc-meta">'+esc(scopes.join(', '))+'</div><span class="team-pill">Tech / advisor</span></div><button class="btn btn-danger btn-sm" onclick="openRemoveMember(\''+tid+'\')">Remove access</button></div>';
+    g.grants.forEach(function(a){
+    var veh=a.vehicle_id?byId(C.vehicles,a.vehicle_id):null,aid=jsId(a.id);
+    var scope=PM_SCOPE[a.id]||'';
+    if(scope&&a.vehicle_id&&scope!==a.vehicle_id)scope='';
+    var pr=permRowFor(a.id,scope),eff=pr.eff||{};
+    var covered=a.vehicle_id?(veh?[veh]:[]):myVeh;
+    h+='<details class="more" id="pm-'+aid+'"><summary>Permissions'+(g.grants.length>1?' - '+esc(a.vehicle_id?(veh?vFull(veh):'one vehicle'):'all vehicles'):'')+'</summary><div style="padding-top:10px;">';
+    if(covered.length>1||(covered.length===1&&!a.vehicle_id)){
+      h+='<div class="input-group"><label>Settings apply to</label><select onchange="pmScopeChange(\''+aid+'\',this)"><option value="">All vehicles (default)</option>'+covered.map(function(v){return '<option value="'+esc(v.id)+'"'+(scope===v.id?' selected':'')+'>'+esc(vName(v))+' only'+(permRowFor(a.id,v.id).ov?' (custom)':'')+'</option>';}).join('')+'</select></div>';
+    }
+    if(scope&&pr.ov)h+='<div class="doc-meta" style="margin-bottom:8px;">This vehicle has its own settings. <span class="link" onclick="resetPermOverride(\''+aid+'\',\''+jsId(scope)+'\')">Reset to default</span></div>';
+    PERM_LABELS.forEach(function(gr){
+      h+='<div class="lab" style="margin:14px 0 6px;">'+esc(gr[1])+'</div>';
+      gr[2].forEach(function(p){
+        h+='<label class="tgl"><input type="checkbox" id="pm-'+aid+'-'+p[0]+'"'+(eff[p[0]]?' checked':'')+' onchange="togglePerm(\''+aid+'\',\''+p[0]+'\',this.checked,\''+jsId(scope)+'\')"><span class="tgl-ui"></span><span class="tgl-t">'+esc(p[1])+'</span></label>';
+      });
+    });
+    h+='<div class="doc-meta" style="margin-top:12px;">Insurance and title documents that you upload are always private to you. Changes apply immediately.</div></div></details>';
+    });
+    h+='</div>';
+  });
+  var open=C.invites.filter(function(i){return (i.kind==='tech_owner'||i.kind==='tech_vehicle')&&inviteActive(i)&&i.created_by===myId();});
+  h+='<div class="sh"><h2>Invite a tech or advisor</h2></div><div style="max-width:420px;">';
+  h+='<div class="input-group"><label>Their email</label><input type="email" id="inv-email" maxlength="120" placeholder="tech@email.com" autocapitalize="none" inputmode="email"></div>';
+  h+='<div class="input-group"><label>Access to</label><select id="inv-scope"><option value="">All my vehicles</option>'+myVeh.map(function(v){return '<option value="'+esc(v.id)+'">'+esc(vFull(v))+' only</option>';}).join('')+'</select></div>';
+  h+='<button class="btn btn-gold btn-sm" onclick="createInviteFromAccess()">Create invite link and code</button><div class="doc-meta" style="margin-top:8px;">The code only works for this email address. You share it yourself by message, email or copy. After they join you can fine-tune their permissions here.</div></div>';
+  if(open.length){
+    h+='<div class="sh"><h2>Waiting to join</h2></div>'+open.map(function(i){
+      var v=i.vehicle_id?byId(C.vehicles,i.vehicle_id):null;
+      return '<div class="access-row"><div><div class="doc-meta">'+esc(i.email||'Any email')+' / '+esc(v?vFull(v):'All vehicles')+' / expires '+esc(fmtDate(String(i.expires_at).slice(0,10)))+'</div>'+inviteRowExtras(i.id,i.email)+'</div><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(i.id)+'\')">Cancel invite</button></div>';
+    }).join('');
+  }
+  elHTML('access-body',h);
+  revealMissingCodes(open.map(function(i){return i.id;}));
+}
+function openRemoveMember(techId){
+  var oid=ownerClientId()||myId(),g=teamGroups(oid).filter(function(x){return x.techId===techId;})[0];
+  if(!g)return;
+  var tp=C.profiles[techId],tn=displayName(tp);
+  var all=g.grants.some(function(a){return !a.vehicle_id;});
+  var cars=C.vehicles.filter(function(v){return v.clientId===oid&&!v.archived;});
+  var scopeTxt=all?pluralN(cars.length,'vehicle'):g.grants.map(function(a){var v=byId(C.vehicles,a.vehicle_id);return v?vFull(v):'a vehicle';}).join(', ');
+  var html='<ul><li>'+esc(tn)+' loses access right away to '+esc(all?('all of your vehicles ('+scopeTxt+')'):scopeTxt)+': service history, documents, photos, reminders and anything else you had shared.</li>'+
+    '<li>Nothing is deleted. All records stay with your cars, including anything '+esc(tn)+' added.</li>'+
+    '<li>'+esc(tn)+' will see "Access ended" in their app.</li>'+
+    '<li>Any unused invite sent to '+esc((tp&&tp.email)||'their email')+' is cancelled. You can invite them again any time.</li></ul>';
+  sheetOpen({title:'Remove '+tn+' from your team?',html:html,buttons:[{label:'Cancel',fn:sheetClose},{label:'Remove access',cls:'btn-solid-danger',id:'rm-member',fn:function(){doRemoveMember(techId,tn);}}]});
+}
+async function doRemoveMember(techId,name){
+  var b=document.getElementById('rm-member');if(b){b.disabled=true;b.textContent='Removing...';}
+  try{
+    rpcRow(await sb.rpc('remove_team_member',{p_tech_id:techId}));
+    sheetClose();await loadAll();renderAccess();showToast(name+' no longer has access','success');
+  }catch(e){sheetClose();showToast(/no_active_access/.test(String(e&&e.message))?'That access had already ended.':friendlyError(e),'error');await loadAll();renderAccess();}
 }
 
 </script>
