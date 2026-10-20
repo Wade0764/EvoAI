@@ -923,6 +923,18 @@ body.dtv-open{overflow:hidden}
 .dt-sheet .btn{min-height:50px;font-size:16px;display:flex;align-items:center;justify-content:center;text-decoration:none}
 @media (prefers-reduced-motion:reduce){.dtv,.dtv-stage img,.dt-img,.dt-sheet-wrap{transition:none}.dt-th:active{transform:none}}
 
+/* v19 Replica / Kit car row: main Vehicle grid, large, gold switch */
+.vr-main{margin-top:6px;padding:14px 16px;border-radius:16px;border:1px solid rgba(201,170,107,.35);background:rgba(201,170,107,.05)}
+.vr-tgl-lg{justify-content:space-between;gap:16px;min-height:60px!important;margin:0!important;position:relative}
+.vr-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.vr-name{font-size:19px;font-weight:500;color:var(--text);line-height:1.3}
+.vr-help{font-size:15px;line-height:1.45;color:var(--text-secondary)}
+.vr-tgl-lg .vr-sw{width:58px;height:34px}
+.vr-tgl-lg .vr-sw::after{width:26px;height:26px}
+.vr-tgl-lg input:checked+.vr-sw::after{transform:translateX(24px)}
+.vr-builder{margin-top:12px}
+.vr-builder label{font-size:17px!important}
+
 </style>
 </head>
 <body>
@@ -1198,6 +1210,7 @@ body.dtv-open{overflow:hidden}
       <div class="input-group"><label>Model</label><input type="text" id="v-model" maxlength="60" placeholder="911 GT3"></div>
       <div class="input-group form-full"><label>Nickname (optional)</label><input type="text" id="v-nickname" maxlength="40" placeholder="The Ghost"></div>
       <div class="input-group"><label>Color</label><input type="text" id="v-color" maxlength="40" placeholder="GT Silver"></div>
+      <div class="input-group form-full vr-group vr-main" id="v-replica-group"><label class="vr-tgl vr-tgl-lg" for="v-replica"><span class="vr-txt"><span class="vr-name">Replica / Kit car</span><span class="vr-help" id="v-replica-help">Turn on if this car is a replica, recreation or kit build.</span></span><input type="checkbox" id="v-replica" role="switch" aria-describedby="v-replica-help" onchange="vrFormToggle()"><span class="vr-sw" aria-hidden="true"></span></label><div id="v-builder-row" class="vr-builder" style="display:none"><label for="v-builder">Builder</label><input type="text" id="v-builder" maxlength="80" placeholder="e.g. JPS Motorsport" autocomplete="off"></div><div id="v-rep-hint" class="vr-hint" style="display:none" role="status" aria-live="polite"></div></div>
     </div>
     <details id="v-dates" class="fin-only" style="margin-top:14px;">
       <summary>Dates and reminders (optional)</summary>
@@ -1220,7 +1233,7 @@ body.dtv-open{overflow:hidden}
         <div class="input-group form-full"><label>VIN (optional)</label><input type="text" id="v-vin" maxlength="24" placeholder="WP0AC2A9..." autocapitalize="characters" oninput="vinChanged()">
           <div id="v-vin-row" style="display:none;margin-top:8px;"><button class="btn btn-ghost btn-sm" id="v-vin-btn" onclick="fillFromVin()">Fill from VIN</button></div>
           <div id="v-vin-msg" style="display:none;margin-top:8px;font-size:0.82rem;line-height:1.5;"></div></div>
-        <div class="input-group"><label>Trim</label><input type="text" id="v-trim" maxlength="40" placeholder="Touring"></div><div class="input-group form-full vr-group"><label class="vr-tgl" for="v-replica"><input type="checkbox" id="v-replica" onchange="vrFormToggle()"><span class="vr-sw" aria-hidden="true"></span><span>Replica / Kit car</span></label><div id="v-builder-row" style="display:none"><label for="v-builder">Builder</label><input type="text" id="v-builder" maxlength="80" placeholder="e.g. JPS Motorsport"></div><div id="v-rep-hint" class="vr-hint" style="display:none" role="status" aria-live="polite"></div></div>
+        <div class="input-group"><label>Trim</label><input type="text" id="v-trim" maxlength="40" placeholder="Touring"></div>
         <div class="input-group"><label>Mileage</label><input type="number" id="v-mileage" placeholder="1850" min="0" inputmode="numeric"></div>
         <div class="input-group fin-only"><label>Purchase price ($)</label><input type="number" id="v-purchase-price" placeholder="229000" min="0" inputmode="numeric"></div>
         <div class="input-group fin-only"><label>Purchase date</label><input type="date" id="v-purchase-date"></div>
@@ -6695,9 +6708,9 @@ function vrRep(r,x){if(r&&Object.prototype.hasOwnProperty.call(r,'is_replica'))V
 function vrBld(r,x){return cleanText((r&&r.builder)||(x&&x.bld)||'',80);}
 function vrLabel(v){return v&&v.isReplica?('Replica'+(v.builder?' by '+v.builder:'')):'';}
 async function vrSyncCols(v){
-  if(VR.cols!==true||!v)return;
+  if(VR.cols===false||!v)return;
   try{var r=await sb.from('vehicles').update({is_replica:!!v.isReplica,builder:v.isReplica&&v.builder?String(v.builder).slice(0,80):null}).eq('id',v.id);
-    if(r&&r.error&&(r.error.code==='42703'||r.error.code==='PGRST204'))VR.cols=false;}catch(e){}
+    if(r&&r.error&&(r.error.code==='42703'||r.error.code==='PGRST204'))VR.cols=false;else if(r&&!r.error)VR.cols=true;}catch(e){}
 }
 function vrFormToggle(){var on=!!(document.getElementById('v-replica')||{}).checked;var g=document.getElementById('v-builder-row');if(g)g.style.display=on?'':'none';}
 function vrFormFill(v){var c=document.getElementById('v-replica');if(c)c.checked=!!(v&&v.isReplica);setVal('v-builder',v&&v.builder||'');vrFormToggle();vrHint('');}
