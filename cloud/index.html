@@ -1501,6 +1501,7 @@ function friendlyError(err){
   if(/failed to fetch|networkerror|load failed|network request failed|fetch/i.test(m)&&!c)return 'You seem to be offline. That change was not saved. Please try again when you are back online.';
   if(c==='42501'||/row-level security|permission denied/i.test(m))return 'You do not have permission to make that change.';
   if(c==='23505'||/duplicate key/i.test(m))return /vin/i.test(m)?'A vehicle with that VIN is already in this collection.':'That already exists.';
+  if(c==='23502'||/violates not-null/i.test(m))return 'Something needed was missing, so that did not save. Please close and reopen this page, then try again.';
   if(c==='23514'||/violates check/i.test(m))return 'One of the values was not accepted. Please check the details and try again.';
   if(/invalid_or_expired_invite/.test(m))return 'That code is not valid. It may be used, expired or revoked. Ask for a new one.';
   if(/cannot_redeem_own_invite/.test(m))return 'You cannot use a code that you created.';
@@ -1688,14 +1689,14 @@ async function svcSync(v,prev){
 async function uploadPhoto(v,blob,cover){
   var path=v.clientId+'/'+v.id+'/'+uid()+'.'+extOf(blob.type,'');
   chk(await sb.storage.from('vehicle-photos').upload(path,blob,{contentType:blob.type||'image/jpeg',upsert:false}));
-  var pid=uid();
+  var pid=uid(),so=(v._photos||[]).length;
   try{
     if(cover)await sb.from('vehicle_photos').update({is_cover:false}).eq('vehicle_id',v.id).eq('is_cover',true);
-    chk(await sb.from('vehicle_photos').insert({id:pid,vehicle_id:v.id,uploaded_by:myId(),storage_path:path,is_cover:!!cover,sort_order:(v._photos||[]).length}));
+    chk(await sb.from('vehicle_photos').insert({id:pid,vehicle_id:v.id,uploaded_by:myId(),storage_path:path,is_cover:!!cover,sort_order:so}));
   }catch(e){try{await sb.storage.from('vehicle-photos').remove([path]);}catch(e2){}throw e;}
   var su=null;try{var r=await sb.storage.from('vehicle-photos').createSignedUrl(path,3600);su=r&&r.data?r.data.signedUrl:null;}catch(e3){}
   if(!v._photos)v._photos=[];
-  v._photos.push({id:pid,path:path,url:su,isCover:!!cover,by:myId()});
+  v._photos.push({id:pid,path:path,thumb:'',disp:'',tag:'',sort:so,at:new Date().toISOString(),url:su,isCover:!!cover,caption:'',by:myId()});
   return su;
 }
 async function imgSync(v,prev){
@@ -6485,7 +6486,7 @@ function pfUploadAll(){
   if(!pfCanAdd(v)){showToast('Photos are not enabled for you on this vehicle.','error');return;}
   A.busy=true;var done=0,fails=0,first='',next=0;
   var hasCover=(v._photos||[]).some(function(p){return p.isCover;});
-  var base=(v._photos||[]).reduce(function(m,p){return Math.max(m,p.sort+1);},(v._photos||[]).length);
+  var base=(v._photos||[]).reduce(function(m,p){return Math.max(m,(Number(p.sort)||0)+1);},(v._photos||[]).length);if(!isFinite(base))base=(v._photos||[]).length;
   var msg=document.getElementById('pfa-msg'),bar=document.querySelector('#pfa-prog i'),tagQ=[],tagChain=Promise.resolve();
   pfAddRender();
   function setP(){if(bar)bar.style.width=Math.round(100*(done+fails)/todo.length)+'%';if(msg)msg.textContent='Uploading '+Math.min(todo.length,done+fails+1)+' of '+todo.length+'...';}
@@ -6500,7 +6501,7 @@ function pfUploadAll(){
       async function put(path,blob){chk(await sb.storage.from('vehicle-photos').upload(path,blob,{contentType:'image/jpeg',upsert:false}));up.push(path);}
       await put(paths.d,out.disp);await put(paths.t,out.thumb);await put(paths.o,out.orig);
       var cover=!hasCover&&!first;if(cover)hasCover=true;
-      var row={id:id,vehicle_id:v.id,uploaded_by:myId(),storage_path:paths.o,thumb_path:paths.t,display_path:paths.d,is_cover:cover,sort_order:base+ix};
+      var row={id:id,vehicle_id:v.id,uploaded_by:myId(),storage_path:paths.o,thumb_path:paths.t,display_path:paths.d,is_cover:cover,sort_order:(isFinite(base+ix)?base+ix:ix)};
       var tr=ptTagRow(it.manual?it.tag:null,'manual');for(var k in tr)row[k]=tr[k];
       var r=await sb.from('vehicle_photos').insert(row);
       if(r&&r.error&&(r.error.code==='23514')&&!PT.legacy){PT.legacy=true;tr=ptTagRow(it.manual?it.tag:null,'manual');delete row.tag_source;delete row.tag_confidence;for(k in tr)row[k]=tr[k];r=await sb.from('vehicle_photos').insert(row);}
