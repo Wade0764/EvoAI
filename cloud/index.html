@@ -803,6 +803,70 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]){
 #vd-doc #vd-airem .dai-card{padding:12px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;margin:0}
 #vd-next{display:none}
 
+/* v17 value chart */
+.vch-host{display:none}.vch-host.on{display:block}
+.vch-host.on+.hero-grid{display:none}
+.vch-one{grid-template-columns:1fr!important}
+.vch-brief{margin-top:30px}
+.vch-brief:empty{display:none}
+.vch{position:relative;--up:#7FD6A2;--down:#F0927A}
+.vch-lab{display:flex;align-items:center;gap:10px;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#C9CCD1;font-weight:500}
+.vch-big{font-size:46px;font-weight:300;letter-spacing:-.02em;margin-top:8px;font-variant-numeric:tabular-nums;line-height:1.05;color:#F2F0EB}
+.vch-big small{font-size:.62em;vertical-align:.32em;margin-right:2px;color:#E6CF9C}
+.vch-chg{font-size:19px;font-weight:500;margin-top:8px;min-height:27px;color:#F2F0EB}
+.vch-chg .up{color:var(--up)}.vch-chg .down{color:var(--down)}.vch-chg .vch-rl{color:#C9CCD1;font-weight:400}
+.vch-plot{position:relative;margin-top:10px;height:190px;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;cursor:crosshair;outline:none;overscroll-behavior:contain}
+.vch-plot:focus-visible{box-shadow:0 0 0 2px rgba(201,170,107,.6);border-radius:8px}
+.vch-svg svg{display:block;overflow:visible}
+.vch-svg text{font-family:inherit}
+.vch-st{fill:#E6CF9C;font-size:18px;font-weight:500}
+.vch-bt{fill:#DCDDE0;font-size:14px;paint-order:stroke;stroke:#07080A;stroke-width:4px;stroke-linejoin:round}
+.vch-ot{fill:#E6CF9C;font-size:14px;font-weight:600}
+.vch-hit{position:absolute;inset:0}
+.vch-x{position:absolute;left:0;width:1.5px;margin-left:-.75px;background:#C9AA6B;opacity:0;pointer-events:none;will-change:transform}
+.vch-dot{position:absolute;left:0;top:0;width:14px;height:14px;border-radius:50%;background:#F1DCA8;border:2px solid #07080A;box-shadow:0 0 0 7px rgba(201,170,107,.25);opacity:0;pointer-events:none;will-change:transform}
+.vch-bub{position:absolute;left:0;top:0;background:#14161A;border:1px solid #C9AA6B;border-radius:12px;padding:6px 12px;text-align:center;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.6);opacity:0;pointer-events:none;will-change:transform}
+.vch-bub .d{font-size:14px;color:#C9CCD1}.vch-bub .x{font-size:20px;font-weight:500;color:#E6CF9C;font-variant-numeric:tabular-nums}
+.vch.scrub .vch-svg{opacity:.92}
+.vch-axis{display:flex;justify-content:space-between;font-size:15px;color:#B3B7BE;padding:6px 2px 0;min-height:4px}
+.vch-ranges{display:flex;gap:8px;margin-top:10px;max-width:520px}
+.vch-ranges button{flex:1;min-height:44px;background:transparent;border:1px solid rgba(255,255,255,.16);color:#C9CCD1;border-radius:999px;font:500 17px/1 inherit;font-family:inherit;cursor:pointer}
+.vch-ranges button.on{background:rgba(201,170,107,.14);border-color:#C9AA6B;color:#E6CF9C}
+.vch-ranges button:disabled{opacity:.38;cursor:default}
+.vch-leg{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;font-size:15px;color:#C9CCD1}
+.vch-leg:empty{display:none}
+.vch-leg i{display:inline-block;width:22px;height:0;border-top:2.5px solid #C9AA6B;vertical-align:middle;margin-right:8px}
+.vch-leg i.d{border-top:2px dashed #DCDDE0}.vch-leg i.a{border-top:2px dashed #C9AA6B}
+.vch-leg b.o{display:inline-block;width:11px;height:11px;border-radius:50%;background:#F1DCA8;box-shadow:0 0 0 4px rgba(201,170,107,.3);vertical-align:middle;margin-right:9px}
+.vch-leg .vch-hist{color:#E6CF9C;font-size:16px}
+.vch-ins{display:flex;gap:12px;align-items:flex-start;margin-top:14px;font-size:18px;line-height:1.5;color:#F2F0EB;max-width:760px}
+.vch-ins .tag{flex:none;font-size:12px;letter-spacing:.14em;font-weight:600;color:#07080A;background:#C9AA6B;border-radius:6px;padding:4px 7px;margin-top:3px}
+.vb.has-vch>.lab,.vb.has-vch>.num{display:none}
+.vb.has-vch>.vch-host{margin-bottom:12px}
+@media (min-width:900px){.vch-big{font-size:56px}}
+#ptr{position:fixed;left:50%;top:calc(var(--sat,0px) + 8px);z-index:900;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;transform:translate3d(-50%,-90px,0);pointer-events:none;transition:opacity .2s}
+#ptr .ptr-ring{position:relative;width:46px;height:46px;border-radius:50%;background:rgba(7,8,10,.9);box-shadow:0 6px 24px rgba(0,0,0,.6)}
+#ptr .ptr-ring svg{width:100%;height:100%}
+#ptr .ptr-ring .evo-o{position:absolute;inset:30%}
+#ptr .ptr-t{font-size:14px;color:#E6CF9C;background:rgba(7,8,10,.85);padding:3px 10px;border-radius:999px}
+#ptr.spin .ptr-ring svg{animation:ptrspin 1.6s linear infinite}
+@keyframes ptrspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#ptr.spin .ptr-ring svg{animation:none}}
+.ai-disc,.vch-disc{font-size:16px;line-height:1.4;color:#C9CCD1;margin-top:6px;letter-spacing:0;text-transform:none;font-weight:400}
+.co-sec{margin-top:44px}
+.co-desc{font-size:17px;line-height:1.5;color:#C9CCD1;margin:0 0 14px}.co-muted{color:#B3B7BE}
+.co-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.09)}
+.co-n{font-size:19px;color:#F2F0EB}.co-m{font-size:15px;color:#B3B7BE;margin-top:3px;line-height:1.4}
+.co-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.co-code-box{margin-top:16px;padding:16px;border:1px solid rgba(201,170,107,.45);border-radius:14px}
+.co-code{font-size:24px;letter-spacing:.08em;color:#E6CF9C;margin-top:8px;word-break:break-all;user-select:all;-webkit-user-select:all}
+.co-link{font-size:15px;color:#C9CCD1;margin-top:6px;word-break:break-all;user-select:all;-webkit-user-select:all}
+.vin-sheet{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:0 0 calc(var(--sab,0px) + 12px)}
+.vin-card{width:min(520px,calc(100% - 24px));background:#14161A;border:1px solid rgba(201,170,107,.5);border-radius:20px;padding:20px 20px 16px;box-shadow:0 -10px 40px rgba(0,0,0,.6)}
+.vin-t{font-size:20px;line-height:1.4;color:#F2F0EB}.vin-s{font-size:16px;color:#C9CCD1;margin-top:6px}
+.vin-a{display:flex;gap:10px;margin-top:16px}.vin-a .btn{flex:1;min-height:48px;font-size:17px}
+@media (min-width:900px){.vin-sheet{align-items:center}}
+
 </style>
 </head>
 <body>
@@ -915,19 +979,20 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]){
 <div class="page active" id="page-dashboard">
       <div class="topline"><span class="lab">Collection <span id="dash-date"></span></span><div class="head-actions"><button class="btn btn-sm" onclick="openNewClient()">New client</button><button class="btn btn-sm btn-primary perm-addveh" onclick="openAddVehicleModal()">Add vehicle</button></div></div><div id="dash-empty"></div>
       <section class="hero" id="dash-hero">
+        <div class="vch-host" id="dash-vch"></div>
         <div class="hero-grid">
           <div><div class="lab">Collection value</div><div class="num" id="ph-total-value">$0</div><div class="delta" id="ph-delta"></div></div>
           <div class="hero-chart" id="ph-chart"></div>
         </div>
+        <section id="dash-brief" class="vch-brief"></section>
         <div class="stats3">
           <div><b id="ph-vehicle-count">0</b><span class="lab">Vehicles</span></div>
           <div><b id="ph-attn-count">0</b><span class="lab">Needs attention</span></div>
           <div><b id="ph-avg-health">0</b><span class="lab">Avg health</span></div>
         </div>
       </section>
-      <div class="cols2" id="dash-cols">
+      <div class="cols2 vch-one" id="dash-cols">
         <section><div class="sh first"><h2>Needs attention</h2><a onclick="goReminders()">All reminders</a></div><div id="dash-attention"></div></section>
-        <section id="dash-brief"></section>
       </div>
       <section class="sec" id="dash-veh-sec"><div class="sh first"><h2>Vehicles</h2><a id="dash-archive-link" onclick="openArchivesPage()"></a></div><div class="car-grid" id="dash-vehicles"></div></section>
       <section class="sec" id="dash-act-sec"><div class="sh first"><h2>Recent activity</h2></div><div id="dash-activity"></div></section>
@@ -935,19 +1000,20 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]){
 <div class="page" id="page-client-portal">
       <div id="cp-welcome"></div><div id="cp-redeem"></div><div class="topline"><span class="lab" id="cp-title">My collection</span><div class="head-actions"><button class="btn btn-sm btn-primary" onclick="openAddVehicleModal()">Add vehicle</button></div></div><div id="cp-banner"></div>
       <section class="hero" id="cp-hero">
+        <div class="vch-host" id="cp-vch"></div>
         <div class="hero-grid">
           <div><div class="lab">Collection value</div><div class="num" id="cp-total-value">$0</div><div class="delta" id="cp-delta"></div></div>
           <div class="hero-chart" id="cp-chart"></div>
         </div>
+        <section id="cp-brief" class="vch-brief"></section>
         <div class="stats3">
           <div><b id="cp-vehicle-count">0</b><span class="lab">Vehicles</span></div>
           <div><b id="cp-attn-count">0</b><span class="lab">Needs attention</span></div>
           <div><b id="cp-avg-health">0</b><span class="lab">Avg health</span></div>
         </div>
       </section>
-      <div class="cols2" id="cp-cols">
+      <div class="cols2 vch-one" id="cp-cols">
         <section><div class="sh first"><h2>Needs your attention</h2><a onclick="goReminders()">All reminders</a></div><div id="cp-attention"></div></section>
-        <section id="cp-brief"></section>
       </div>
       <section class="sec" id="cp-veh-sec"><div class="sh first"><h2>Vehicles</h2><a id="cp-archive-link" onclick="openArchivesPage()"></a></div><div class="car-grid" id="cp-vehicles"></div></section>
       <section class="sec" id="cp-act-sec"><div class="sh first"><h2>Recent activity</h2></div><div id="cp-activity"></div></section>
@@ -958,9 +1024,9 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]){
       <div class="page-header"><div><div class="page-title" id="cd-name">Client</div><div class="page-subtitle" id="cd-meta"></div><div id="cd-managed"></div></div>
         <div class="head-actions"><button class="btn btn-sm btn-primary perm-addveh" onclick="openAddVehicleModal()">Add vehicle</button><button class="btn btn-sm" onclick="openClientArchives()">Archives</button></div></div>
       <div class="stats-grid" id="cd-stats"></div>
-      <div class="cols2" style="margin-top:0">
+      <div class="vch-host" id="cd-vch"></div><section id="cd-brief" class="vch-brief"></section>
+      <div class="cols2 vch-one" style="margin-top:0">
         <section><div class="sh first"><h2>Needs attention</h2></div><div id="cd-attention"></div></section>
-        <section id="cd-brief"></section>
       </div>
       <section class="sec"><div class="sh first"><h2>Vehicles</h2></div><div id="cd-archive-note"></div><div class="car-grid" id="cd-vehicles"></div></section>
       <section class="sec"><div class="sh first"><h2>Owner access</h2></div><div id="cd-access"></div></section>
@@ -1530,7 +1596,7 @@ function extOf(mime,name){
 }
 // ---- permissions (UI mirrors the database rules; the database is the real gate) ----
 var PERM_KEYS=['view_service_records','view_expenses','view_documents','view_reminders','view_value_estimate','view_health_estimate','view_purchase_info','view_photos','can_add_service','can_add_documents','can_add_expenses','can_create_advisories'];
-function isRealOwnerOf(v){return !!(v&&v.clientId&&v.clientId===myId());}
+function isRealOwnerOf(v){return !!(v&&v.clientId&&(v.clientId===myId()||(typeof CO!=='undefined'&&CO.of&&v.clientId===CO.of)));}
 // A client the tech created that is not on the app yet: the tech acts as the owner until the client claims it (database rule: private.is_managing_tech).
 function managedMine(clientId){
   if(!session||!clientId)return false;
@@ -1553,7 +1619,7 @@ function canManageReminders(v){return canEditVehicle(v);}
 function canAddVehicleFor(clientId){
   if(!session||!clientId)return false;
   if(realAdmin())return true;
-  if(clientId===myId())return true;
+  if(clientId===myId()||(typeof CO!=='undefined'&&CO.of&&clientId===CO.of))return true;
   if(managedMine(clientId))return true;
   var cl=byId(C.clients,clientId);return !!(cl&&cl.canAdd);
 }
@@ -1621,7 +1687,7 @@ var DOC_TO_DB={title:'title',registration:'registration',insurance:'insurance',i
 var URG_TO_DB={red:'urgent',yellow:'recommended',green:'info'},URG_FROM_DB={urgent:'red',recommended:'yellow',info:'green'};
 var REC_TO_DB={open:'pending',accepted:'accepted',declined:'declined',completed:'completed'},REC_FROM_DB={pending:'open',accepted:'accepted',declined:'declined',completed:'completed'};
 function parseCost(s){var m=/[0-9][0-9,]*(\.[0-9]+)?/.exec(String(s||''));if(!m)return null;var n=parseFloat(m[0].replace(/,/g,''));return isNaN(n)?null:n;}
-function vx(v){return {trim:v.trim||'',ins:Number(v.insuredValue)>0?Number(v.insuredValue):'',svcM:svcMonths(v),svcI:svcMiles(v),insRep:v.insRepeat==='6months'?'6months':'yearly',rep:v.isReplica?1:'',bld:v.isReplica?(v.builder||''):''};}
+function vx(v){return {trim:v.trim||'',ins:Number(v.insuredValue)>0?Number(v.insuredValue):'',svcM:svcMonths(v),svcI:svcMiles(v),insRep:v.insRepeat==='6months'?'6months':'yearly',rep:v.isReplica?1:'',bld:v.isReplica?(v.builder||''):'',eng:v.engine||'',body:v.bodyClass||'',vdec:v.vinDecodedAt||''};}
 function vCore(v){
   return {year:toInt(v.year),make:v.make,model:v.model,color:nz(v.color),nickname:nz(v.nickname),vin:nz(String(v.vin||'').toUpperCase()),mileage:Number(v.mileage)>0?Math.round(Number(v.mileage)):null,notes:packX(v.notes||'',vx(v)),archived:!!v.archived};
 }
@@ -1720,7 +1786,7 @@ var KIND={
     sig:function(v){return JSON.stringify(vview(v));},
     insert:async function(v){
       var c=vCore(v),row={id:v.id,owner_id:v.clientId,year:c.year,make:c.make,model:c.model,color:c.color,nickname:c.nickname,vin:c.vin,mileage:c.mileage,notes:c.notes,archived:false};
-      chk(await sb.from('vehicles').insert(row));await vrSyncCols(v);
+      chk(await sb.from('vehicles').insert(row));await vrSyncCols(v);await vinSyncCols(v);try{valueAutoQueue(v.id);}catch(e){}
       if(canEditVehicle(v)||canAddVehicleFor(v.clientId)){
         if(Number(v.purchasePrice)>0||v.purchaseDate){if(canEditVehicle(v))await finSave(v,null);}
         if(canEditVehicle(v))await remSync(v,null);
@@ -1736,7 +1802,7 @@ var KIND={
         if(!prev||oc!==nc){
           var c=vCore(v);
           chk(await sb.from('vehicles').update({year:c.year,make:c.make,model:c.model,color:c.color,nickname:c.nickname,vin:c.vin,mileage:c.mileage,notes:c.notes,archived:c.archived}).eq('id',v.id));
-          await vrSyncCols(v);
+          await vrSyncCols(v);await vinSyncCols(v);
         }
         if(String(pv.purchasePrice||'')!==String(v.purchasePrice||'')||String(pv.purchaseDate||'')!==String(v.purchaseDate||''))await finSave(v,pv);
         await remSync(v,pv);
@@ -1821,7 +1887,7 @@ async function docUpload(d){
   }
   var path=d.clientId+'/'+d.vehicleId+'/'+uid()+'.'+extOf(mime,name);
   chk(await sb.storage.from('vehicle-documents').upload(path,blob,{contentType:mime,upsert:false}));
-  var ownerOnly=!!(d.type==='insurance'||d.type==='title')&&(realAdmin()||d.clientId===myId()||managedMine(d.clientId));
+  var ownerOnly=!!(d.type==='insurance'||d.type==='title')&&(realAdmin()||d.clientId===myId()||(typeof CO!=='undefined'&&CO.of&&d.clientId===CO.of)||managedMine(d.clientId));
   try{
     chk(await sb.from('documents').insert({id:d.id,vehicle_id:d.vehicleId,uploaded_by:myId(),kind:kind,title:packX(String(d.name||'Document').slice(0,120),{type:d.type,exp:d.expiry,notes:d.notes}),storage_path:path,mime_type:mime,size_bytes:blob.size||null,owner_only:ownerOnly}));
   }catch(e){await removeObject('vehicle-documents',path);throw e;}
@@ -1886,8 +1952,8 @@ async function loadAll(){
   var mine=profMap[me0];
   if(!mine)throw new Error('noprofile');
   DOCAI_REM={};
-  var res=await Promise.all([tbl('vehicles'),tbl('vehicle_financials'),tbl('reminders'),tbl('service_records'),tbl('expenses'),tbl('documents'),tbl('vehicle_photos'),tbl('advisories'),tbl('ai_estimates'),tbl('tech_access'),tbl('tech_permissions'),tbl('invites'),tbl('transfers'),tbl('vehicle_archives'),mine.role==='tech'?tbl('my_tech_visibility'):Promise.resolve([]),ovLoad()]);
-  var rows={veh:res[0],fin:res[1],rem:res[2],svc:res[3],exp:res[4],doc:res[5],pho:res[6],adv:res[7],est:res[8],acc:res[9],perm:res[10],inv:res[11],xfer:res[12],arc:res[13],vis:res[14],ov:res[15]||[]};
+  var res=await Promise.all([tbl('vehicles'),tbl('vehicle_financials'),tbl('reminders'),tbl('service_records'),tbl('expenses'),tbl('documents'),tbl('vehicle_photos'),tbl('advisories'),tbl('ai_estimates'),tbl('tech_access'),tbl('tech_permissions'),tbl('invites'),tbl('transfers'),tbl('vehicle_archives'),mine.role==='tech'?tbl('my_tech_visibility'):Promise.resolve([]),ovLoad(),cmLoad()]);
+  var rows={veh:res[0],fin:res[1],rem:res[2],svc:res[3],exp:res[4],doc:res[5],pho:res[6],adv:res[7],est:res[8],acc:res[9],perm:res[10],inv:res[11],xfer:res[12],arc:res[13],vis:res[14],ov:res[15]||[]};CO.rows=res[16]||[];CO.of=coOfRows(CO.rows,me0);
   var nc=emptyCache();
   nc.profile=mine;nc.profiles=profMap;
   var archOwners={},keepV={};
@@ -1911,7 +1977,7 @@ async function loadAll(){
   var vehicles=[];
   for(i=0;i<rows.veh.length;i++){
     var r=rows.veh[i],un=unpackX(r.notes),x=un.x,fin=byVeh.fin[r.id],rems=byVeh.rem[r.id]||[],svc=byVeh.svc[r.id]||[],pho=latestBy(byVeh.pho[r.id]||[],'created_at'),est=byVeh.est[r.id]||[];
-    var v={id:r.id,clientId:r.owner_id,year:r.year?String(r.year):'',make:r.make||'',model:r.model||'',trim:x.trim||'',isReplica:vrRep(r,x),builder:vrBld(r,x),nickname:r.nickname||'',color:r.color||'',mileage:r.mileage||0,vin:r.vin||'',notes:un.text,
+    var v={id:r.id,clientId:r.owner_id,year:r.year?String(r.year):'',make:r.make||'',model:r.model||'',trim:x.trim||'',isReplica:vrRep(r,x),builder:vrBld(r,x),engine:cleanText(r.engine||x.eng,120),bodyClass:cleanText(r.body_class||x.body,80),vinDecodedAt:r.vin_decoded_at||x.vdec||'',nickname:r.nickname||'',color:r.color||'',mileage:r.mileage||0,vin:r.vin||'',notes:un.text,
       purchasePrice:fin&&fin.purchase_price!==null?Number(fin.purchase_price):0,purchaseDate:fin&&fin.purchase_date?fin.purchase_date:'',insuredValue:Number(x.ins)>0?Number(x.ins):0,
       archived:!!r.archived,archivedAt:r.archived_at||null,archiveReason:r.archived?'archived':'',createdAt:r.created_at,updatedAt:r.updated_at,
       regExpiry:'',insRenewal:'',insRepeat:x.insRep==='6months'?'6months':'yearly',inspExpiry:'',lastServiceDate:'',nextServiceDate:'',nextServiceMiles:'',
@@ -1964,8 +2030,8 @@ async function loadAll(){
       var e=est[j];
       if(e.kind==='value'&&e.value_low!==null&&e.value_high!==null){
         var mid=(e.value_mid!==null&&e.value_mid!==undefined&&Number(e.value_mid)>0)?Math.round(Number(e.value_mid)):Math.round((Number(e.value_low)+Number(e.value_high))/2);var prevAi=v.aiValue;
-        v.valueLog.push({date:String(e.as_of).slice(0,10),value:mid,source:'AI',ai:true});
-        v.aiValue={value:mid,low:Math.round(Number(e.value_low)),high:Math.round(Number(e.value_high)),asOf:String(e.as_of).slice(0,10),sources:srcObjList(e.sources,8),notes:cleanText(e.notes,400),confidence:e.confidence===null?'':Number(e.confidence),prev:prevAi?prevAi.value:null,prevAsOf:prevAi?prevAi.asOf:''};
+        v.valueLog.push({date:String(e.as_of).slice(0,10),value:mid,source:'AI',ai:true,ts:e.as_of});
+        v.aiValue={value:mid,low:Math.round(Number(e.value_low)),high:Math.round(Number(e.value_high)),asOf:(function(t){t=new Date(e.as_of);return isNaN(t.getTime())||!/T\d/.test(String(e.as_of))?String(e.as_of).slice(0,10):isoLocal(t);})(),sources:srcObjList(e.sources,8),notes:cleanText(e.notes,400),confidence:e.confidence===null?'':Number(e.confidence),prev:prevAi?prevAi.value:null,prevAsOf:prevAi?prevAi.asOf:''};
       }
     }
     ovApply(v,rows.ov);
@@ -2007,7 +2073,7 @@ async function loadAll(){
     cl.push({id:p.id,name:displayName(p),email:p.email||'',phone:p.phone||'',location:'',since:String(p.created_at||'').slice(0,7),createdAt:p.created_at,linked:true,canAdd:!!canAdd,
       managed:!!p.managed,claimed:!!p.claimed_by,managedBy:p.managed_by||'',notes:p.notes||''});
   }
-  if(mine.role==='owner'){addClientRow(mine,true);}
+  if(mine.role==='owner'){if(CO.of&&profMap[CO.of])addClientRow(profMap[CO.of],true);else if(CO.of){seenC[CO.of]=1;cl.push({id:CO.of,name:'Collection',email:'',phone:'',location:'',createdAt:'',linked:true,canAdd:true});}else addClientRow(mine,true);}
   else if(mine.role==='tech'){
     for(i=0;i<rows.acc.length;i++){var ac=rows.acc[i];if(ac.tech_id===me0&&ac.status==='active')addClientRow(profMap[ac.owner_id],ac.vehicle_id===null||(profMap[ac.owner_id]&&profMap[ac.owner_id].managed));}
   }else{
@@ -2222,7 +2288,7 @@ function viewAsRestore(acct){
     else if(o.role==='owner'&&o.clientId)session.viewAs={role:'owner',clientId:String(o.clientId)};
   }catch(e){}
 }
-function ownerClientId(){var a=me();return (a&&a.role==='owner')?(a.clientId||null):null;}
+function ownerClientId(){var a=me();return (a&&a.role==='owner')?((typeof CO!=='undefined'&&CO.of)||a.clientId||null):null;}
 function ownerClient(){var cid=ownerClientId();return cid?byId(getClients(),cid):null;}
 // Archived vehicles stay in storage but leave active totals.
 function isArchivedVehicle(v){return !!(v&&v.archived===true);}
@@ -2594,6 +2660,7 @@ function inviteDoneText(d){
   for(i=0;i<cl.length;i++)n+=Number(cl[i]&&cl[i].vehicles)||0;
   if(d.kind==='client_owner')return n?('Connected. '+n+' vehicle'+(n===1?'':'s')+' your tech already added '+(n===1?'is':'are')+' now in your collection.'):'Connected. Your tech can now see your collection.';
   if(d.kind==='transfer')return 'The vehicle is now in your collection.';
+  if(d.kind==='co_owner')return 'You are now a co-owner of this collection.';
   return 'Access added. Look under Clients.';
 }
 var CAPCLAIM=true;
@@ -3039,7 +3106,7 @@ function handlePhoto(input,ctx){
   });
 }
 function readResized(file,input,cb){
-  if(file.type&&file.type.indexOf('image/')!==0||!file.type&&!/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name||'')){showToast('Please choose a photo (image file)','error');if(input)input.value='';return;}
+  if(!(file.type&&file.type.indexOf('image/')===0)&&!(!file.type&&/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name||''))){showToast('Please choose a photo (image file)','error');if(input)input.value='';return;}
   shrinkPhotoToDataUrl(file,MAX_PHOTO_DIM,MAX_PHOTO_BYTES,'#fff').then(cb,function(e){photoShrinkError(e);if(input)input.value='';});
 }
 
@@ -3406,7 +3473,7 @@ function renderOverview(owner,vehicles){
   var archN=visibleArchives().length;
   elHTML(n+'-total-value',valueOverviewNum(t));valueEnsureProbe();
   elHTML(n+'-delta',deltaHTML(t));
-  elHTML(n+'-chart',portfolioChartHTML(vehicles,t.gain));
+  elHTML(n+'-chart',portfolioChartHTML(vehicles,t.gain));vchRenderCollection(p,vehicles);
   elText(n+'-vehicle-count',String(vehicles.length));
   var ac=document.getElementById(n+'-attn-count');
   if(ac){ac.textContent=String(att.length);ac.className=att.length?'hot':'';}
@@ -3439,12 +3506,12 @@ function renderClientDetail(){
   elText('cd-meta',[c.location,c.email,c.phone].filter(function(x){return x;}).join(' / '));
   elHTML('cd-managed',managedBannerHTML(c));
   elHTML('cd-stats',
-    '<div class="stat-card"><div class="stat-value">'+totalMoney(t)+'</div><div class="stat-label">Collection value</div>'+(t.basis>0?'<div class="stat-delta '+(t.gain>=0?'':'neg')+'">'+esc(pct(t.pctGain))+'</div>':'')+'</div>'+
+    '<div class="stat-card"><div class="stat-value">'+totalMoney(t)+'</div><div class="stat-label">Collection value</div>'+(t.nValued>t.nOwner?'<div class="ai-disc">Estimate, not an appraisal</div>':'')+(t.basis>0?'<div class="stat-delta '+(t.gain>=0?'':'neg')+'">'+esc(pct(t.pctGain))+'</div>':'')+'</div>'+
     '<div class="stat-card"><div class="stat-value">'+(t.basisAll>0?money(t.basisAll):'--')+'</div><div class="stat-label">Cost basis</div></div>'+
     '<div class="stat-card"><div class="stat-value">'+vehicles.length+'</div><div class="stat-label">Vehicles</div></div>');
   renderClientAccess(c.id);
   elHTML('cd-attention',attentionHTML(vehicles,6));
-  elHTML('cd-brief',collectionBrief(vehicles));
+  elHTML('cd-brief',collectionBrief(vehicles));vchRenderCollection('cd',vehicles);
   elHTML('cd-archive-note',archN?'<div class="doc-meta" style="padding:12px 0 0;">'+archN+' archived vehicle'+(archN===1?' is':'s are')+' kept in Archives and not included in the totals above.</div>':'');
   elHTML('cd-vehicles',vehicles.length?vehicles.map(function(v){return vehicleCardHTML(v);}).join(''):emptyCard(archN?'No active vehicles. Archived copies are in Archives.':'No vehicles yet for this client.<div><button class="btn btn-primary" onclick="openAddVehicleFor(\''+jsId(c.id)+'\')">Add first vehicle for '+esc(c.name)+'</button></div>','grid-column:1/-1;'));
 }
@@ -3552,7 +3619,7 @@ function saveVehicle(){
     for(var k in fields)if(fields.hasOwnProperty(k))v[k]=fields[k];
     if(pendingVehicleImage==='__remove__')v.image=null;
     else if(pendingVehicleImage)v.image=pendingVehicleImage;
-    v.updatedAt=now;saved=v;
+    v.updatedAt=now;saved=v;vinFormApply(v,false);
     if(!setVehicles(vehicles))return;
     audit('vehicle.updated','Vehicle details updated: '+vName(v),{clientId:v.clientId,vehicleId:v.id});
     showToast('Vehicle updated','success');
@@ -3561,7 +3628,7 @@ function saveVehicle(){
     if(pp&&pdate&&pdate<todayISO())log.push({date:pdate,value:pp,source:'Purchase price'});
     var nv={id:uid(),image:(pendingVehicleImage&&pendingVehicleImage!=='__remove__')?pendingVehicleImage:null,valueLog:log,createdAt:now};
     for(var k2 in fields)if(fields.hasOwnProperty(k2))nv[k2]=fields[k2];
-    vehicles.push(nv);saved=nv;
+    vinFormApply(nv,true);vehicles.push(nv);saved=nv;
     if(!setVehicles(vehicles))return;
     audit('vehicle.created','Vehicle added: '+vName(nv)+' ('+vFull(nv)+')',{clientId:nv.clientId,vehicleId:nv.id});
     showToast('Vehicle added','success');
@@ -3575,24 +3642,18 @@ var MAX_PHOTO_BYTES=1.5*1024*1024,MAX_PHOTO_DIM=1280,MAX_RAW_BYTES=15*1024*1024;
 function pickVehicleImage(){var i=document.getElementById('v-img-input');if(i){i.value='';i.click();}}
 function clearVehicleImage(){resetImagePicker();if(editingVehicleId)pendingVehicleImage='__remove__';}
 function dataUrlBytes(u){var i=u.indexOf(',');return Math.round((u.length-i-1)*3/4);}
-// Decode (createImageBitmap, <img> fallback) -> resize to maxDim -> JPEG. Size is checked ONLY on the output;
-// if still over maxBytes, step quality down, then dimensions down, until it fits. Never blocks on input size.
-function photoShrinkError(e){
-  var m=String((e&&(e.message||e))||'');
-  if(m==='decode')showToast('This image format is not supported here. Try a JPEG or PNG.','error');
-  else showToast('Could not read this photo','error');
-}
+// v16b/v17 size fix helpers: shrink first, check only the output
+function photoShrinkError(e){showToast(e&&e.message==='decode'?'This image format is not supported here. Try a JPEG or PNG.':'Could not read this photo','error');}
 function blobToDataUrl(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=function(){rej(new Error('read'));};r.readAsDataURL(b);});}
 async function shrinkPhotoBlob(file,maxDim,maxBytes,bg){
   var d=await pfDecode(file).catch(function(){throw new Error('decode');});
   try{
-    if(!d.w||!d.h)throw new Error('decode');
-    var dim=Math.min(maxDim,Math.max(d.w,d.h)),qs=[0.8,0.7,0.6,0.5,0.4],b=null;
-    for(var step=0;step<8;step++){
-      for(var i=0;i<qs.length;i++){b=await pfEncode(d,dim,qs[i],bg);if(b.size<=maxBytes)return b;}
+    var dim=Math.min(maxDim,Math.max(d.w,d.h)),last=null,Q=[0.8,0.7,0.6,0.5,0.4];
+    for(var s=0;s<8;s++){
+      for(var i=0;i<Q.length;i++){last=await pfEncode(d,dim,Q[i],bg);if(last.size<=maxBytes)return last;}
       dim=Math.max(64,Math.round(dim*0.75));
     }
-    return b;
+    return last;
   }finally{d.done();}
 }
 function shrinkPhotoToDataUrl(file,maxDim,maxBytes,bg){return shrinkPhotoBlob(file,maxDim,maxBytes,bg).then(blobToDataUrl);}
@@ -3600,11 +3661,11 @@ function handleVehicleImage(input){
   var file=input&&input.files&&input.files[0];if(!file)return;
   if(file.type&&file.type.indexOf('image/')!==0){showToast('Please choose an image file','error');input.value='';return;}
   shrinkPhotoToDataUrl(file,MAX_PHOTO_DIM,MAX_PHOTO_BYTES,'#000').then(function(out){
-      pendingVehicleImage=out;
-      autoIdIdentify(out);
-      var ps=document.getElementById('v-img-preview-src');if(ps)ps.src=out;
-      showEl('v-img-preview',true);
-      showToast('Photo ready ('+Math.round(dataUrlBytes(out)/1024)+' KB)','success');
+    pendingVehicleImage=out;
+    autoIdIdentify(out);
+    var ps=document.getElementById('v-img-preview-src');if(ps)ps.src=out;
+    showEl('v-img-preview',true);
+    showToast('Photo ready ('+Math.round(dataUrlBytes(out)/1024)+' KB)','success');
   },function(e){photoShrinkError(e);input.value='';});
 }
 // ============ VIN DECODE (suggestion only, never auto-saved) ============
@@ -3617,7 +3678,7 @@ function withTimeout(promise,ms,ctl){
 function cleanText(x,max){return (x===null||x===undefined)?'':String(x).replace(/[\u0000-\u001f]/g,' ').trim().slice(0,max);}
 function cleanVin(){return val('v-vin').replace(/\s+/g,'').toUpperCase();}
 function vinChanged(){
-  var ok=cleanVin().length===17;
+  var ok=cleanVin().length===17;try{if(VIN.form&&VIN.form.vin!==cleanVin())VIN.form=null;vinAutoForm();}catch(e){}
   showEl('v-vin-row',ok);
   var m=document.getElementById('v-vin-msg');if(m){m.textContent='';m.style.display='none';}
 }
@@ -3625,6 +3686,7 @@ function setVinMsg(t){var m=document.getElementById('v-vin-msg');if(!m)return;m.
 function titleCase(s){return String(s||'').toLowerCase().replace(/(^|[\s-])([a-z])/g,function(m,a,b){return a+b.toUpperCase();});}
 function fillFromVin(){
   var vin=cleanVin();
+  if(vinOk(vin)&&!vinFormReplica()){VIN.form=null;clearTimeout(VIN.tm);vinFormDecode();return;}
   if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(vin)){setVinMsg('A VIN has 17 letters and numbers (no I, O or Q).');return;}
   var btn=document.getElementById('v-vin-btn');if(btn)btn.disabled=true;
   setVinMsg('Looking up VIN...');
@@ -3803,7 +3865,7 @@ function renderValuations(){
   var vehicles=visibleVehicles(),exs=getExpenses(),adv=isAdvisor();
   var t=portfolioTotals(vehicles);
   elHTML('val-stats',
-    '<div class="stat-card"><div class="stat-value">'+totalMoney(t)+'</div><div class="stat-label">Collection value</div>'+(t.nPending?'<div class="stat-delta muted">'+t.nPending+' without an estimate</div>':(t.nValued?'<div class="stat-delta muted">Estimate, range '+money(t.low)+' to '+money(t.high)+'</div>':''))+'</div>'+
+    '<div class="stat-card"><div class="stat-value">'+totalMoney(t)+'</div><div class="stat-label">Collection value</div>'+(t.nValued>t.nOwner?'<div class="ai-disc">Estimate, not an appraisal</div>':'')+(t.nPending?'<div class="stat-delta muted">'+t.nPending+' without an estimate</div>':(t.nValued?'<div class="stat-delta muted">Estimate, range '+money(t.low)+' to '+money(t.high)+'</div>':''))+'</div>'+
     '<div class="stat-card"><div class="stat-value '+(t.gain>=0?'pos':'neg')+'">'+(t.basis>0?money(t.gain):'--')+'</div><div class="stat-label">Unrealized gain / loss</div>'+(t.basis>0?'<div class="stat-delta '+(t.gain>=0?'':'neg')+'">'+esc(pct(t.pctGain))+'</div>':'')+'</div>'+
     '<div class="stat-card"><div class="stat-value">'+(t.basisAll>0?money(t.basisAll):'--')+'</div><div class="stat-label">Cost basis</div></div>');
   var rows='';
@@ -5528,7 +5590,7 @@ function renderAccess(){
       return '<div class="access-row"><div><div class="doc-meta">'+esc(i.email||'Any email')+' / '+esc(v?vFull(v):'All vehicles')+' / expires '+esc(fmtDate(String(i.expires_at).slice(0,10)))+'</div>'+inviteRowExtras(i.id,i.email)+'</div><button class="btn btn-sm" onclick="revokeInviteById(\''+jsId(i.id)+'\')">Cancel invite</button></div>';
     }).join('');
   }
-  elHTML('access-body',h);
+  elHTML('access-body',h);coRender();
   revealMissingCodes(open.map(function(i){return i.id;}));
 }
 function openRemoveMember(techId){
@@ -5876,11 +5938,10 @@ async function pfProcess(file){
   if(!file||!/^image\//.test(file.type||'')&&!/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name||''))throw new Error('notimage');
   var d=await pfDecode(file).catch(function(){throw new Error('decode');});
   try{
-    var PF_ORIG_MAX=14*1024*1024;
-    var keep=(file.type==='image/jpeg'&&file.size<=PF_ORIG_MAX);
+    var keep=(file.type==='image/jpeg'&&file.size<=14*1024*1024);
     var orig=keep?file:null;
-    if(!orig){var od=4096,oq=[0.92,0.85,0.75,0.65];
-      for(var st=0;st<6&&!orig;st++){for(var qi=0;qi<oq.length;qi++){var ob=await pfEncode(d,od,oq[qi]);if(ob.size<=PF_ORIG_MAX){orig=ob;break;}}od=Math.round(od*0.75);}
+    if(!orig){var PF_ORIG_MAX=14*1024*1024,dm=Math.min(4096,Math.max(d.w,d.h));
+      outer:for(var s=0;s<6;s++){for(var qi=0,Q=[0.92,0.85,0.75,0.65];qi<Q.length;qi++){var b=await pfEncode(d,dm,Q[qi]);if(b.size<=PF_ORIG_MAX){orig=b;break outer;}}dm=Math.round(dm*0.75);}
       if(!orig)orig=await pfEncode(d,1600,0.8);}
     var disp=await pfEncode(d,1600,0.86),th=await pfEncode(d,400,0.8);
     return {orig:orig,disp:disp,thumb:th};
@@ -6093,12 +6154,14 @@ function swbInit(){
   window.addEventListener('pointerdown',function(e){
     if(e.pointerType==='mouse')return;
     if(e.clientX>SWB.edge+sal())return;
+    if(e.target&&e.target.closest&&e.target.closest('.vch-plot'))return;
     var t=swbTarget();if(!t)return;
     SWB.claim={t:t,x:e.clientX,y:e.clientY};e.stopPropagation();
   },true);
   window.addEventListener('touchstart',function(e){
     if(e.touches.length>1){if(SWB.on)swbEnd(false);SWB.claim=null;return;}
     var p=e.touches[0];if(p.clientX>SWB.edge+sal()){SWB.claim=null;return;}
+    if(e.target&&e.target.closest&&e.target.closest('.vch-plot')){SWB.claim=null;return;}
     var t=(SWB.claim&&SWB.claim.t)||swbTarget();SWB.claim=null;if(!t)return;
     SWB.on={t:t,x0:p.clientX,y0:p.clientY,dx:0,mode:0,t0:Date.now()};e.stopPropagation();
   },{capture:true,passive:true});
@@ -6219,6 +6282,7 @@ async function docAiScan(docId){
   if(!s||typeof s!=='object'||!s.category){docAiState('note','The scan did not return usable details. Enter them below.');return;}
   DOCAI.fn=true;
   DOCAI.edit.scan=s;
+  try{if(s.vin&&vinOk(s.vin)&&DOCAI.edit.vehicleId){var _dv=byId(getVehicles(),DOCAI.edit.vehicleId);if(_dv&&vinNorm(_dv.vin)!==vinNorm(s.vin))setTimeout(function(){vinApplyToVehicle(_dv.id,s.vin,'ask','The document shows VIN '+vinNorm(s.vin)+': ');},400);}}catch(e){}
   docAiFill({category:s.category,title:s.title,docDate:s.doc_date,vendor:s.vendor,mileage:s.mileage,amount:s.amount,expiresOn:s.expires_on,services:s.services||[],summary:s.summary||''});
   DOCAI.edit.base=docAiRead();
   DOCAI.edit.rems=(s.reminders||[]).map(function(x){return {kind:x.kind,title:x.title,due_date:x.due_date,due_mileage:x.due_mileage,repeat_months:x.repeat_months,repeat_miles:x.repeat_miles,reason:x.reason,on:true};});
@@ -6515,6 +6579,7 @@ function pfUploadAll(){
       PF.focusId=first;PF.tag='';
       try{await loadAll();}catch(e){}
       refreshCurrent();refreshDetailIfOpen();
+      try{var _vv=byId(getVehicles(),v.id);if(_vv&&!(_vv.aiValue&&Number(_vv.aiValue.value)>0))valueAutoQueue(v.id,300);}catch(e){}
       var allManual=todo.every(function(i){return i.state!=='done'||i.manual;});
       if(!fails&&allManual){showToast(done+' photo'+(done===1?'':'s')+' added to the portfolio','success');setTimeout(function(){pfCloseAdd();},350);}
     }
@@ -6710,6 +6775,7 @@ function vbFinish(v){
   var host=document.getElementById('vd-value');
   [].slice.call(host.children).forEach(function(c){if(c!==p&&c.classList.contains('delta'))p.appendChild(c);});
   var t=document.createElement('div');t.className='vb-tail';t.innerHTML=vbTailHTML(v);p.appendChild(t);
+  vchRenderVehicle(v);
   var rl=document.getElementById('vd-rep');if(rl)rl.remove();
   if(v.isReplica){var sub=document.getElementById('vd-sub');if(sub)sub.insertAdjacentHTML('afterend','<div class="vr-line" id="vd-rep"><span class="vr-badge">Replica</span>'+(v.builder?'<span>by '+esc(v.builder)+'</span>':'')+'</div>');}
 }
@@ -6759,6 +6825,495 @@ async function dsecUpload(v,blob,mime,label){
 }
 // photo dump "Scan as document?" uses the same path
 async function ptScanBlob(v,blob,label){return dsecUpload(v,blob,'image/jpeg',label||'Photo document');}
+// ===== v17: value chart (collection + vehicle). Plain SVG + vanilla JS. Real ai_estimates rows only (v.valueLog ai:true, mid), owner value priority. =====
+var VCH={st:{},ranges:['1M','3M','1Y','All'],months:{'1M':1,'3M':3,'1Y':12,'All':0},rl:{'1M':'past month','3M':'past 3 months','1Y':'past year','All':'since the first estimate'}};
+function vchT(s){var d=parseDate(s);if(!d)return NaN;d.setHours(12,0,0,0);return d.getTime();}
+function vchNum(n){n=Number(n);return isFinite(n)?n:0;}
+function vchShort(s){var d=parseDate(s);return d?d.toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';}
+// AI points for one vehicle: one per day (the latest of that day), ascending.
+function vchAiPts(v){
+  var m={},out=[];
+  (v&&v.valueLog||[]).forEach(function(p){if(!(p&&p.ai===true&&Number(p.value)>0))return;var dd=String(p.date||'').slice(0,10);
+    if(p.ts&&/T\d/.test(String(p.ts))){var t=new Date(p.ts);if(!isNaN(t.getTime()))dd=isoLocal(t);}
+    if(isFinite(vchT(dd)))m[dd]=Math.round(Number(p.value));});
+  Object.keys(m).sort().forEach(function(d){out.push({d:d,v:m[d]});});
+  return out;
+}
+function vchOwner(v){var o=(typeof ovVal==='function')?ovVal(v):null;if(o===null||!(o>0))return null;var s=v.ownerValue&&v.ownerValue.setAt;return {v:Math.round(o),d:(s&&isFinite(vchT(s)))?String(s).slice(0,10):todayISO()};}
+// value of one car as of day d (carry forward). Owner value wins from the day it was set.
+function vchValAt(ai,own,d){
+  if(own&&own.d<=d)return own.v;
+  var r=null;for(var i=0;i<ai.length;i++){if(ai[i].d<=d)r=ai[i].v;else break;}return r;
+}
+// Collection series: every date any car got a value; sum of each car's latest value as of that date. Ends today at the current total.
+function vchCollSeries(vehicles,today){
+  today=today||todayISO();
+  var cars=[],dates={};
+  (vehicles||[]).forEach(function(v){if(!can(v,'view_value_estimate'))return;var ai=vchAiPts(v),own=vchOwner(v);if(!ai.length&&!own)return;
+    cars.push({v:v,ai:ai,own:own});ai.forEach(function(p){dates[p.d]=1;});if(own)dates[own.d<=today?own.d:today]=1;});
+  var ds=Object.keys(dates).sort(),pts=[];
+  ds.forEach(function(d){var sum=0,parts={},n=0;cars.forEach(function(c){var x=vchValAt(c.ai,c.own,d);if(x!==null){sum+=x;parts[c.v.id]=x;n++;}});if(n)pts.push({d:d,v:sum,parts:parts});});
+  var real=pts.length;
+  if(pts.length&&pts[pts.length-1].d<today){var lp=pts[pts.length-1];pts.push({d:today,v:lp.v,parts:lp.parts,ext:true});}
+  return {pts:pts,real:real,cars:cars};
+}
+// Slice a series to a range; carry the last value before the range start in as the first point.
+function vchSlice(pts,r,today){
+  if(!pts.length)return [];
+  var m=VCH.months[r];if(!m)return pts.slice();
+  var t=parseDate(today||todayISO());t.setMonth(t.getMonth()-m);var s=isoLocal(t),out=[],before=null;
+  pts.forEach(function(p){if(p.d<s)before=p;else out.push(p);});
+  if(before&&out.length&&out[0].d>s)out.unshift({d:s,v:before.v,parts:before.parts,carry:true});
+  return out;
+}
+function vchChange(sl){if(sl.length<2)return null;var a=sl[0].v,b=sl[sl.length-1].v,d=b-a;return {d:d,p:a?d/a*100:0,a:a,b:b};}
+function vchChgHTML(c,lbl){
+  if(!c)return '';
+  var up=c.d>=0,cl=c.d===0?'':(up?'up':'down'),ar=c.d===0?'':(up?'\u25B2 +':'\u25BC \u2212');
+  return '<span class="'+cl+'">'+(c.d===0?'No change':ar+money(Math.abs(c.d)).replace('-','')+' ('+(up?'+':'\u2212')+Math.abs(c.p).toFixed(1)+'%)')+'</span> <span class="vch-rl">'+esc(lbl)+'</span>';
+}
+function vchPct(c){return Math.abs(c.p).toFixed(1)+'%';}
+// ---------- insight lines (local, from the real data; no API calls) ----------
+function vchFirstText(d){return 'First AI estimate recorded '+vchShort(d)+'. Trends appear after a few weekly updates.';}
+function vchCollInsight(S,r,today){
+  if(S.real<2){var f=S.pts.length?S.pts[0].d:today;return vchFirstText(f);}
+  var sl=vchSlice(S.pts,r,today),c=vchChange(sl);if(!c)return 'Not enough history for this range yet.';
+  var a=sl[0],b=sl[sl.length-1],best=null,added=0,txt;
+  S.cars.forEach(function(k){var id=k.v.id,x=a.parts[id],y=b.parts[id];if(x===undefined&&y!==undefined){added++;return;}if(x===undefined||y===undefined)return;var dd=y-x;if(!best||Math.abs(dd)>Math.abs(best.d))best={d:dd,n:vName(k.v)};});
+  if(c.d===0)txt='Unchanged over the '+VCH.rl[r].replace('since the first estimate','whole history')+'.';
+  else txt=(c.d>0?'Up ':'Down ')+vchPct(c)+' ('+(c.d>0?'+':'\u2212')+money(Math.abs(c.d)).replace('-','')+') '+(r==='All'?'since the first estimate':'over the '+VCH.rl[r])+'.';
+  if(best&&best.d!==0)txt+=' Biggest mover: '+best.n+' ('+(best.d>0?'+':'\u2212')+money(Math.abs(best.d)).replace('-','')+').';
+  if(added)txt+=' '+added+' vehicle'+(added===1?'':'s')+' got a first value in this period.';
+  var no=S.cars.filter(function(k){return !!k.own;}).length;if(no)txt+=' Uses your own value for '+no+' vehicle'+(no===1?'':'s')+'.';
+  return txt;
+}
+function vchConfText(v){
+  var a=v.aiValue;if(!a)return '';var cf=a.confidence===''||a.confidence===null||a.confidence===undefined?null:Number(a.confidence),ns=(a.sources||[]).length,bits=[];
+  if(cf!==null&&isFinite(cf))bits.push((cf<0.3?'low confidence (':'')+Math.round(cf*100)+'% confidence'+(cf<0.3?')':''));
+  bits.push(ns?ns+' source'+(ns===1?'':'s'):'no sources returned');
+  return 'Latest estimate: '+bits.join(', ')+'.';
+}
+function vchVehInsight(v,ai,own,r,today){
+  var txt='';
+  if(ai.length<2)txt=ai.length?vchFirstText(ai[0].d):'No AI estimate yet.';
+  else{var c=vchChange(vchSlice(vchExt(ai,today),r,today));
+    if(!c)txt='Not enough history for this range yet.';
+    else if(c.d===0)txt='AI estimate unchanged over the '+(r==='All'?'whole history':VCH.rl[r])+'.';
+    else txt='AI estimate '+(c.d>0?'up ':'down ')+vchPct(c)+' ('+(c.d>0?'+':'\u2212')+money(Math.abs(c.d)).replace('-','')+') '+(r==='All'?'since the first estimate':'over the '+VCH.rl[r])+'.';}
+  if(ai.length)txt+=' '+vchConfText(v);
+  if(v.isReplica)txt+=' Valued as a replica'+(v.builder?' by '+v.builder:'')+'.';
+  if(own&&ai.length){var dd=own.v-ai[ai.length-1].v;txt+=' Your owner value is '+(dd===0?'the same as':money(Math.abs(dd))+(dd>0?' above':' below'))+' the latest AI estimate.';}
+  return txt;
+}
+function vchExt(ai,today){var p=ai.slice();if(p.length&&p[p.length-1].d<today)p.push({d:today,v:p[p.length-1].v,ext:true});return p;}
+// ---------- models ----------
+function vchCollModel(id,vehicles){
+  var today=todayISO(),S=vchCollSeries(vehicles,today);if(!S.pts.length)return null;
+  var t=portfolioTotals(vehicles),cur=t.value>0?t.value:S.pts[S.pts.length-1].v;
+  if(S.pts.length)S.pts[S.pts.length-1].v=cur; // the line ends at the same total the rest of the app shows
+  var basisOk=S.cars.length&&S.cars.every(function(k){return Number(k.v.purchasePrice)>0&&can(k.v,'view_purchase_info');});
+  return {id:id,kind:'coll',today:today,label:'Collection value',value:cur,S:S,main:S.pts,real:S.real,
+    basis:basisOk?function(p){var b=0;S.cars.forEach(function(k){if(p.parts&&p.parts[k.v.id]!==undefined)b+=Number(k.v.purchasePrice);});return b;}:null,
+    insight:function(r){return vchCollInsight(S,r,today);},nOwner:S.cars.filter(function(k){return !!k.own;}).length};
+}
+function vchVehModel(id,v){
+  if(!v||!can(v,'view_value_estimate'))return null;
+  var today=todayISO(),ai=vchAiPts(v),own=vchOwner(v);if(!ai.length&&!own)return null;
+  var pp=Number(v.purchasePrice)>0&&can(v,'view_purchase_info')?Number(v.purchasePrice):0;
+  var m={id:id,kind:'veh',today:today,v:v,own:own,ai:ai,real:ai.length,basis:pp?function(){return pp;}:null,
+    label:own?'Owner value':'Estimated value',value:own?own.v:ai[ai.length-1].v,
+    insight:function(r){return vchVehInsight(v,ai,own,r,today);}};
+  if(own){m.main=[];m.dash=ai;m.real=ai.length+1;}else m.main=vchExt(ai,today);
+  return m;
+}
+function vchHasAi(m){return m.kind==='coll'?m.S.cars.some(function(k){return !k.own&&k.ai.length;}):!!(m.ai&&m.ai.length);}
+// ---------- render ----------
+function vchSeriesFor(m,r){return m.own?{main:[],dash:vchSlice(m.ai,r,m.today)}:{main:vchSlice(m.main,r,m.today),dash:[]};}
+function vchRangeOk(m,r){if(m.real<2)return false;var s=vchSeriesFor(m,r);return (m.own?s.dash.length+1:s.main.length)>=2;}
+function vchMount(hostId,m){
+  var host=document.getElementById(hostId);if(!host)return;
+  if(!m){host.innerHTML='';host.classList.remove('on');delete VCH.st[hostId];return;}
+  var key=m.kind+':'+(m.v?m.v.id:m.id),prev=VCH.st[hostId],r=prev&&prev.key===key&&prev.r;
+  if(!r||!vchRangeOk(m,r)){r='1Y';if(!vchRangeOk(m,r)){r=null;for(var i=VCH.ranges.length-1;i>=0;i--)if(vchRangeOk(m,VCH.ranges[i])){r=VCH.ranges[i];break;}if(!r)r='All';if(vchRangeOk(m,'1Y'))r='1Y';}}
+  var st={m:m,r:r,key:key,host:host,sel:null,raf:0};VCH.st[hostId]=st;
+  host.classList.add('on');
+  host.innerHTML='<div class="vch" data-kind="'+m.kind+'">'+
+    '<div class="vch-head"><div class="vch-lab"><span class="vch-labt"></span>'+'</div><div class="vch-big" aria-live="polite"></div><div class="vch-chg"></div><div class="vch-disc"'+(vchHasAi(m)?'':' hidden')+'>Estimate, not an appraisal</div></div>'+
+    '<div class="vch-plot" role="img" tabindex="0"><div class="vch-svg"></div><div class="vch-hit" aria-hidden="true"></div><div class="vch-x" aria-hidden="true"></div><div class="vch-dot" aria-hidden="true"></div><div class="vch-bub" aria-hidden="true"><div class="d"></div><div class="x"></div></div></div>'+
+    '<div class="vch-axis" aria-hidden="true"></div>'+
+    '<div class="vch-ranges" role="group" aria-label="Chart range">'+VCH.ranges.map(function(k){var ok=vchRangeOk(m,k);return '<button type="button" data-r="'+k+'"'+(ok?'':' disabled aria-disabled="true"')+'>'+k+'</button>';}).join('')+'</div>'+
+    '<div class="vch-leg"></div>'+
+    '<div class="vch-ins"><span class="tag">AI</span><div class="vch-inst"></div></div></div>';
+  host.querySelectorAll('.vch-ranges button').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();if(b.disabled)return;st.r=b.getAttribute('data-r');st.sel=null;vchDraw(st);});});
+  vchBind(st);vchDraw(st);
+  if(!VCH.rs){VCH.rs=1;var tm=0;window.addEventListener('resize',function(){clearTimeout(tm);tm=setTimeout(function(){Object.keys(VCH.st).forEach(function(k){var s=VCH.st[k];if(s.host&&document.body.contains(s.host))vchDraw(s);});},150);});}
+}
+function vchGeom(st){
+  var m=st.m,plot=st.host.querySelector('.vch-plot'),W=Math.max(260,Math.round(plot.clientWidth||st.host.clientWidth||360)),H=W>640?240:190;
+  var s=vchSeriesFor(m,st.r),all=s.main.concat(s.dash),vals=all.map(function(p){return p.v;});
+  if(m.own)vals.push(m.own.v);
+  var bl=[];if(m.basis&&s.main.length)bl=s.main.map(function(p){return {d:p.d,v:m.basis(p)};}).filter(function(p){return p.v>0;});else if(m.basis&&m.own)bl=[{d:(s.dash[0]||{d:m.today}).d,v:m.basis()},{d:m.today,v:m.basis()}];
+  bl.forEach(function(p){vals.push(p.v);});
+  var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);if(!isFinite(mn)){mn=0;mx=1;}
+  var pad=(mx-mn)*0.14;if(!(pad>0))pad=Math.max(1,mx*0.04);mn-=pad;mx+=pad;
+  var t0=Infinity,t1=-Infinity;all.concat(m.own?[{d:m.today}]:[]).forEach(function(p){var t=vchT(p.d);if(t<t0)t0=t;if(t>t1)t1=t;});
+  if(!(t1>t0)){t0-=864e5*3;t1+=864e5*3;}
+  var PL=W>640?6:4,PR=W>640?10:14,PT=56,PB=12;
+  return {W:W,H:H,PL:PL,PR:PR,PT:PT,PB:PB,mn:mn,mx:mx,t0:t0,t1:t1,s:s,bl:bl,
+    X:function(d){return PL+(W-PL-PR)*(vchT(d)-t0)/(t1-t0);},Y:function(v){return PT+(H-PT-PB)*(1-(v-mn)/(mx-mn));}};
+}
+function vchPath(pts,G){
+  var P=pts.map(function(p){return [G.X(p.d),G.Y(p.v)];});if(!P.length)return '';
+  var d='M'+P[0][0].toFixed(1)+','+P[0][1].toFixed(1);
+  for(var i=0;i<P.length-1;i++){var p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||p2;
+    // monotone-ish: clamp control points vertically to the segment so the curve never overshoots real values
+    var y1=p1[1]+(p2[1]-p0[1])/6,y2=p2[1]-(p3[1]-p1[1])/6,lo=Math.min(p1[1],p2[1]),hi=Math.max(p1[1],p2[1]);y1=Math.min(hi,Math.max(lo,y1));y2=Math.min(hi,Math.max(lo,y2));
+    d+=' C'+(p1[0]+(p2[0]-p0[0])/6).toFixed(1)+','+y1.toFixed(1)+' '+(p2[0]-(p3[0]-p1[0])/6).toFixed(1)+','+y2.toFixed(1)+' '+p2[0].toFixed(1)+','+p2[1].toFixed(1);}
+  return d;
+}
+function vchDraw(st){
+  var m=st.m,h=st.host,G=vchGeom(st),s=G.s,W=G.W,H=G.H,id='vg'+Math.random().toString(36).slice(2,7),svg;
+  st.G=G;st.pts=s.main.length?s.main:s.dash.concat(m.own?[{d:m.today,v:m.own.v,own:true}]:[]);
+  h.querySelectorAll('.vch-ranges button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-r')===st.r&&m.real>=2);b.setAttribute('aria-pressed',b.getAttribute('data-r')===st.r&&m.real>=2?'true':'false');});
+  svg='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" focusable="false"><defs><linearGradient id="'+id+'f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9AA6B" stop-opacity=".34"/><stop offset=".6" stop-color="#C9AA6B" stop-opacity=".08"/><stop offset="1" stop-color="#C9AA6B" stop-opacity="0"/></linearGradient>'+
+    '<linearGradient id="'+id+'l" x1="0" x2="1"><stop offset="0" stop-color="#9C8350"/><stop offset=".7" stop-color="#C9AA6B"/><stop offset="1" stop-color="#F1DCA8"/></linearGradient>'+
+    '<filter id="'+id+'g" x="-10%" y="-60%" width="120%" height="220%"><feGaussianBlur stdDeviation="5"/></filter></defs>';
+  for(var g=1;g<4;g++){var gy=G.PT+(H-G.PT-G.PB)*g/4;svg+='<line x1="0" x2="'+W+'" y1="'+gy.toFixed(1)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(255,255,255,.06)"/>';}
+  var single=m.real<2,leg=[];
+  if(single){
+    var p0=st.pts[st.pts.length-1],cx=W/2,cy=G.PT+(H-G.PT-G.PB)*0.55;st.single={x:cx,y:cy,p:p0};
+    svg+='<line x1="0" x2="'+W+'" y1="'+cy+'" y2="'+cy+'" stroke="#C9AA6B" stroke-opacity=".28" stroke-dasharray="2 7"/>';
+    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="22" fill="#C9AA6B" opacity=".12"/><circle cx="'+cx+'" cy="'+cy+'" r="12" fill="#C9AA6B" opacity=".25" filter="url(#'+id+'g)"/><circle cx="'+cx+'" cy="'+cy+'" r="6" fill="#F1DCA8"/>';
+    svg+='<text x="'+cx+'" y="'+(cy-30)+'" text-anchor="middle" class="vch-st">'+esc((m.own?'Owner value ':'')+money(p0.v))+'</text>';
+    leg.push('<span class="vch-hist">History starts '+esc(fmtDate((m.ai[0]||st.pts[0]||{d:m.today}).d||m.today))+' \u2014 updates weekly</span>');
+  }else{
+    st.single=null;
+    if(G.bl.length>1){var bp='';G.bl.forEach(function(p,i){bp+=(i?' L':'M')+G.X(p.d).toFixed(1)+','+G.Y(p.v).toFixed(1);});
+      svg+='<path d="'+bp+'" fill="none" stroke="#DCDDE0" stroke-width="1.6" stroke-dasharray="6 6" opacity=".7"/>';
+      var lb=G.bl[G.bl.length-1];var fb=G.bl[0],ly0=G.Y(fb.v),mly=s.main.length?G.Y(s.main[0].v):H;svg+='<text x="'+(G.PL+2)+'" y="'+(mly<ly0?Math.min(H-G.PB-4,ly0+20):Math.max(G.PT-4,ly0-9)).toFixed(1)+'" text-anchor="start" class="vch-bt">Cost basis '+esc(money(lb.v))+'</text>';leg.push('<span><i class="d"></i>Cost basis</span>');}
+    if(s.main.length>1){var ln=vchPath(s.main,G),x0=G.X(s.main[0].d),x1=G.X(s.main[s.main.length-1].d);
+      svg+='<path d="'+ln+' L'+x1.toFixed(1)+','+(H-G.PB)+' L'+x0.toFixed(1)+','+(H-G.PB)+' Z" fill="url(#'+id+'f)"/>';
+      svg+='<path d="'+ln+'" fill="none" stroke="#E6CF9C" stroke-width="6" opacity=".5" filter="url(#'+id+'g)"/><path d="'+ln+'" fill="none" stroke="url(#'+id+'l)" stroke-width="2.8" stroke-linecap="round"/>';
+      var lp=s.main[s.main.length-1];svg+='<circle cx="'+x1.toFixed(1)+'" cy="'+G.Y(lp.v).toFixed(1)+'" r="11" fill="#C9AA6B" opacity=".22"/><circle cx="'+x1.toFixed(1)+'" cy="'+G.Y(lp.v).toFixed(1)+'" r="5" fill="#F1DCA8"/>';
+      leg.unshift('<span><i></i>'+(m.kind==='coll'&&m.nOwner?'Value (owner values where set)':'AI estimate')+'</span>');}
+    if(m.own){
+      if(s.dash.length>1)svg+='<path d="'+vchPath(s.dash,G)+'" fill="none" stroke="#C9AA6B" stroke-width="2" stroke-dasharray="5 6" opacity=".8"/>';
+      s.dash.forEach(function(p){svg+='<circle cx="'+G.X(p.d).toFixed(1)+'" cy="'+G.Y(p.v).toFixed(1)+'" r="2.6" fill="#C9AA6B" opacity=".9"/>';});
+      var ox=G.X(m.today),oy=G.Y(m.own.v);
+      svg+='<circle cx="'+ox.toFixed(1)+'" cy="'+oy.toFixed(1)+'" r="13" fill="#C9AA6B" opacity=".22"/><circle cx="'+ox.toFixed(1)+'" cy="'+oy.toFixed(1)+'" r="6.5" fill="#F1DCA8" stroke="#07080A" stroke-width="2" class="vch-own"/>';
+      svg+='<text x="'+(ox-14).toFixed(1)+'" y="'+(oy-16).toFixed(1)+'" text-anchor="end" class="vch-ot">Owner value</text>';
+      leg=['<span><b class="o"></b>Owner value</span>','<span><i class="a"></i>AI estimate</span>'].concat(leg);
+    }
+  }
+  svg+='</svg>';
+  h.querySelector('.vch-svg').innerHTML=svg;
+  h.querySelector('.vch-plot').style.height=H+'px';
+  var ax=h.querySelector('.vch-axis');
+  if(single)ax.innerHTML='';
+  else{var a=st.pts[0].d,b=st.pts[st.pts.length-1].d,mid=isoLocal(new Date((vchT(a)+vchT(b))/2)),fm=function(d){if(d===m.today)return 'Today';var dt=parseDate(d);return st.r==='All'&&(vchT(b)-vchT(a))>400*864e5?String(dt.getFullYear()):dt.toLocaleDateString('en-US',st.r==='1Y'||st.r==='All'?{month:'short',year:'2-digit'}:{month:'short',day:'numeric'});};
+    ax.innerHTML='<span>'+esc(fm(a))+'</span><span>'+esc(fm(mid))+'</span><span>'+esc(fm(b))+'</span>';}
+  h.querySelector('.vch-leg').innerHTML=leg.join('');
+  h.querySelector('.vch-inst').textContent=m.insight(st.r);
+  h.querySelector('.vch-plot').setAttribute('aria-label',m.label+' chart. '+m.insight(st.r));
+  vchHead(st,null);vchOverlay(st);
+}
+function vchHead(st,p){
+  var m=st.m,h=st.host,lab=h.querySelector('.vch-labt'),big=h.querySelector('.vch-big'),chg=h.querySelector('.vch-chg');
+  if(p){
+    lab.textContent=(p.own?'Owner value':(m.own?'AI estimate':(p.ext?'Value today':'Value on '+vchShort(p.d))));
+    big.innerHTML=bigNum(p.v);
+    var f=st.pts[0];chg.innerHTML=(p===f||st.pts.length<2)?'<span class="vch-rl">'+esc(fmtDate(p.d))+'</span>':vchChgHTML(vchChange([f,p]),'vs. '+vchShort(f.d));
+    return;
+  }
+  lab.textContent=m.label;big.innerHTML=bigNum(m.value);
+  if(m.real<2){chg.innerHTML='<span class="vch-rl">'+esc(m.own?'Set by the owner'+(m.ai.length?' / AI estimate '+money(m.ai[m.ai.length-1].v):''):'First AI estimate, '+fmtDate((m.ai[0]||{}).d||m.today))+'</span>';return;}
+  if(m.own){var s=vchSlice(m.ai,st.r,m.today),c=vchChange(s);chg.innerHTML=c?'<span class="vch-rl">AI estimate</span> '+vchChgHTML(c,VCH.rl[st.r]):'<span class="vch-rl">AI estimate '+esc(money(m.ai[m.ai.length-1].v))+'</span>';return;}
+  chg.innerHTML=vchChgHTML(vchChange(st.pts),VCH.rl[st.r]);
+}
+function vchOverlay(st){
+  var h=st.host,x=h.querySelector('.vch-x'),dt=h.querySelector('.vch-dot'),bu=h.querySelector('.vch-bub'),G=st.G,p=st.sel;
+  if(!p||!G||st.single){x.style.opacity=dt.style.opacity=bu.style.opacity='0';h.querySelector('.vch').classList.remove('scrub');return;}
+  var px=G.X(p.d),py=G.Y(p.v),W=G.W;
+  x.style.transform='translate3d('+px.toFixed(1)+'px,0,0)';x.style.top=(G.PT-8)+'px';x.style.height=(G.H-G.PT-G.PB+8)+'px';
+  dt.style.transform='translate3d('+(px-7).toFixed(1)+'px,'+(py-7).toFixed(1)+'px,0)';
+  bu.querySelector('.d').textContent=(p.own?'Owner value / ':(st.m.own?'AI estimate / ':''))+(p.ext?'Today':parseDate(p.d).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}));
+  bu.querySelector('.x').textContent=money(p.v);
+  var bw=bu.offsetWidth||150,bx=Math.min(Math.max(px-bw/2,0),W-bw);bu.style.transform='translate3d('+bx.toFixed(1)+'px,0,0)';
+  x.style.opacity=dt.style.opacity=bu.style.opacity='1';h.querySelector('.vch').classList.add('scrub');
+}
+function vchPick(st,clientX){
+  var G=st.G;if(!G||st.single||!st.pts.length)return null;var r=st.host.querySelector('.vch-plot').getBoundingClientRect(),x=clientX-r.left,best=null,bd=Infinity;
+  st.pts.forEach(function(p){var d=Math.abs(G.X(p.d)-x);if(d<bd){bd=d;best=p;}});return best;
+}
+function vchSet(st,p){if(p===st.sel)return;st.sel=p;if(st.raf)return;st.raf=requestAnimationFrame(function(){st.raf=0;vchOverlay(st);vchHead(st,st.sel);});}
+function vchBind(st){
+  var plot=st.host.querySelector('.vch-plot'),down=null,tm=0;
+  function stop(e){e.stopPropagation();}
+  plot.addEventListener('pointerdown',function(e){stop(e);if(st.single)return;clearTimeout(tm);down={id:e.pointerId,t:e.pointerType};try{plot.setPointerCapture(e.pointerId);}catch(_){}vchSet(st,vchPick(st,e.clientX));});
+  plot.addEventListener('pointermove',function(e){if(down||e.pointerType==='mouse'){if(down)stop(e);if(!st.single)vchSet(st,vchPick(st,e.clientX));}});
+  function up(e){if(!down)return;stop(e);var touch=down.t!=='mouse';down=null;if(touch){clearTimeout(tm);tm=setTimeout(function(){vchSet(st,null);},2600);}}
+  plot.addEventListener('pointerup',up);plot.addEventListener('pointercancel',up);
+  plot.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse'&&!down)vchSet(st,null);});
+  ['touchstart','touchmove','touchend'].forEach(function(n){plot.addEventListener(n,stop,{passive:true});});
+  plot.addEventListener('click',stop);
+  plot.addEventListener('keydown',function(e){if(st.single||!st.pts.length)return;var i=st.pts.indexOf(st.sel);
+    if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();i=i<0?st.pts.length-1:Math.max(0,Math.min(st.pts.length-1,i+(e.key==='ArrowLeft'?-1:1)));vchSet(st,st.pts[i]);}
+    else if(e.key==='Escape')vchSet(st,null);});
+  plot.addEventListener('blur',function(){vchSet(st,null);});
+}
+// ---------- page hooks ----------
+function vchRenderCollection(prefix,vehicles){try{vchMount(prefix+'-vch',vchCollModel(prefix,vehicles));}catch(e){var h=document.getElementById(prefix+'-vch');if(h){h.innerHTML='';h.classList.remove('on');}}}
+function vchRenderVehicle(v){
+  var p=document.getElementById('val-panel');if(!p)return;
+  var m=null;try{m=vchVehModel('vd',v);}catch(e){m=null;}
+  var host=document.getElementById('vd-vch');
+  if(!m){if(host)host.remove();p.classList.remove('has-vch');delete VCH.st['vd-vch'];return;}
+  if(!host){host=document.createElement('div');host.id='vd-vch';host.className='vch-host';p.insertBefore(host,p.firstChild);}
+  p.classList.add('has-vch');vchMount('vd-vch',m);
+}
+// ===== v17: auto estimate on add + pull-to-refresh on the collection screen =====
+var AUTOV={q:[],run:false,max:5,stop:false,log:[]};
+// Quiet, background estimate for one vehicle. Respects permission, the "off" state, the 1-per-vehicle-per-day client rule and the server 429 limits.
+function valueAutoOk(vid){
+  var v=byId(getVehicles(),vid);
+  if(!v||isArchivedVehicle(v)||!session||!can(v,'view_value_estimate'))return false;
+  if(VALUE.state==='off'||VALUE.busy[vid]||valueRefreshedToday(vid))return false;
+  if(!(v.year&&v.make&&v.model))return false;
+  return typeof sb!=='undefined'&&sb&&sb.functions&&typeof sb.functions.invoke==='function';
+}
+function valueAutoQueue(vid,delay){
+  if(AUTOV.q.indexOf(vid)<0)AUTOV.q.push(vid);
+  setTimeout(valueAutoPump,delay===undefined?1200:delay);
+}
+function valueAutoPump(){
+  if(AUTOV.run)return;AUTOV.run=true;
+  (function next(){
+    if(!AUTOV.q.length||AUTOV.stop){AUTOV.q=[];AUTOV.run=false;return;}
+    var vid=AUTOV.q.shift();
+    if(!valueAutoOk(vid)){next();return;}
+    AUTOV.log.push(vid);
+    try{refreshValue(vid);}catch(e){}
+    var t0=Date.now();
+    (function wait(){
+      if(VALUE.busy[vid]&&Date.now()-t0<95000){setTimeout(wait,250);return;}
+      var n=VALUE.note[vid];
+      if(n&&n.kind==='limit'&&!/already refreshed/i.test(n.text))AUTOV.stop=true; // per-user daily limit reached: stop for this session
+      if(n&&n.kind!=='done')delete VALUE.note[vid]; // fail quietly in the background
+      setTimeout(next,reloading?600:150);
+    })();
+  })();
+}
+// Cars with no estimate yet (up to max), queued after a pull-to-refresh.
+function valueAutoMissing(max){
+  var vs=(typeof visibleVehicles==='function'&&isOwner&&isOwner()?visibleVehicles():activeVehicles()),n=0;
+  vs.forEach(function(v){if(n>=(max||AUTOV.max))return;if(!(v.aiValue&&Number(v.aiValue.value)>0)&&valueAutoOk(v.id)){valueAutoQueue(v.id,0);n++;}});
+  return n;
+}
+// ---------- pull-to-refresh (collection screens only) ----------
+var PTR={on:null,busy:false,th:72};
+function ptrPage(){var p=document.querySelector('.page.active');return p&&(p.id==='page-client-portal'||p.id==='page-dashboard')?p:null;}
+function ptrBlocked(t){
+  if(document.querySelector('.modal.active'))return true;
+  if(t&&t.closest&&t.closest('.vch-plot,.whl-stage,.whl,.pfg,.pf-lb,.lightbox,input,textarea,select,[data-noptr]'))return true;
+  return false;
+}
+function ptrEl(){
+  var e=document.getElementById('ptr');
+  if(!e){e=document.createElement('div');e.id='ptr';e.setAttribute('aria-hidden','true');e.innerHTML='<div class="ptr-ring">'+(typeof evoRingSVG==='function'?evoRingSVG():'')+'<i class="evo-o"></i></div><div class="ptr-t">Pull to refresh</div>';document.body.appendChild(e);}
+  return e;
+}
+function ptrShow(dy,done){var e=ptrEl(),y=Math.min(dy,PTR.th*1.6);e.style.transform='translate3d(-50%,'+(y-70).toFixed(1)+'px,0)';e.style.opacity=String(Math.min(1,y/PTR.th));e.classList.toggle('ready',y>=PTR.th);e.querySelector('.ptr-t').textContent=done||(y>=PTR.th?'Release to refresh':'Pull to refresh');}
+function ptrHide(){var e=document.getElementById('ptr');if(e){e.classList.remove('spin','ready');e.style.transform='translate3d(-50%,-90px,0)';e.style.opacity='0';}}
+function ptrRefresh(){
+  if(PTR.busy)return Promise.resolve();PTR.busy=true;
+  var e=ptrEl();e.classList.add('spin');ptrShow(PTR.th,'Updating values');
+  return Promise.resolve(reloadAll(true)).then(function(){return vinBackfill().catch(function(){});}).then(function(){var n=valueAutoMissing(AUTOV.max);ptrShow(PTR.th,n?'Estimating '+n+' vehicle'+(n===1?'':'s'):'Up to date');})
+    .catch(function(){}).then(function(){setTimeout(function(){PTR.busy=false;ptrHide();},700);});
+}
+function ptrInit(){
+  if(PTR.init)return;PTR.init=1;
+  var main=document.querySelector('.main');if(!main)return;
+  main.addEventListener('touchstart',function(e){
+    PTR.on=null;
+    if(PTR.busy||e.touches.length!==1||!ptrPage()||main.scrollTop>0||ptrBlocked(e.target))return;
+    var p=e.touches[0];if(p.clientX<=((typeof SWB!=='undefined'&&SWB.edge)||24)+8)return; // the left edge belongs to swipe-back
+    PTR.on={x:p.clientX,y:p.clientY,mode:0,dy:0};
+  },{passive:true});
+  main.addEventListener('touchmove',function(e){
+    var S=PTR.on;if(!S)return;
+    if(typeof SWB!=='undefined'&&SWB.on&&SWB.on.mode){PTR.on=null;ptrHide();return;}
+    var p=e.touches[0],dx=p.clientX-S.x,dy=p.clientY-S.y;
+    if(!S.mode){if(Math.abs(dx)<8&&Math.abs(dy)<8)return;if(dy>0&&dy>Math.abs(dx)*1.5&&main.scrollTop<=0)S.mode=1;else{PTR.on=null;return;}}
+    S.dy=dy*0.55;e.preventDefault();ptrShow(S.dy);
+  },{passive:false});
+  function end(){var S=PTR.on;PTR.on=null;if(!S||!S.mode)return;if(S.dy>=PTR.th)ptrRefresh();else ptrHide();}
+  main.addEventListener('touchend',end);main.addEventListener('touchcancel',function(){PTR.on=null;ptrHide();});
+}
+document.addEventListener('DOMContentLoaded',ptrInit);if(document.readyState!=='loading')setTimeout(ptrInit,0);
+// ===== v17: co-owners (migration_010). A collection = the owner profile vehicles.owner_id points to; co-owners are members with equal rights. =====
+var CO={on:null,rows:[],of:null,list:null,lastCode:'',busy:false};
+async function cmLoad(){
+  try{var r=await sb.from('collection_members').select('*');
+    if(r&&r.error){CO.on=false;return [];}
+    CO.on=true;return (r&&r.data)||[];}catch(e){CO.on=false;return [];}
+}
+function coOfRows(rows,me0){for(var i=0;i<(rows||[]).length;i++)if(rows[i]&&rows[i].user_id===me0)return rows[i].collection_owner_id;return null;}
+function coIsMember(){return !!CO.of;}
+function coMembers(){var o=ownerClientId()||myId();return (CO.rows||[]).filter(function(m){return m.collection_owner_id===o;});}
+async function coInvite(){
+  if(CO.busy)return;if(CO.on===false){showToast('Co-owners need one backend update first.','error');return;}
+  CO.busy=true;
+  try{
+    var r=await sb.rpc('create_co_owner_invite',{p_email:null});
+    if(r.error){if(rpcMissing(r.error)){CO.on=false;CO.busy=false;showToast('Co-owners need one backend update first.','error');coRender();return;}throw r.error;}
+    var row=Object.prototype.toString.call(r.data)==='[object Array]'?r.data[0]:r.data;
+    if(!row||!row.code)throw new Error('no code returned');
+    CO.lastCode=codeKey(row.code);saveInviteCode(row.invite_id,row.code);
+    CO.busy=false;coRender();
+    var el=document.getElementById('co-code');if(el)el.scrollIntoView({block:'center'});
+  }catch(e){CO.busy=false;showToast(friendlyError(e),'error');}
+}
+function coShareText(code){return 'You are invited to co-own a collection on EvoAI. Open '+APP_LINK+'?invite='+codeKey(code)+' , create your own account (a new login), then enter this code: '+groupCode(codeKey(code));}
+function coCopy(){if(CO.lastCode)copyText(APP_LINK+'?invite='+CO.lastCode,'Link copied');}
+function coCopyCode(){if(CO.lastCode)copyText(groupCode(CO.lastCode),'Code copied');}
+function coShare(){if(!CO.lastCode)return;var t=coShareText(CO.lastCode);if(navigator.share)navigator.share({title:'Co-own a collection on EvoAI',text:t}).catch(function(e){if(e&&e.name==='AbortError')return;copyText(t,'Invite message copied');});else copyText(t,'Invite message copied');}
+async function coRemove(uid,leave){
+  if(!window.confirm(leave?'Leave this collection? You will lose access to its vehicles straight away.':'Remove this co-owner? They lose access to the collection straight away.'))return;
+  try{
+    var r=await sb.rpc('remove_co_owner',{p_user_id:uid});if(r.error)throw r.error;
+    showToast(leave?'You left the collection.':'Co-owner removed.','success');
+    await reloadAll(true);if(leave){try{setAccountFromProfile(session.user||{id:myId()});}catch(e){}}refreshCurrent();
+  }catch(e){showToast(friendlyError(e),'error');}
+}
+function coSectionHTML(){
+  if(!session||!isOwner())return '';
+  var me0=myId(),o=ownerClientId()||me0,primary=o===me0,mem=coMembers(),h='<section class="co-sec" id="co-sec"><div class="sh"><h2>Co-owners</h2></div>';
+  h+='<p class="co-desc">Co-owners have their own login and the same owner rights over every vehicle in this collection: photos, documents, values, reminders, team and transfers.</p>';
+  if(CO.on===false)return h+'<p class="co-desc co-muted">Co-owners need one backend update before they can be added.</p></section>';
+  var po=C.profiles&&C.profiles[o];
+  h+='<div class="co-row"><div><div class="co-n">'+esc(primary?'You':(displayName(po)||'Collection owner'))+'</div><div class="co-m">Original owner'+(po&&po.email&&!primary?' / '+esc(po.email):'')+'</div></div></div>';
+  mem.forEach(function(m){var p=C.profiles&&C.profiles[m.user_id],mine=m.user_id===me0;
+    h+='<div class="co-row" data-co="'+esc(m.user_id)+'"><div><div class="co-n">'+esc(mine?'You':(displayName(p)||'Co-owner'))+'</div><div class="co-m">Co-owner'+(p&&p.email&&!mine?' / '+esc(p.email):'')+' since '+esc(fmtDate(String(m.created_at||'').slice(0,10)))+'</div></div>'+
+      (mine?'<button class="btn btn-sm btn-ghost" type="button" onclick="coRemove(\''+jsId(m.user_id)+'\',true)">Leave collection</button>':(primary?'<button class="btn btn-sm btn-ghost" type="button" onclick="coRemove(\''+jsId(m.user_id)+'\',false)">Remove</button>':''))+'</div>';});
+  h+='<div class="co-acts"><button class="btn btn-primary" type="button" id="co-invite-btn" onclick="coInvite()">Invite co-owner</button></div>';
+  if(CO.lastCode){
+    h+='<div class="co-code-box" id="co-code"><div class="co-m">One-time code (valid 14 days). It is not sent automatically - copy or share it yourself.</div>'+
+      '<div class="co-code">'+esc(groupCode(CO.lastCode))+'</div><div class="co-link">'+esc(APP_LINK+'?invite='+CO.lastCode)+'</div>'+
+      '<div class="co-acts"><button class="btn btn-sm" type="button" onclick="coCopyCode()">Copy code</button><button class="btn btn-sm" type="button" onclick="coCopy()">Copy link</button><button class="btn btn-sm btn-primary" type="button" onclick="coShare()">Share</button></div></div>';
+  }
+  return h+'</section>';
+}
+function coRender(){var b=document.getElementById('access-body');if(!b)return;var old=document.getElementById('co-sec');if(old)old.remove();var h=coSectionHTML();if(h)b.insertAdjacentHTML('beforeend',h);}
+// ===== v17 (E): automatic VIN decode with the free NHTSA vPIC API (browser, CORS allowed). VIN data wins; conflicts ask once. =====
+var VIN={cache:{},form:null,tm:0,cols:null,url:'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/',bf:{max:5}};
+var VIN_T={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,J:1,K:2,L:3,M:4,N:5,P:7,R:9,S:2,T:3,U:4,V:5,W:6,X:7,Y:8,Z:9},VIN_W=[8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2];
+function vinNorm(s){return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+// 17 chars, no I/O/Q, valid check digit (position 9), and not a 1980 model-year code (pre-1981 cars have no standard VIN).
+function vinOk(s){
+  var v=vinNorm(s);if(!/^[A-HJ-NPR-Z0-9]{17}$/.test(v))return false;
+  var sum=0;for(var i=0;i<17;i++){var c=v[i];sum+=(/[0-9]/.test(c)?+c:VIN_T[c])*VIN_W[i];}
+  var r=sum%11;if(v[8]!==(r===10?'X':String(r)))return false;
+  if(v[9]==='A'&&/[0-9]/.test(v[6]))return false; // 1980 (cars and light trucks: digit in position 7 = 1980-2009 cycle)
+  return true;
+}
+function vinParse(row){
+  if(!row)return null;
+  var yr=cleanText(row.ModelYear,4);if(!/^\d{4}$/.test(yr))yr='';
+  var dl=Number(row.DisplacementL),cy=cleanText(row.EngineCylinders,3),fu=cleanText(row.FuelTypePrimary,40);
+  var eng=[dl>0?(Math.round(dl*10)/10).toFixed(1)+'L':'',cy&&/^\d+$/.test(cy)?cy+'-cyl':'',fu].filter(function(x){return x;}).join(' ');
+  var o={year:yr,make:titleCase(cleanText(row.Make,40)),model:cleanText(row.Model,60),trim:cleanText(row.Trim||row.Series,60),engine:eng.slice(0,120),body:cleanText(row.BodyClass,80),row:row};
+  if(!o.year&&!o.make&&!o.model)return null;
+  return o;
+}
+function vinFetch(vin){
+  vin=vinNorm(vin);if(VIN.cache[vin])return Promise.resolve(VIN.cache[vin]);
+  var ctl=null;try{ctl=new AbortController();}catch(e){}
+  var p;try{p=fetch(VIN.url+encodeURIComponent(vin)+'?format=json',ctl?{signal:ctl.signal}:undefined);}catch(e){return Promise.resolve(null);}
+  return withTimeout(p,12000,ctl).then(function(r){if(!r||!r.ok)throw new Error('http');return r.json();})
+    .then(function(d){var o=vinParse(d&&d.Results&&d.Results[0]);if(o&&o.year&&Number(o.year)<1981)o=null;if(o)VIN.cache[vin]=o;return o;})
+    .catch(function(){return null;});
+}
+function vinLabel(o){return [o.year,o.make,o.model,o.trim].filter(function(x){return x;}).join(' ');}
+function vinSame(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();}
+// one quick confirm sheet. resolve(true) = Use VIN
+function vinSheet(o,lead){
+  return new Promise(function(res){
+    var old=document.getElementById('vin-sheet');if(old)old.remove();
+    var s=document.createElement('div');s.id='vin-sheet';s.className='vin-sheet';s.setAttribute('role','dialog');s.setAttribute('aria-modal','true');s.setAttribute('aria-labelledby','vin-sheet-t');
+    s.innerHTML='<div class="vin-card"><div class="vin-t" id="vin-sheet-t">'+esc((lead||'VIN says ')+vinLabel(o)+'. Update?')+'</div>'+
+      (o.engine||o.body?'<div class="vin-s">'+esc([o.engine,o.body].filter(function(x){return x;}).join(' / '))+'</div>':'')+
+      '<div class="vin-a"><button type="button" class="btn btn-primary" id="vin-use">Use VIN</button><button type="button" class="btn btn-ghost" id="vin-keep">Keep mine</button></div></div>';
+    document.body.appendChild(s);
+    function done(v){s.remove();res(v);}
+    s.querySelector('#vin-use').onclick=function(){done(true);};s.querySelector('#vin-keep').onclick=function(){done(false);};
+    s.addEventListener('click',function(e){if(e.target===s)done(false);});
+    setTimeout(function(){var b=document.getElementById('vin-use');if(b)b.focus();},30);
+  });
+}
+// ---------- add / edit form ----------
+function vinFormReplica(){return !!(document.getElementById('v-replica')||{}).checked;}
+function vinAutoForm(){clearTimeout(VIN.tm);VIN.tm=setTimeout(vinFormDecode,450);}
+async function vinFormDecode(){
+  var vin=cleanVin();
+  if(!vinOk(vin)||vinFormReplica())return;          // pre-1981 / not 17 / bad check digit / replica: manual entry stays
+  if(VIN.form&&VIN.form.vin===vin&&VIN.form.done)return;
+  setVinMsg('Reading the VIN...');
+  var o=await vinFetch(vin);
+  if(cleanVin()!==vin)return;
+  if(!o){setVinMsg('The VIN lookup did not answer. Your entries are kept.');return;}
+  var _rh=typeof vrVinHint==='function'?vrVinHint(o.row,val('v-make').trim()):'';
+  if(_rh){vrHint(_rh);setVinMsg('VIN decoded as '+vinLabel(o)+'. It may be a replica, so nothing was changed.');VIN.form={vin:vin,done:true,o:null};return;}
+  var map={'v-year':o.year,'v-make':o.make,'v-model':o.model,'v-trim':o.trim},k,conflict=false;
+  for(k in map)if(map[k]&&val(k).trim()&&!vinSame(val(k),map[k]))conflict=true;
+  var use=true;if(conflict)use=await vinSheet(o);
+  VIN.form={vin:vin,done:true,o:use?o:null};
+  if(!use){setVinMsg('Kept your entries.');return;}
+  for(k in map)if(map[k])setVal(k,k==='v-trim'?map[k].slice(0,40):map[k]);
+  setVinMsg('Filled from VIN: '+vinLabel(o)+(o.engine?' / '+o.engine:'')+(o.body?' / '+o.body:'')+'.');
+}
+// called from saveVehicle for the saved object
+function vinFormApply(v,isNew){
+  try{
+    var f=VIN.form;if(!v||!f||!f.o||vinNorm(v.vin)!==f.vin||v.isReplica)return;
+    v.engine=f.o.engine||v.engine||'';v.bodyClass=f.o.body||v.bodyClass||'';v.vinDecodedAt=new Date().toISOString();
+    VIN.form=null;
+    if(!isNew)vinRerun(v.id);
+  }catch(e){}
+}
+function vinRerun(vid){try{var u=getUI(),m=u.valRef||{};delete m[vid];u.valRef=m;localStorage.setItem('evoai_ui',JSON.stringify(u));}catch(e){}valueAutoQueue(vid,1500);}
+async function vinSyncCols(v){
+  if(VIN.cols===false||!v||!v.vinDecodedAt)return;
+  try{var r=await sb.from('vehicles').update({trim:v.trim?String(v.trim).slice(0,60):null,engine:v.engine||null,body_class:v.bodyClass||null,vin_decoded_at:v.vinDecodedAt}).eq('id',v.id);
+    if(r&&r.error&&(r.error.code==='42703'||r.error.code==='PGRST204'))VIN.cols=false;else VIN.cols=true;}catch(e){}
+}
+// ---------- an existing car (document scan, backfill) ----------
+// mode 'ask': conflicts open the sheet; 'quiet': fill empty fields only (background backfill)
+async function vinApplyToVehicle(vid,vin,mode,lead){
+  var v=byId(getVehicles(),vid);vin=vinNorm(vin||(v&&v.vin));
+  if(!v||!canEditVehicle(v)||isArchivedVehicle(v)||v.isReplica||!vinOk(vin))return 'skip';
+  var o=await vinFetch(vin);if(!o)return 'nodata';
+  if(mode!=='ask'&&typeof vrVinHint==='function'&&vrVinHint(o.row,v.make))return 'replica';
+  v=byId(getVehicles(),vid);if(!v)return 'skip';
+  var F={year:o.year,make:o.make,model:o.model,trim:o.trim},k,conflict=false,changed=false;
+  for(k in F)if(F[k]&&String(v[k]||'').trim()&&!vinSame(v[k],F[k]))conflict=true;
+  if(vinNorm(v.vin)&&vinNorm(v.vin)!==vin)conflict=true;
+  var use=!conflict;
+  if(conflict&&mode==='ask')use=await vinSheet(o,lead);
+  var list=getVehicles();v=byId(list,vid);if(!v)return 'skip';
+  if(use){for(k in F)if(F[k]&&!vinSame(v[k],F[k])){v[k]=k==='trim'?F[k].slice(0,40):F[k];changed=true;}if(vinNorm(v.vin)!==vin){v.vin=vin;changed=true;}}
+  else for(k in F)if(F[k]&&!String(v[k]||'').trim()){v[k]=k==='trim'?F[k].slice(0,40):F[k];changed=true;}
+  if(o.engine&&!v.engine){v.engine=o.engine;changed=true;}if(o.body&&!v.bodyClass){v.bodyClass=o.body;changed=true;}
+  v.vinDecodedAt=new Date().toISOString();v.updatedAt=v.vinDecodedAt;
+  setVehicles(list);
+  if(changed){vinRerun(vid);}
+  return use?(changed?'updated':'same'):'kept';
+}
+// one-time backfill for cars that already have a VIN (pull-to-refresh), at most VIN.bf.max per refresh
+function vinBackfill(){
+  var n=0,list=(typeof activeVehicles==='function'?activeVehicles():getVehicles()).filter(function(v){return v&&!v.vinDecodedAt&&!v.isReplica&&vinOk(v.vin)&&canEditVehicle(v);});
+  var todo=list.slice(0,VIN.bf.max);
+  return todo.reduce(function(p,v){return p.then(function(){n++;return vinApplyToVehicle(v.id,v.vin,'quiet');});},Promise.resolve()).then(function(){return n;});
+}
 
 </script>
 </body>
