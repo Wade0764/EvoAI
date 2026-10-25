@@ -935,6 +935,23 @@ body.dtv-open{overflow:hidden}
 .vr-builder{margin-top:12px}
 .vr-builder label{font-size:17px!important}
 
+/* v20 Missing indicators (p19) */
+#vd-key{margin:22px 0 8px}
+.ms-top{margin:0 0 14px}
+.ms-chip{display:inline-block;background:transparent;border:2px solid var(--gold);color:var(--gold);border-radius:999px;padding:8px 16px;font:inherit;font-size:18px;font-weight:600;cursor:pointer;min-height:44px}
+.ms-chip.ms-full{background:var(--gold);color:#111}
+.ms-card{background:#0C0E11;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:4px 18px}
+.ms-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.ms-row:last-child{border-bottom:0}
+.ms-lab{font-size:17px;font-weight:600;color:var(--gold);flex:0 0 auto}
+.ms-val{font-size:20px;color:#F2F0EB;text-align:right;word-break:break-word}
+.ms-val.mono{font-family:ui-monospace,Menlo,monospace;font-size:18px}
+.ms-none{color:#F2F0EB;opacity:.9}
+.ms-miss{background:transparent;border:0;border-bottom:3px solid #E5484D;color:#FFFFFF;font:inherit;font-size:20px;font-weight:700;padding:6px 0 2px;cursor:pointer;min-height:44px}
+.ms-miss:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.ms-hint{font-size:18px;color:#F2F0EB;margin:12px 2px 0}
+.input-group.ms-focus{outline:2px solid var(--gold);outline-offset:6px;border-radius:6px}
+
 </style>
 </head>
 <body>
@@ -1234,8 +1251,8 @@ body.dtv-open{overflow:hidden}
           <div id="v-vin-row" style="display:none;margin-top:8px;"><button class="btn btn-ghost btn-sm" id="v-vin-btn" onclick="fillFromVin()">Fill from VIN</button></div>
           <div id="v-vin-msg" style="display:none;margin-top:8px;font-size:0.82rem;line-height:1.5;"></div></div>
         <div class="input-group"><label>Trim</label><input type="text" id="v-trim" maxlength="40" placeholder="Touring"></div>
-        <div class="input-group"><label>Mileage</label><input type="number" id="v-mileage" placeholder="1850" min="0" inputmode="numeric"></div>
-        <div class="input-group fin-only"><label>Purchase price ($)</label><input type="number" id="v-purchase-price" placeholder="229000" min="0" inputmode="numeric"></div>
+        <div class="input-group"><label>Mileage</label><input type="number" id="v-mileage" placeholder="1850" min="0" inputmode="numeric"></div><div class="input-group"><label for="v-plate">Registration (plate)</label><input type="text" id="v-plate" maxlength="20" placeholder="K9 JOLLY" autocapitalize="characters" autocomplete="off"></div><div class="input-group"><label for="v-plate-region">State / region</label><input type="text" id="v-plate-region" maxlength="30" placeholder="FL" autocomplete="off"></div><div class="input-group form-full"><label for="v-location">Location</label><input type="text" id="v-location" maxlength="120" placeholder="Hickory Vaults" autocomplete="off"></div><div class="input-group form-full"><label for="v-insurer">Insurance</label><input type="text" id="v-insurer" maxlength="80" placeholder="Chubb" autocomplete="off"></div>
+        <div class="input-group fin-only"><label for="v-purchase-price">What you paid</label><input type="number" id="v-purchase-price" placeholder="229000" min="0" inputmode="decimal"></div><div class="input-group fin-only"><label for="v-currency">Currency</label><select id="v-currency"><option value="USD">USD ($)</option><option value="EUR">EUR (&#8364;)</option><option value="GBP">GBP (&#163;)</option></select></div>
         <div class="input-group fin-only"><label>Purchase date</label><input type="date" id="v-purchase-date"></div>
 <div class="input-group form-full"><div class="doc-meta">Value is an AI estimate from market prices and the health score is calculated from your records. Both are read-only and can never be typed in.</div></div>
 
@@ -1255,6 +1272,7 @@ body.dtv-open{overflow:hidden}
     <div class="backbar"><button class="backbtn" onclick="closeModal('modal-vehicle-detail')"><span class="ba" aria-hidden="true">&larr;</span> Back</button><span id="vd-tag"></span></div>
     <div id="vd-img-area"></div>
     <div class="vhead"><h1 id="vd-title">Vehicle</h1><div id="vd-nickname"></div><p id="vd-sub"></p><div class="quiet-note" id="vd-autonote" style="display:none">Year, make, model and color can be filled in from a photo when adding a vehicle. You can edit them any time.</div></div>
+    <div id="vd-key"></div>
     <div id="vd-pf"></div>
     <div id="vd-banner"></div>
     <div class="vval" id="vd-value"></div>
@@ -1756,7 +1774,7 @@ var DOC_TO_DB={title:'title',registration:'registration',insurance:'insurance',i
 var URG_TO_DB={red:'urgent',yellow:'recommended',green:'info'},URG_FROM_DB={urgent:'red',recommended:'yellow',info:'green'};
 var REC_TO_DB={open:'pending',accepted:'accepted',declined:'declined',completed:'completed'},REC_FROM_DB={pending:'open',accepted:'accepted',declined:'declined',completed:'completed'};
 function parseCost(s){var m=/[0-9][0-9,]*(\.[0-9]+)?/.exec(String(s||''));if(!m)return null;var n=parseFloat(m[0].replace(/,/g,''));return isNaN(n)?null:n;}
-function vx(v){return {trim:v.trim||'',ins:Number(v.insuredValue)>0?Number(v.insuredValue):'',svcM:svcMonths(v),svcI:svcMiles(v),insRep:v.insRepeat==='6months'?'6months':'yearly',rep:v.isReplica?1:'',bld:v.isReplica?(v.builder||''):'',eng:v.engine||'',body:v.bodyClass||'',vdec:v.vinDecodedAt||''};}
+function vx(v){return {trim:v.trim||'',ins:Number(v.insuredValue)>0?Number(v.insuredValue):'',svcM:svcMonths(v),svcI:svcMiles(v),insRep:v.insRepeat==='6months'?'6months':'yearly',rep:v.isReplica?1:'',bld:v.isReplica?(v.builder||''):'',eng:v.engine||'',body:v.bodyClass||'',vdec:v.vinDecodedAt||'',pl:msX(v).pl,plr:msX(v).plr,loc:msX(v).loc,insc:msX(v).insc,cur:msX(v).cur};}
 function vCore(v){
   return {year:toInt(v.year),make:v.make,model:v.model,color:nz(v.color),nickname:nz(v.nickname),vin:nz(String(v.vin||'').toUpperCase()),mileage:Number(v.mileage)>0?Math.round(Number(v.mileage)):null,notes:packX(v.notes||'',vx(v)),archived:!!v.archived};
 }
@@ -1855,7 +1873,7 @@ var KIND={
     sig:function(v){return JSON.stringify(vview(v));},
     insert:async function(v){
       var c=vCore(v),row={id:v.id,owner_id:v.clientId,year:c.year,make:c.make,model:c.model,color:c.color,nickname:c.nickname,vin:c.vin,mileage:c.mileage,notes:c.notes,archived:false};
-      chk(await sb.from('vehicles').insert(row));await vrSyncCols(v);await vinSyncCols(v);try{valueAutoQueue(v.id);}catch(e){}
+      chk(await sb.from('vehicles').insert(row));await vrSyncCols(v);await msSyncCols(v);await vinSyncCols(v);try{valueAutoQueue(v.id);}catch(e){}
       if(canEditVehicle(v)||canAddVehicleFor(v.clientId)){
         if(Number(v.purchasePrice)>0||v.purchaseDate){if(canEditVehicle(v))await finSave(v,null);}
         if(canEditVehicle(v))await remSync(v,null);
@@ -1871,7 +1889,7 @@ var KIND={
         if(!prev||oc!==nc){
           var c=vCore(v);
           chk(await sb.from('vehicles').update({year:c.year,make:c.make,model:c.model,color:c.color,nickname:c.nickname,vin:c.vin,mileage:c.mileage,notes:c.notes,archived:c.archived}).eq('id',v.id));
-          await vrSyncCols(v);await vinSyncCols(v);
+          await vrSyncCols(v);await msSyncCols(v);await vinSyncCols(v);
         }
         if(String(pv.purchasePrice||'')!==String(v.purchasePrice||'')||String(pv.purchaseDate||'')!==String(v.purchaseDate||''))await finSave(v,pv);
         await remSync(v,pv);
@@ -2104,7 +2122,7 @@ async function loadAll(){
         v.aiValue={value:mid,low:Math.round(Number(e.value_low)),high:Math.round(Number(e.value_high)),asOf:(function(t){t=new Date(e.as_of);return isNaN(t.getTime())||!/T\d/.test(String(e.as_of))?String(e.as_of).slice(0,10):isoLocal(t);})(),sources:srcObjList(e.sources,8),notes:cleanText(e.notes,400),confidence:e.confidence===null?'':Number(e.confidence),prev:prevAi?prevAi.value:null,prevAsOf:prevAi?prevAi.asOf:''};
       }
     }
-    ovApply(v,rows.ov);
+    ovApply(v,rows.ov);msLoad(v,r,x,fin);
     vehicles.push(v);
   }
   nc.vehicles=vehicles;
@@ -3615,7 +3633,7 @@ function openAddVehicleModal(presetClientId){
   var vdt=document.getElementById('v-dates');if(vdt)vdt.open=false;
   vinChanged();
   var mre=document.getElementById('v-more');if(mre)mre.open=false;
-  vrFormFill(null);
+  vrFormFill(null);msFormFill(null);
   openModal('modal-add-vehicle');
 }
 function editCurrentVehicle(){
@@ -3633,7 +3651,7 @@ function editCurrentVehicle(){
   setVal('v-year',v.year);setVal('v-make',v.make);setVal('v-model',v.model);setVal('v-trim',v.trim||'');vrFormFill(v);
   setVal('v-nickname',v.nickname||'');setVal('v-color',v.color||'');setVal('v-mileage',v.mileage||'');
   setVal('v-vin',v.vin||'');setVal('v-purchase-price',v.purchasePrice||'');setVal('v-purchase-date',v.purchaseDate||'');
-  setVal('v-insured-value',v.insuredValue||'');setVal('v-notes',v.notes||'');
+  setVal('v-insured-value',v.insuredValue||'');setVal('v-notes',v.notes||'');msFormFill(v);
   setVal('v-reg-expiry',dateField(v,'regExpiry'));setVal('v-ins-renewal',dateField(v,'insRenewal'));setVal('v-ins-repeat',v.insRepeat==='6months'?'6months':'yearly');
   setVal('v-insp-expiry',dateField(v,'inspExpiry'));setVal('v-last-service',dateField(v,'lastServiceDate'));setVal('v-next-service',dateField(v,'nextServiceDate'));
   setVal('v-next-service-miles',Number(v.nextServiceMiles)>0?v.nextServiceMiles:'');
@@ -3681,6 +3699,7 @@ function saveVehicle(){
   if(pdate&&pdate>todayISO()){showToast('Purchase date cannot be in the future','error');return;}
   var vehicles=getVehicles(),now=new Date().toISOString(),saved=null;
   var fields={clientId:clientId,year:String(yr),make:make.slice(0,40),model:model.slice(0,60),trim:val('v-trim').trim().slice(0,40),isReplica:!!(document.getElementById('v-replica')||{}).checked,builder:(document.getElementById('v-replica')||{}).checked?cleanText(val('v-builder'),80):'',nickname:val('v-nickname').trim().slice(0,40),color:val('v-color').trim().slice(0,40),mileage:mileage,vin:vin,purchasePrice:pp,purchaseDate:pdate,insuredValue:ins,notes:val('v-notes').slice(0,1000)};
+  var _ms=msFormRead();for(var _mk in _ms)if(_ms.hasOwnProperty(_mk))fields[_mk]=_ms[_mk];
   var dfs=readDateFields(mileage);for(var dk in dfs)if(dfs.hasOwnProperty(dk))fields[dk]=dfs[dk];
   if(editingVehicleId){
     var v=byId(vehicles,editingVehicleId);if(!v){showToast('Vehicle no longer exists','error');return;}
@@ -3853,6 +3872,7 @@ function openVehicleDetail(vehicleId){
   var actions=detailActionsHTML(v);
   elHTML('vd-actions',actions);
   showEl('vd-actions',!!actions,'flex');
+  msRender(v);
   openModal('modal-vehicle-detail');
 }
 function editVehicleDates(){
@@ -7648,6 +7668,101 @@ function docRowHTML(d){
     '<div class="doc-name">'+esc(d.name)+badge+'</div>'+
     (meta.length||d.notes?'<div class="doc-meta">'+esc(meta.join(' / '))+(d.notes?(meta.length?' / ':'')+esc(d.notes):'')+'</div>':'')+svc+exp+
     (btns?'<div class="dai-btns dt-btns">'+btns+'</div>':'')+'</div></div>';
+}
+// ============ v20: Missing indicators + completeness count on the vehicle page (p19) ============
+// Columns: vehicles.plate / plate_region (base schema), vehicles.location / insurance_carrier and
+// vehicle_financials.purchase_currency (migration_012, optional). Everything is mirrored in the notes
+// extras (pl, plr, loc, insc, cur) so it works without migration_012.
+var MS={cols:null,fcur:null};
+var MS_CUR={USD:'$',EUR:'\u20ac',GBP:'\u00a3'};
+function msColFlag(r){if(r&&Object.prototype.hasOwnProperty.call(r,'location'))MS.cols=true;else if(r&&MS.cols===null)MS.cols=false;}
+function msLoad(v,r,x,fin){
+  msColFlag(r);x=x||{};
+  if(fin&&Object.prototype.hasOwnProperty.call(fin,'purchase_currency'))MS.fcur=true;else if(fin&&MS.fcur===null)MS.fcur=false;
+  v.plate=cleanText((r&&r.plate)||x.pl||'',20);
+  v.plateRegion=cleanText((r&&r.plate_region)||x.plr||'',30);
+  v.location=cleanText((r&&r.location)||x.loc||'',120);
+  v.insurer=cleanText((r&&r.insurance_carrier)||x.insc||'',80);
+  var c=String((fin&&fin.purchase_currency)||x.cur||'USD').toUpperCase();v.currency=MS_CUR[c]?c:'USD';
+}
+function msX(v){return {pl:v.plate||'',plr:v.plateRegion||'',loc:v.location||'',insc:v.insurer||'',cur:(v.currency&&v.currency!=='USD')?v.currency:''};}
+async function msSyncCols(v){
+  if(!v||!v.id)return;
+  try{await sb.from('vehicles').update({plate:v.plate||null,plate_region:v.plateRegion||null}).eq('id',v.id);}catch(e){}
+  if(MS.cols===true){try{var r=await sb.from('vehicles').update({location:v.location||null,insurance_carrier:v.insurer||null}).eq('id',v.id);
+    if(r&&r.error&&(r.error.code==='42703'||r.error.code==='PGRST204'))MS.cols=false;}catch(e2){}}
+  if(MS.fcur===true&&Number(v.purchasePrice)>0){try{var r2=await sb.from('vehicle_financials').update({purchase_currency:v.currency||'USD'}).eq('vehicle_id',v.id);
+    if(r2&&r2.error&&(r2.error.code==='42703'||r2.error.code==='PGRST204'))MS.fcur=false;}catch(e3){}}
+}
+// --- which fields count. Year/make/model counts as one ("Car").
+var MS_FIELDS=[
+  {k:'car',label:'Car',input:'v-year'},
+  {k:'vin',label:'VIN / Chassis no.',input:'v-vin',more:1},
+  {k:'reg',label:'Registration',input:'v-plate',more:1},
+  {k:'color',label:'Colour',input:'v-color'},
+  {k:'miles',label:'Mileage',input:'v-mileage',more:1},
+  {k:'paid',label:'What you paid',input:'v-purchase-price',more:1,fin:1},
+  {k:'loc',label:'Location',input:'v-location',more:1},
+  {k:'ins',label:'Insurance',input:'v-insurer',more:1}
+];
+function msMoney(n,cur){var s=MS_CUR[cur]||'$';var x=Math.round(Number(n)*100)/100;return s+x.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function msValue(v,f){
+  switch(f.k){
+    case 'car':return (v.year&&v.make&&v.model)?[v.year,v.make,v.model].join(' '):'';
+    case 'vin':return v.vin||'';
+    case 'reg':return v.plate?(v.plate+(v.plateRegion?' / '+v.plateRegion:'')):'';
+    case 'color':return v.color||'';
+    case 'miles':return Number(v.mileage)>0?fmtNum(v.mileage)+' mi':'';
+    case 'paid':return Number(v.purchasePrice)>0?msMoney(v.purchasePrice,v.currency):'';
+    case 'loc':return v.location||'';
+    case 'ins':return v.insurer||'';
+  }
+  return '';
+}
+// Missing shows only to the person who can edit this car: never to techs (shared), co-owners, archived cars, or exports.
+function msCanSeeMissing(v){
+  if(!v||isArchivedVehicle(v))return false;
+  if(typeof coIsMember==='function'&&coIsMember())return false;
+  return !!canEditVehicle(v);
+}
+function msFieldsFor(v){return MS_FIELDS.filter(function(f){return !f.fin||can(v,'view_purchase_info')||canEditVehicle(v);});}
+function msCount(v){var fs=msFieldsFor(v),n=0;fs.forEach(function(f){if(msValue(v,f))n++;});return {done:n,total:fs.length};}
+function msCountOn(){try{return localStorage.getItem('evoai_ms_count')!=='0';}catch(e){return true;}}
+function msSetCount(on){try{localStorage.setItem('evoai_ms_count',on?'1':'0');}catch(e){}var v=byId(getVehicles(),currentVehicleId);if(v)msRender(v);}
+function msHTML(v){
+  var edit=msCanSeeMissing(v),fs=msFieldsFor(v),c=msCount(v);
+  var rows=fs.map(function(f){
+    var x=msValue(v,f),val;
+    if(x)val='<span class="ms-val'+(f.k==='vin'?' mono':'')+'">'+esc(x)+'</span>';
+    else if(edit)val='<button type="button" class="ms-miss" data-f="'+f.k+'" onclick="msEdit(\''+f.k+'\')" aria-label="'+esc(f.label)+' missing. Tap to add">Missing</button>';
+    else val='<span class="ms-val ms-none">Not on file</span>';
+    return '<div class="ms-row" data-k="'+f.k+'"><span class="ms-lab">'+esc(f.label)+'</span>'+val+'</div>';
+  }).join('');
+  var chip=(edit&&msCountOn())?'<button type="button" class="ms-chip'+(c.done===c.total?' ms-full':'')+'" onclick="msFirst()" aria-label="'+c.done+' of '+c.total+' details complete">'+c.done+' of '+c.total+' complete</button>':'';
+  var hint=(edit&&c.done<c.total)?'<p class="ms-hint">Tap <b>Missing</b> to fill it in.</p>':'';
+  return '<section class="ms-sec" aria-label="Key details">'+(chip?'<div class="ms-top">'+chip+'</div>':'')+'<div class="ms-card">'+rows+'</div>'+hint+'</section>';
+}
+function msRender(v){var el=document.getElementById('vd-key');if(el)el.innerHTML=v?msHTML(v):'';}
+function msFirst(){var b=document.querySelector('#vd-key .ms-miss');if(b){b.scrollIntoView({block:'center',behavior:'smooth'});b.focus();}}
+function msEdit(k){
+  var v=byId(getVehicles(),currentVehicleId);if(!v||!msCanSeeMissing(v))return;
+  var f=MS_FIELDS.filter(function(x){return x.k===k;})[0];if(!f)return;
+  editCurrentVehicle();
+  var id=f.input;
+  if(k==='car'){id=!v.year?'v-year':(!v.make?'v-make':'v-model');}
+  if(f.more){var m=document.getElementById('v-more');if(m)m.open=true;}
+  setTimeout(function(){var el=document.getElementById(id);if(!el)return;
+    var g=el.closest('.input-group')||el;g.classList.add('ms-focus');setTimeout(function(){g.classList.remove('ms-focus');},4000);
+    try{el.focus({preventScroll:true});}catch(e){el.focus();}g.scrollIntoView({block:'center'});},250);
+}
+function msFormFill(v){
+  setVal('v-plate',v&&v.plate||'');setVal('v-plate-region',v&&v.plateRegion||'');setVal('v-location',v&&v.location||'');setVal('v-insurer',v&&v.insurer||'');
+  setVal('v-currency',v&&v.currency&&MS_CUR[v.currency]?v.currency:'USD');
+  document.querySelectorAll('#modal-add-vehicle .ms-focus').forEach(function(e){e.classList.remove('ms-focus');});
+}
+function msFormRead(){
+  var c=String(val('v-currency')||'USD').toUpperCase();
+  return {plate:cleanText(val('v-plate'),20).toUpperCase(),plateRegion:cleanText(val('v-plate-region'),30),location:cleanText(val('v-location'),120),insurer:cleanText(val('v-insurer'),80),currency:MS_CUR[c]?c:'USD'};
 }
 
 </script>
