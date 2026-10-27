@@ -1139,6 +1139,19 @@ html.ph-open,html.ph-open body{overflow:hidden}
 .mg-unm{display:grid;gap:6px;font-size:16px;line-height:1.4;border-color:rgba(201,170,107,.55)!important}.mg-unm b{color:#C9AA6B}.mg-unm button{justify-self:start}
 .im-note25{color:#C9AA6B}
 @media (prefers-reduced-motion:reduce){.whl-card.ph-holding{transition:none!important}}
+/* v25b: iOS long-press must not start callout, text selection or image drag */
+.whl-stage,.whl-stage *{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.whl-stage img{-webkit-user-drag:none;user-drag:none;pointer-events:none}
+.whl-card{-webkit-tap-highlight-color:transparent}
+
+.vq{margin:12px 0 4px;padding:14px 16px;border:1px solid rgba(201,170,107,.35);border-radius:14px;background:#141414;color:#F2F0EB;font-size:15px;line-height:1.45}
+.vq-p{margin:6px 0;font-size:15px;color:#F2F0EB}
+.vq-p b{color:#C9AA6B;font-weight:600}
+.vq-status{font-size:15px;color:#C9AA6B;margin-bottom:6px;font-weight:600}
+.vq-btn{min-height:44px;margin-top:8px;font-size:15px;background:#C9AA6B;color:#0B0B0B;border:0;border-radius:12px;padding:10px 18px;font-weight:600}
+.vq-btn[disabled]{background:#2A2620;color:#F2F0EB;opacity:1}
+#vq-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:900;background:#1A1814;color:#F2F0EB;border:1px solid #C9AA6B;border-radius:999px;padding:10px 18px;font-size:15px;display:none;max-width:calc(100vw - 32px);text-align:center}
+#vq-toast.on{display:block}
 
 </style>
 </head>
@@ -2306,11 +2319,14 @@ async function loadAll(){
       var e=est[j];
       if(e.kind==='value'&&e.value_low!==null&&e.value_high!==null){
         var mid=(e.value_mid!==null&&e.value_mid!==undefined&&Number(e.value_mid)>0)?Math.round(Number(e.value_mid)):Math.round((Number(e.value_low)+Number(e.value_high))/2);var prevAi=v.aiValue;
-        v.valueLog.push({date:String(e.as_of).slice(0,10),value:mid,source:'AI',ai:true,ts:e.as_of});
+        var _rv=(e.inputs&&Object.prototype.toString.call(e.inputs.review)==='[object Array]'&&e.inputs.review.length)?e.inputs.review.slice(0,4).map(function(x){return String(x).slice(0,80);}):null;
+        if(_rv&&v.aiValue&&!v.aiValue.review){v.aiReview={value:mid,asOf:String(e.as_of).slice(0,10),why:_rv};continue;}
+        if(!_rv)v.aiReview=null;v._lastRv=_rv;
+        v.valueLog.push({date:String(e.as_of).slice(0,10),value:mid,source:'AI',ai:true,ts:e.as_of,key:e.cache_key||'',review:!!_rv});
         v.aiValue={value:mid,low:Math.round(Number(e.value_low)),high:Math.round(Number(e.value_high)),asOf:(function(t){t=new Date(e.as_of);return isNaN(t.getTime())||!/T\d/.test(String(e.as_of))?String(e.as_of).slice(0,10):isoLocal(t);})(),sources:srcObjList(e.sources,8),notes:cleanText(e.notes,400),confidence:e.confidence===null?'':Number(e.confidence),prev:prevAi?prevAi.value:null,prevAsOf:prevAi?prevAi.asOf:''};
       }
     }
-    ovApply(v,rows.ov);msLoad(v,r,x,fin);poApplyRow(v,r);
+    valFinish25(v);ovApply(v,rows.ov);msLoad(v,r,x,fin);poApplyRow(v,r);
     vehicles.push(v);
   }
   nc.vehicles=vehicles;
@@ -2527,7 +2543,7 @@ function viewAsRefreshUI(){
   elText('viewas-cur',role==='owner'?'Owner':(role==='advisor'?'Tech':'Admin'));
   var opts=document.querySelectorAll('#viewas-menu .va-opt');
   for(i=0;i<opts.length;i++)opts[i].setAttribute('aria-selected',opts[i].getAttribute('data-role')===role?'true':'false');
-  for(i=0;i<clients.length;i++)h+='<option value="'+esc(clients[i].id)+'"'+(act&&session.viewAs.clientId===clients[i].id?' selected':'')+'>'+esc(clients[i].name)+'</option>';
+  for(i=0;i<clients.length;i++)h+='<option value="'+esc(clients[i].id)+'"'+(act&&session.viewAs.clientId===clients[i].id?' selected':'')+'>'+esc(collName(clients[i]))+'</option>';
   if(cs){cs.innerHTML=h;cs.style.display=role==='owner'?'':'none';}
   var cn=act&&role==='owner'?byId(clients,session.viewAs.clientId):null;
   elText('viewas-msg',act?('Viewing as '+viewAsLabel()+(cn?' ('+cn.name+')':'')+' - back to Admin'):'');
@@ -3757,7 +3773,7 @@ function renderOverview(owner,vehicles){
   var ahv=avgHealth(vehicles);elText(n+'-avg-health',ahv===null?'--':String(ahv));
   elHTML(p+'-attention',attentionHTML(vehicles,5));
   elHTML(p+'-brief',collectionBrief(vehicles));
-  vehicles=phSorted(vehicles);elHTML(p+'-vehicles',vehicles.length?wheelHTML(vehicles,p):emptyCard(owner?'Your collection is empty. Add your first vehicle to get started.<div><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button></div>':'No vehicles yet.','grid-column:1/-1;'));
+  vehicles=stApply(phSorted(vehicles));elHTML(p+'-vehicles',vehicles.length?wheelHTML(vehicles,p):emptyCard(owner?'Your collection is empty. Add your first vehicle to get started.<div><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button></div>':'No vehicles yet.','grid-column:1/-1;'));
   wheelMount(p+'-vehicles',vehicles);
   if(owner)elHTML('cp-redeem',vehicles.length?'':redeemCardHTML('ov'));
   var al=document.getElementById(p+'-archive-link');if(al){al.textContent=archN?archN+' archived':'';al.style.display=archN?'':'none';}
@@ -3779,7 +3795,7 @@ function renderClientDetail(){
   var vehicles=owned.filter(function(v){return !isArchivedVehicle(v);});
   var archN=owned.length-vehicles.length;
   var t=portfolioTotals(vehicles);
-  ctitleSet('cd-name',c.name);
+  ctitleSet('cd-name',collName(c),!!collCustom(c));
   elText('cd-meta',[c.location,c.email,c.phone].filter(function(x){return x;}).join(' / '));
   elHTML('cd-managed',managedBannerHTML(c));
   elHTML('cd-stats',
@@ -3790,7 +3806,7 @@ function renderClientDetail(){
   elHTML('cd-attention',attentionHTML(vehicles,6));
   elHTML('cd-brief',collectionBrief(vehicles));vchRenderCollection('cd',vehicles);
   elHTML('cd-archive-note',archN?'<div class="doc-meta" style="padding:12px 0 0;">'+archN+' archived vehicle'+(archN===1?' is':'s are')+' kept in Archives and not included in the totals above.</div>':'');
-  elHTML('cd-vehicles',vehicles.length?vehicles.map(function(v){return vehicleCardHTML(v);}).join(''):emptyCard(archN?'No active vehicles. Archived copies are in Archives.':'No vehicles yet for this client.<div><button class="btn btn-primary" onclick="openAddVehicleFor(\''+jsId(c.id)+'\')">Add first vehicle for '+esc(c.name)+'</button></div>','grid-column:1/-1;'));
+  elHTML('cd-vehicles',vehicles.length?stApply(phSorted(vehicles)).map(function(v){return vehicleCardHTML(v);}).join(''):emptyCard(archN?'No active vehicles. Archived copies are in Archives.':'No vehicles yet for this client.<div><button class="btn btn-primary" onclick="openAddVehicleFor(\''+jsId(c.id)+'\')">Add first vehicle for '+esc(c.name)+'</button></div>','grid-column:1/-1;'));
 }
 
 // ============ VEHICLE CARDS ============
@@ -4572,7 +4588,7 @@ function renderClientPortal(){
   var client=ownerClient();
   if(!client){showPage('client-link');return;}
   var vehicles=visibleVehicles();
-  ctitleSet('cp-title',client.name);
+  ctitleSet('cp-title',collName(client),!!collCustom(client));
   var open=getRecs().filter(function(r){return r.clientId===client.id&&r.status==='open'&&recordIsActive(r);}).length;
   elHTML('cp-banner',open?'<div class="banner" onclick="showPage(\'recommendations\')">'+open+' '+(open!==1?'advisories await':'advisory awaits')+' your response. Review</div>':'');
   var hr=new Date().getHours(),greet=hr<12?'Good morning':(hr<18?'Good afternoon':'Good evening');
@@ -5598,7 +5614,7 @@ function refreshValue(vid){
   if(VALUE.busy[vid]||valueRefreshedToday(vid))return;
   if(typeof sb==='undefined'||!sb||!sb.functions||typeof sb.functions.invoke!=='function'){valueSetOff(true);valueRerender();return;}
   VALUE.busy[vid]=true;delete VALUE.note[vid];valueRerender();
-  var call;try{call=Promise.resolve(sb.functions.invoke('estimate-value',{body:{vehicle_id:vid}}));}
+  var call;try{call=Promise.resolve(sb.functions.invoke('estimate-value',{body:valBody25(vid)}));}
   catch(e){call=Promise.resolve({data:null,error:{name:'FunctionsFetchError'}});}
   var timer=new Promise(function(res){setTimeout(function(){res({data:null,error:{name:'Timeout'}});},90000);});
   function done(){VALUE.busy[vid]=false;}
@@ -5612,6 +5628,7 @@ function refreshValue(vid){
       valueRerender();
     });
     done();
+    if(data&&data.skipped){valueRerender();return;}
     if(!data||typeof data!=='object'||!(Number(data.mid)>0)){
       VALUE.note[vid]={kind:'fail',text:(data&&data.notes)?String(data.notes).slice(0,200):'No reliable market prices were found for this vehicle yet.'};valueRerender();return;
     }
@@ -9280,42 +9297,50 @@ function phThumb(v){var s='';try{s=imgSrc(v);}catch(e){}return s?'<img src="'+ph
 function phVibe(){try{if(navigator.vibrate)navigator.vibrate(15);}catch(e){}}
 function phLayer(){var r=document.getElementById('ph-root');if(!r){r=document.createElement('div');r.id='ph-root';document.body.appendChild(r);}return r;}
 function phClose(){var r=document.getElementById('ph-root');if(r)r.innerHTML='';document.documentElement.classList.remove('ph-open');}
-function phOpenLayer(html,label){var r=phLayer();r.innerHTML='<div class="ph-back" onclick="if(event.target===this)phClose()"></div>'+html;document.documentElement.classList.add('ph-open');
+function phOpenLayer(html,label){var r=phLayer();r.innerHTML='<div class="ph-back" onclick="if(event.target===this&&Date.now()-PH.opened>450)phClose()"></div>'+html;PH.opened=Date.now();document.documentElement.classList.add('ph-open');
   var d=r.querySelector('[role=dialog]');if(d){d.setAttribute('aria-label',label||'Car options');var b=d.querySelector('button');if(b)try{b.focus({preventScroll:true});}catch(e){}}}
-/* --- gesture --- */
+/* --- gesture (v25b: document-level delegation; touch events drive touch holds so iOS pointercancel cannot kill them) --- */
+function phFrontCard(t){var c=t&&t.closest&&t.closest('.whl-card');if(!c||!c.classList.contains('front')||!c.closest('.whl-stage'))return null;if(t.closest('.whl-arrow,.whl-dots,.whl-dot'))return null;return c;}
 function phCancelHold(){if(PH.timer){clearTimeout(PH.timer);PH.timer=null;}if(PH.ringT){clearTimeout(PH.ringT);PH.ringT=null;}
   var c=document.querySelector('.ph-holding');if(c)c.classList.remove('ph-holding');PH.st=null;}
-function phAttach(stage){if(!stage||stage._ph25)return;stage._ph25=1;
-  stage.addEventListener('pointerdown',function(e){phCancelHold();if(e.button&&e.button!==0)return;
-    if(e.isPrimary===false){return;}
-    var card=e.target.closest&&e.target.closest('.whl-card.front');if(!card||e.target.closest('.whl-arrow'))return;
-    if(e.clientX<24)return; // left edge belongs to swipe-back
-    PH.st={x:e.clientX,y:e.clientY,id:card.getAttribute('data-id'),card:card,stage:stage,pid:e.pointerId,t:Date.now()};
-    PH.ringT=setTimeout(function(){if(PH.st){PH.st.card.classList.add('ph-holding');}},150);
-    PH.timer=setTimeout(phFire,500);},true);
-  stage.addEventListener('pointermove',function(e){if(!PH.st||e.pointerId!==PH.st.pid)return;var dx=e.clientX-PH.st.x,dy=e.clientY-PH.st.y;if(dx*dx+dy*dy>100)phCancelHold();},true);
-  ['pointerup','pointercancel'].forEach(function(t){stage.addEventListener(t,function(e){if(e._ph25)return;if(PH.st&&e.pointerId===PH.st.pid)phCancelHold();},true);});
-  stage.addEventListener('touchstart',function(e){if(e.touches&&e.touches.length>1)phCancelHold();},{passive:true,capture:true});
-  stage.addEventListener('contextmenu',function(e){if(e.target.closest&&e.target.closest('.whl-card')){e.preventDefault();}},true);
-  stage.addEventListener('click',function(e){if(PH.suppress&&Date.now()-PH.suppress<700){e.preventDefault();e.stopPropagation();PH.suppress=0;}},true);
-  stage.addEventListener('keydown',function(e){if((e.key==='ContextMenu')||(e.shiftKey&&e.key==='F10')){var c=stage.querySelector('.whl-card.front');if(c){e.preventDefault();phSheet(c.getAttribute('data-id'));}}});
-}
-window.addEventListener('scroll',function(){if(PH.st)phCancelHold();},{passive:true,capture:true});
+function phStart(x,y,target,kind,pid){if(PH.st&&PH.st.kind==='touch'&&kind==='pointer')return; // touch already tracking this press
+  phCancelHold();var card=phFrontCard(target);if(!card)return;
+  if(x<24)return; // left edge belongs to swipe-back
+  PH.st={sy:window.scrollY,x:x,y:y,id:card.getAttribute('data-id'),card:card,stage:card.closest('.whl-stage'),kind:kind,pid:pid};
+  PH.ringT=setTimeout(function(){if(PH.st)PH.st.card.classList.add('ph-holding');},150);
+  PH.timer=setTimeout(phFire,500);}
+function phMoved(x,y){if(!PH.st)return;var dx=x-PH.st.x,dy=y-PH.st.y;if(dx*dx+dy*dy>100)phCancelHold();}
+document.addEventListener('touchstart',function(e){if(!e.touches||e.touches.length!==1){phCancelHold();return;}var t=e.touches[0];phStart(t.clientX,t.clientY,e.target,'touch',null);},{passive:true,capture:true});
+document.addEventListener('touchmove',function(e){if(PH.st&&PH.st.kind==='touch'){if(e.touches.length!==1){phCancelHold();return;}phMoved(e.touches[0].clientX,e.touches[0].clientY);}},{passive:true,capture:true});
+document.addEventListener('touchend',function(e){if(PH.st&&PH.st.kind==='touch')phCancelHold();},{passive:true,capture:true});
+document.addEventListener('touchcancel',function(e){if(PH.st&&PH.st.kind==='touch')phCancelHold();},{passive:true,capture:true});
+document.addEventListener('pointerdown',function(e){if(e.pointerType==='touch')return;if(e.button&&e.button!==0)return;if(e.isPrimary===false)return;phStart(e.clientX,e.clientY,e.target,'pointer',e.pointerId);},true);
+// Chrome/iOS hold back touchmove inside the touch slop, so pointermove also counts for touch holds
+document.addEventListener('pointermove',function(e){if(!PH.st||e.isPrimary===false)return;if(PH.st.kind==='pointer'?e.pointerId===PH.st.pid:e.pointerType==='touch')phMoved(e.clientX,e.clientY);},true);
+['pointerup','pointercancel'].forEach(function(t){document.addEventListener(t,function(e){if(e._ph25)return;if(PH.st&&PH.st.kind==='pointer'&&e.pointerId===PH.st.pid)phCancelHold();},true);});
+document.addEventListener('contextmenu',function(e){if(e.target.closest&&e.target.closest('.whl-card')){e.preventDefault();}},true);
+document.addEventListener('selectstart',function(e){if(e.target.closest&&e.target.closest('.whl-stage'))e.preventDefault();},true);
+document.addEventListener('dragstart',function(e){if(e.target.closest&&e.target.closest('.whl-stage'))e.preventDefault();},true);
+// after a hold the finger lifts over the new sheet: swallow that click (and the mouseup click) so it cannot close the sheet or open the car
+document.addEventListener('click',function(e){if(PH.suppress&&Date.now()-PH.suppress<900){e.preventDefault();e.stopPropagation();PH.suppress=0;}},true);
+document.addEventListener('keydown',function(e){if((e.key==='ContextMenu')||(e.shiftKey&&e.key==='F10')){var st=e.target.closest&&e.target.closest('.whl-stage');var c=st&&st.querySelector('.whl-card.front');if(c){e.preventDefault();phSheet(c.getAttribute('data-id'));}}});
+window.addEventListener('scroll',function(){if(PH.st&&Math.abs(window.scrollY-PH.st.sy)>10)phCancelHold();},{passive:true,capture:true});
 function phFire(){var st=PH.st;PH.timer=null;if(!st)return;st.card.classList.remove('ph-holding');PH.st=null;
-  var v=phFind(st.id);if(!v||!(phCanMove(v)||phCanRemove(v)))return;
+  if(!document.contains(st.card))return;
   phVibe();PH.suppress=Date.now();
-  try{var ev=new PointerEvent('pointercancel',{bubbles:true,pointerId:st.pid});ev._ph25=1;st.stage.dispatchEvent(ev);}catch(e){}
+  try{var ev=new PointerEvent('pointercancel',{bubbles:true,pointerId:st.pid==null?1:st.pid});ev._ph25=1;st.stage.dispatchEvent(ev);}catch(e){}
   phSheet(st.id);}
 var _wheelMount25=wheelMount;
-wheelMount=function(id,list){var r=_wheelMount25.apply(this,arguments);try{var host=document.getElementById(id);var stage=host&&(host.querySelector('.whl-stage')||host);phAttach(stage);
-  if(host&&!host.querySelector('.ph-hint')&&(list||[]).some(function(v){return phCanMove(v)||phCanRemove(v);})){var h=document.createElement('div');h.className='ph-hint';h.textContent='Hold a car for options';host.appendChild(h);}}catch(e){}return r;};
+wheelMount=function(id,list){var r=_wheelMount25.apply(this,arguments);try{var host=document.getElementById(id);
+  if(host&&!host.querySelector('.ph-hint')&&(list||[]).length){var h=document.createElement('div');h.className='ph-hint';h.textContent='Hold a car for options';host.appendChild(h);}}catch(e){}return r;};
 /* --- action sheet (ph-02) --- */
 function phHead(v){return '<div class="ph-head"><div class="ph-th">'+phThumb(v)+'</div><div><div class="ph-nm">'+phE(vFull(v))+'</div><div class="ph-pf">'+phE(phPfName(v))+'</div></div></div>';}
 function phSheet(id){var v=phFind(id);if(!v)return;var h='<div class="ph-sheet" role="dialog" aria-modal="true">'+phHead(v);
   if(phCanMove(v))h+='<button class="ph-row" onclick="phMoveOpen(\''+v.id+'\')"><span class="ph-ic">\u2194</span><span><b>Move to another spot</b><small>Change the order of your cars</small></span></button>';
   if(phCanMove(v)&&mgOthers(v).length)h+='<button class="ph-row" onclick="mgOpen(\''+v.id+'\')"><span class="ph-ic">\u29c9</span><span><b>Merge with\u2026</b><small>Two entries for the same car? Combine them</small></span></button>';
   if(phCanRemove(v))h+='<button class="ph-row" onclick="phRemove(\''+v.id+'\')"><span class="ph-ic">\u2715</span><span><b>Remove from portfolio</b><small>Archive or delete this car</small></span></button>';
-  h+='<button class="ph-cancel" onclick="phClose()">Cancel</button></div>';phOpenLayer(h,'Options for '+vFull(v));}
+  if(!phCanMove(v)&&!phCanRemove(v))h+='<p class="ph-rtxt">'+(isArchivedVehicle(v)?'This car is archived. Bring it back from Archived cars to move or merge it.':'You can view this car, but only its owner or the admin can move, merge or remove it.')+'</p>';
+  h+='<button class="ph-cancel" onclick="phClose()">'+(phCanMove(v)||phCanRemove(v)?'Cancel':'OK')+'</button></div>';phOpenLayer(h,'Options for '+vFull(v));}
 /* --- move mode (ph-03) --- */
 function phPortfolioCars(v){var key=phPfKey(v);return phSorted(activeVehicles(getVehicles()).filter(function(x){return phPfKey(x)===key&&!isArchivedVehicle(x);}));}
 function phMoveOpen(id){var v=phFind(id);if(!v)return;PH.move={pf:v.portfolioId||null,owner:v.clientId,key:phPfKey(v),name:phPfName(v),ids:phPortfolioCars(v).map(function(x){return x.id;}),focus:id};phMoveRender();}
@@ -9443,6 +9468,554 @@ function imUnmLine25(l){if(!l||!l.length)return '';var names=l.slice(0,3).map(im
 function mgFromImport(){var p={};(IM._unm25||[]).forEach(function(v){p[v.id]=1;});mgOpen(null,p);}
 var _phStep3=imStep3;imStep3=function(){var h=_phStep3();try{IM._unm25=imUnmatched25(imA());var l=imUnmLine25(IM._unm25);if(l)h=h.replace('<div class="im-tabs"',l+'<div class="im-tabs"');}catch(e){}return h;};
 var _phStep4=imStep4;imStep4=function(){var h=_phStep4();try{var d=IM.done;if(d&&!d.undone&&IM._unm25){var l=imUnmLine25(IM._unm25.filter(function(v){var w=phFind(v.id);return w&&!isArchivedVehicle(w);}));var i=h.indexOf('</p>');if(l&&i>=0)h=h.slice(0,i+4)+l+h.slice(i+4);}}catch(e){}return h;};
+// ===== v25b: automatic first values (queued, with progress), "Refresh values now", review flags, honest trends =====
+// Server (estimate-value): reason "first" = only when the car has no value (not counted against the user's 5/day);
+// mode "collection_start" + reason "collection" = once per day per collection, skips cars valued in the last 7 days;
+// a monthly live-call cap keeps Gemini under the $10/month budget.
+var VQ={q:[],total:0,done:0,fail:0,run:false,reason:{},msg:'',stopped:''};
+VALUE.reason=VALUE.reason||{};
+function vqKey(){return 'evoai_valfirst';}
+function vqTried(){try{return JSON.parse(localStorage.getItem(vqKey())||'{}')||{};}catch(e){return {};}}
+function vqMark(id){try{var m=vqTried();m[id]=Date.now();localStorage.setItem(vqKey(),JSON.stringify(m));}catch(e){}}
+function vqHasValue(v){return !!(v&&v.aiValue&&Number(v.aiValue.value)>0);}
+function vqComplete(v){return !!(v&&Number(v.year)>=1886&&v.make&&v.model);}
+function vqMissing(v){var m=[];if(!(Number(v.year)>=1886))m.push('year');if(!v.make)m.push('make');if(!v.model)m.push('model');return m;}
+function vqOk(v){return !!(v&&!isArchivedVehicle(v)&&session&&can(v,'view_value_estimate')&&VALUE.state!=='off'&&vqComplete(v)&&typeof sb!=='undefined'&&sb&&sb.functions&&typeof sb.functions.invoke==='function');}
+function vqAdd(ids,reason){
+  var n=0;
+  (ids||[]).forEach(function(id){
+    if(VQ.q.some(function(x){return x.id===id;})||VALUE.busy[id])return;
+    var v=byId(getVehicles(),id);if(!vqOk(v))return;
+    if(reason==='first'&&vqHasValue(v))return;
+    VQ.q.push({id:id,reason:reason});n++;
+  });
+  if(n){if(!VQ.run){VQ.total=0;VQ.done=0;VQ.fail=0;VQ.msg='';VQ.stopped='';}VQ.total+=n;vqBar();setTimeout(vqPump,300);}
+  return n;
+}
+function vqPump(){
+  if(VQ.run)return;VQ.run=true;
+  (function next(){
+    if(!VQ.q.length||VQ.stopped){VQ.q=[];VQ.run=false;vqBar(true);return;}
+    var it=VQ.q.shift(),vid=it.id;
+    VALUE.reason[vid]=it.reason;if(it.reason==='first')vqMark(vid);
+    vqBar();
+    try{refreshValue(vid);}catch(e){}
+    var t0=Date.now();
+    (function wait(){
+      if(VALUE.busy[vid]&&Date.now()-t0<95000){setTimeout(wait,250);return;}
+      delete VALUE.reason[vid];
+      var n=VALUE.note[vid];VQ.done++;
+      if(n&&n.kind==='limit'){VQ.stopped=n.text;}
+      else if(n&&n.kind!=='done'){VQ.fail++;}
+      if(n&&n.kind!=='done'&&it.reason!=='user')delete VALUE.note[vid];
+      vqBar();setTimeout(next,150);
+    })();
+  })();
+}
+function vqBar(finished){
+  var t;
+  if(VQ.run||VQ.q.length)t='Valuing '+Math.min(VQ.total,VQ.done+1)+' of '+VQ.total+'\u2026';
+  else if(VQ.stopped)t=VQ.stopped;
+  else if(finished&&VQ.total)t='Values updated for '+(VQ.done-VQ.fail)+' of '+VQ.total+(VQ.fail?' ('+VQ.fail+' could not be valued yet)':'')+'.';
+  else t='';
+  VQ.msg=t;
+  var els=document.querySelectorAll('.vq-status');
+  for(var i=0;i<els.length;i++){els[i].textContent=t;els[i].style.display=t?'':'none';}
+  var g=document.getElementById('vq-toast');
+  if(!g){g=document.createElement('div');g.id='vq-toast';g.setAttribute('role','status');g.setAttribute('aria-live','polite');document.body.appendChild(g);}
+  g.textContent=t;g.className=t?'on':'';
+  if(finished&&t){clearTimeout(VQ.tm);VQ.tm=setTimeout(function(){if(!VQ.run){g.className='';}},6000);}
+}
+// cars with no value yet that have not been tried in the last 20 hours: new, imported, or pending from before v25b
+function vqSweep(){
+  if(!session||window.__VQ_OFF__)return 0;var tr=vqTried(),now=Date.now(),ids=[];
+  (getVehicles()||[]).forEach(function(v){if(!vqHasValue(v)&&vqOk(v)&&!(tr[v.id]&&now-tr[v.id]<72e6))ids.push(v.id);});
+  return vqAdd(ids,'first');
+}
+var _vqReload=loadAll;
+loadAll=function(){var r=_vqReload.apply(this,arguments);Promise.resolve(r).then(function(){if(!VQ.run)setTimeout(vqSweep,1500);}).catch(function(){});return r;};
+// single add (p15 queued a "user" estimate that used up the 5/day): route new cars to the first-value queue
+var _vqAuto=valueAutoQueue;
+valueAutoQueue=function(vid,delay){var v=byId(getVehicles(),vid);if(v&&!vqHasValue(v)){setTimeout(function(){vqAdd([vid],'first');},delay===undefined?500:delay);return;}return _vqAuto(vid,delay);};
+var _vqRT=valueRefreshedToday;
+valueRefreshedToday=function(vid){if(VALUE.reason&&(VALUE.reason[vid]==='first'||VALUE.reason[vid]==='collection'))return false;return _vqRT(vid);};
+function valBody25(vid){var r=VALUE.reason&&VALUE.reason[vid];return r?{vehicle_id:vid,reason:r}:{vehicle_id:vid};}
+var _vqFail=valueFail;
+valueFail=function(err,body){
+  var st=err&&err.context&&err.context.status,bc=body&&body.error;
+  if(st===429&&(bc==='monthly_cap'||bc==='first_limited'||bc==='collection_limited'))return {kind:'limit',text:String(body.message||'Value limit reached.').slice(0,200)};
+  if(st===400&&bc==='incomplete_vehicle'&&body.missing&&body.missing.length)return {kind:'fail',text:'Add the '+vqList(body.missing)+' so this car can be valued.'};
+  return _vqFail(err,body);
+};
+function vqList(a){a=a.slice();if(a.length<2)return a.join('');var l=a.pop();return a.join(', ')+' and '+l;}
+// ---------- Refresh values now (owner or admin, once per day per collection) ----------
+function vqCanRefresh(vs){var v=vs&&vs[0];return !!(v&&session&&(realAdmin()||(typeof isRealOwnerOf==='function'&&isRealOwnerOf(v))));}
+function vqRefreshNow(owner){
+  var vs=(getVehicles()||[]).filter(function(v){return v.clientId===owner&&!isArchivedVehicle(v);});
+  if(!vs.length||VQ.run)return;
+  var b=document.querySelectorAll('.vq-btn');for(var i=0;i<b.length;i++)b[i].disabled=true;
+  Promise.resolve(sb.functions.invoke('estimate-value',{body:{mode:'collection_start',owner_id:owner}})).then(function(r){
+    var err=r&&r.error;
+    if(err){return autoIdFail(err).then(function(bd){var m=(bd&&bd.message)||'Could not start the refresh right now.';VQ.msg=m;showToast(m,'error');valueRerender();});}
+    try{var u=getUI(),m=u.valCol||{};m[owner]=Date.now();u.valCol=m;localStorage.setItem('evoai_ui',JSON.stringify(u));}catch(e){}
+    var fresh=0,ids=[];vs.forEach(function(v){var a=v.aiValue,t=a&&a.asOf?new Date(a.asOf).getTime():0;if(vqHasValue(v)&&t&&Date.now()-t<7*864e5)fresh++;else ids.push(v.id);});
+    var n=vqAdd(ids,'collection');
+    if(!n){VQ.msg='All values are up to date ('+fresh+' valued in the last 7 days).';vqBar(true);showToast(VQ.msg,'success');}
+    valueRerender();
+  }).catch(function(){showToast('Could not reach the estimate service.','error');valueRerender();});
+}
+function vqColDoneToday(owner){try{var t=Number((getUI().valCol||{})[owner]);return !!(t&&Date.now()-t<864e5);}catch(e){return false;}}
+// ---------- what is missing / what needs review ----------
+function vqPanel(vs){
+  if(!vs||!vs.length||!session)return '';
+  var vis=vs.filter(function(v){return can(v,'view_value_estimate')&&!isArchivedVehicle(v);});if(!vis.length)return '';
+  var miss=vis.filter(function(v){return !vqComplete(v);}),rev=vis.filter(function(v){return (v.aiValue&&v.aiValue.review)||v.aiReview||v._swing;});
+  var weak=vis.filter(function(v){return vqComplete(v)&&!(Number(v.mileage)>0);});
+  var h='<div class="vq" data-noptr>';
+  h+='<div class="vq-status" role="status" aria-live="polite"'+(VQ.msg?'':' style="display:none"')+'>'+esc(VQ.msg)+'</div>';
+  if(miss.length)h+='<p class="vq-p"><b>Can\'t be valued yet:</b> '+miss.slice(0,6).map(function(v){return esc(vName(v)||'Unnamed car')+' (add the '+esc(vqList(vqMissing(v)))+')';}).join('; ')+(miss.length>6?'; and '+(miss.length-6)+' more':'')+'.</p>';
+  if(weak.length)h+='<p class="vq-p">'+weak.length+' '+plural(weak.length,'car is','cars are')+' valued at typical mileage because no mileage is on file. Adding mileage, the VIN and the variant makes estimates more accurate.</p>';
+  if(rev.length)h+='<p class="vq-p"><b>Needs review:</b> '+rev.slice(0,6).map(function(v){var r=(v.aiValue&&v.aiValue.review)||(v.aiReview&&v.aiReview.why)||[];return esc(vName(v))+' ('+esc(v._swing?('value jumped '+pct(v._swing.p)+' on '+fmtDate(v._swing.date)+'; not counted in the trend'):r.join(', '))+')';}).join('; ')+'.</p>';
+  var o=vis[0].clientId;
+  if(vqCanRefresh(vis)){
+    var dis=VQ.run||vqColDoneToday(o);
+    h+='<button type="button" class="btn vq-btn" '+(dis?'disabled ':'')+'onclick="vqRefreshNow(\''+esc(o)+'\')">'+(vqColDoneToday(o)?'Values refreshed today':'Refresh values now')+'</button>';
+    h+='<p class="vq-p vq-note">New and imported cars are valued automatically and every car is refreshed weekly. This button is a backup and works once a day.</p>';
+  }
+  return h+'</div>';
+}
+var _vqCB=collectionBrief;
+collectionBrief=function(vs){return _vqCB(vs)+vqPanel(vs);};
+// ---------- loader: review flags, same-basis history ----------
+// e.inputs.review (server sanity checks) keeps a number out of the trend; a change of basis (cache_key, e.g. a car later marked as a replica) restarts the history.
+function valFinish25(v){
+  if(v.aiValue&&v._lastRv)v.aiValue.review=v._lastRv;
+  delete v._lastRv;
+  var ai=(v.valueLog||[]).filter(function(p){return p&&p.ai===true;}),K='';
+  for(var i=ai.length-1;i>=0;i--)if(!ai[i].review&&ai[i].key){K=ai[i].key;break;}
+  v.valueLog=(v.valueLog||[]).filter(function(p){return !(p&&p.ai===true)||(!p.review&&(!K||!p.key||p.key===K));});
+}
+// a jump of more than 30% between two consecutive AI values is not a market move we can trust: the trend restarts after it and the car is listed under Needs review
+var VQ_SWING=0.30;
+var _vqVP=valuePoints;
+valuePoints=function(v){
+  var pts=_vqVP(v);if(!v)return pts;v._swing=null;
+  if(!pts||pts.length<2)return pts;
+  var cut=0;
+  for(var i=1;i<pts.length;i++){var a=Number(pts[i-1].value),b=Number(pts[i].value);if(a>0&&Math.abs(b-a)/a>VQ_SWING){cut=i;v._swing={p:(b-a)/a*100,date:pts[i].date,from:a,to:b};}}
+  return cut?pts.slice(cut):pts;
+};
+// ============ v27 SIMPLE SECURE SIGN-UP (short invite codes, email code / magic link, admin test mode) ============
+// Codes: 8 chars from an unambiguous alphabet (no 0 O 1 I L), shown as ABCD-EFGH. Legacy 32-char hex codes still work.
+var SU_ALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function suNorm(s){
+  var raw=String(s||'').replace(/[^A-Za-z0-9]/g,'');
+  if(raw.length===8)return raw.toUpperCase();          // new short code
+  return raw.toLowerCase();                              // legacy hex code
+}
+function suIsShort(k){return /^[A-HJ-KMNP-Z2-9]{8}$/.test(k);}
+function suValid(k){return suIsShort(k)||(k.length>=16&&k.length<=64&&/^[a-z0-9]+$/.test(k));}
+function codeKey(c){return suNorm(c);}
+function suLink(k){return APP_LINK+'?invite='+encodeURIComponent(k);}
+function readUrlInvite(){
+  try{
+    var q=new URLSearchParams(window.location.search||''),c=q.get('invite');
+    if(c===null)return;
+    var k=suNorm(c);
+    if(suValid(k))localStorage.setItem(INVITE_KEY,k);
+    q.delete('invite');
+    var qs=q.toString();
+    if(window.history&&history.replaceState)history.replaceState(null,'',window.location.pathname+(qs?'?'+qs:'')+(window.location.hash||''));
+  }catch(e){}
+}
+// ---- link landing: code prefilled, email -> 6-digit code or magic link, no password ----
+var SU={email:'',sentAt:0,step:'email'};
+function suLandingHTML(k){
+  return '<div id="su-landing" class="invite-card" style="margin-bottom:16px;">'
+   +'<div class="sh first"><h2>You are invited to EvoAI</h2></div>'
+   +'<div class="doc-meta">Your invite code is filled in. Enter your email and we will send you a 6-digit sign-in code. No password needed.</div>'
+   +'<div class="input-group" style="margin-top:12px;"><label for="sl-code">Invite code</label><input type="text" id="sl-code" value="'+esc(groupCode(k))+'" autocapitalize="characters" autocomplete="off" maxlength="40"></div>'
+   +'<div id="sl-step-email"><div class="input-group"><label for="sl-name">Your name</label><input type="text" id="sl-name" maxlength="80" autocomplete="name"></div>'
+   +'<div class="input-group"><label for="sl-email">Email</label><input type="email" id="sl-email" maxlength="120" autocapitalize="none" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>'
+   +'<button class="btn btn-primary" style="width:100%;" id="sl-send" type="button" onclick="suSendCode()">Email me a sign-in code</button></div>'
+   +'<div id="sl-step-code" style="display:none;"><div class="doc-meta" id="sl-sent-to"></div>'
+   +'<div class="input-group" style="margin-top:10px;"><label for="sl-otp">6-digit code</label><input type="text" id="sl-otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" placeholder="123456" style="font-size:22px;letter-spacing:.3em;text-align:center;"></div>'
+   +'<button class="btn btn-primary" style="width:100%;" id="sl-verify" type="button" onclick="suVerify()">Verify and join</button>'
+   +'<div class="doc-meta" style="margin-top:8px;">Or tap the sign-in link in the same email on this device. <span class="link" onclick="suResend()">Send again</span> / <span class="link" onclick="suBack()">Use another email</span></div></div>'
+   +'<div class="doc-meta code-msg" id="sl-msg" role="status" style="margin-top:8px;"></div>'
+   +'<div class="doc-meta" style="margin-top:10px;">Already have an account? Sign in below and the code is applied automatically.</div></div>';
+}
+function applyInviteToAuth(){
+  var k=pendingInviteCode();
+  if(!k)return;
+  try{
+    showSignup(true);selectRole('client');setVal('su-code',groupCode(k));
+    var pan=document.getElementById('auth-signup-panel');
+    if(pan&&!document.getElementById('su-landing')){var d=document.createElement('div');d.innerHTML=suLandingHTML(k);pan.insertBefore(d.firstChild,pan.firstChild);}
+    setTimeout(function(){var l=document.getElementById('su-landing');if(l&&l.scrollIntoView)l.scrollIntoView({block:'start'});},60);
+    showToast('Invite code added. Enter your email to join.','success');
+  }catch(e){}
+}
+function suSay(t,bad){var m=document.getElementById('sl-msg');if(m){m.textContent=t||'';m.style.color=bad?'var(--red,#e07070)':'var(--gold)';}}
+function suOtpMsg(e){
+  var m=String((e&&(e.message||e.error_description))||e||'');
+  if(/rate limit|too many|over_email_send_rate|429/i.test(m))return 'Too many emails were sent just now. Wait a few minutes and try again, or ask for a new link by text.';
+  if(/expired|invalid|token/i.test(m))return 'That code did not work or has expired. Check the 6 digits, or tap Send again.';
+  if(/signups not allowed|not allowed/i.test(m))return 'New sign-ups are turned off right now. Ask the person who invited you.';
+  return authMsg(e);
+}
+async function suSendCode(again){
+  if(noBackend()){suSay('The cloud connection is not set up in this build.',true);return;}
+  var k=suNorm(val('sl-code')),email=again?SU.email:normEmail(val('sl-email')),name=(val('sl-name')||'').trim();
+  if(!suValid(k)){suSay('Check the invite code. It has 8 letters and numbers, like ABCD-EFGH.',true);return;}
+  if(!validEmail(email)){suSay('Enter a valid email address.',true);return;}
+  var wait=60000-(Date.now()-SU.sentAt);
+  if(SU.sentAt&&wait>0){suSay('Please wait '+Math.ceil(wait/1000)+' seconds before sending another code.',true);return;}
+  try{localStorage.setItem(INVITE_KEY,k);}catch(e){}
+  var b=document.getElementById('sl-send');if(b)b.disabled=true;
+  suSay('Sending...');
+  try{
+    var data={pending_invite:k};if(name)data.display_name=name.slice(0,80);
+    var r=await sb.auth.signInWithOtp({email:email,options:{shouldCreateUser:true,emailRedirectTo:suLink(k),data:data}});
+    if(b)b.disabled=false;
+    if(r.error){suSay(suOtpMsg(r.error),true);return;}
+    SU.email=email;SU.sentAt=Date.now();SU.step='code';
+    showEl('sl-step-email',false);showEl('sl-step-code',true);
+    elText('sl-sent-to','We emailed a 6-digit code to '+email+'. It expires in 1 hour.');
+    suSay('');var o=document.getElementById('sl-otp');if(o)o.focus();
+  }catch(e){if(b)b.disabled=false;suSay(suOtpMsg(e),true);}
+}
+function suResend(){suSendCode(true);}
+function suBack(){SU.step='email';showEl('sl-step-email',true);showEl('sl-step-code',false);suSay('');}
+async function suVerify(){
+  var t=String(val('sl-otp')||'').replace(/\D/g,'');
+  if(t.length!==6){suSay('Enter the 6 digits from the email.',true);return;}
+  var b=document.getElementById('sl-verify');if(b)b.disabled=true;
+  suSay('Checking...');
+  try{
+    var r=await sb.auth.verifyOtp({email:SU.email,token:t,type:'email'});
+    if(b)b.disabled=false;
+    if(r.error){suSay(suOtpMsg(r.error),true);return;}
+    var u=r.data&&(r.data.user||(r.data.session&&r.data.session.user));
+    SU.justJoined=true;
+    if(u)await bootWithUser(u);
+  }catch(e){if(b)b.disabled=false;suSay(suOtpMsg(e),true);}
+}
+function suSuccess(d){
+  if(!SU.justJoined)return;SU.justJoined=false;
+  var t=inviteDoneText(d)||'Your account is ready.';
+  try{sheetOpen({title:'Welcome to EvoAI',html:'<p>'+esc(t)+'</p><p class="doc-meta">Next time just enter your email and we will send a new code. No password to remember.</p>',buttons:[{label:'Get started',cls:'btn-primary',fn:sheetClose}]});}catch(e){}
+}
+// wrap the existing auto-redeem toast so the joiner also gets a clear success sheet
+var _suDone=inviteDoneText;
+inviteDoneText=function(d){var t=_suDone(d);if(SU.justJoined&&d)setTimeout(function(){suSuccess(d);},50);return t;};
+// ---- redeem while signed in ----
+function suAdminBlock(msgId){
+  var k=suNorm(val(msgId&&msgId.replace(/-msg$/,'')))||pendingInviteCode(),link=suValid(k)?suLink(k):APP_LINK;
+  var t="You're signed in as admin. To test sign-up, open this link in a private tab or on another device.";
+  if(msgId){var m=document.getElementById(msgId);if(m){m.textContent=t;m.style.color='var(--gold)';}}
+  try{sheetOpen({title:'Test sign-up as a new person',html:'<p id="su-admin-msg">'+esc(t)+'</p><div class="invite-code" style="font-size:15px;word-break:break-all;user-select:all;-webkit-user-select:all;">'+esc(link)+'</div><p class="doc-meta">Admin accounts cannot redeem invite codes, and a code cannot be used by the account that made it. Use a different email (for example a +test address) in the private tab.</p>',
+    buttons:[{label:'Close',fn:sheetClose},{label:'Copy link',cls:'btn-primary',id:'su-admin-copy',fn:function(){copyText(link,'Link copied');}}]});}catch(e){}
+}
+async function redeemCodeFrom(inputId,msgId){
+  suWrapRpc();
+  if(!session)return;
+  var say=function(t,bad){if(msgId){var m=document.getElementById(msgId);if(m){m.textContent=t||'';m.style.color=bad?'var(--red,#e07070)':'var(--gold)';}}};
+  say('');
+  if(viewAsActive()||realAdmin()){suAdminBlock(msgId);return;}
+  var k=suNorm(val(inputId));
+  if(!k){say('Paste the invite code first.',true);showToast('Paste the invite code first.','error');return;}
+  if(!suValid(k)){say(k.length<8?'That looks too short. Codes have 8 letters and numbers, like ABCD-EFGH.':'That code is not complete. Check it and try again.',true);showToast('Check the invite code.','error');return;}
+  say('Checking the code...');
+  try{
+    var r=await sb.rpc('redeem_invite',{p_code:k});
+    if(r.error)throw r.error;
+    clearPendingInvite();
+    setVal(inputId,'');closeModal('modal-account');
+    await loadAll();
+    var u=(await sb.auth.getUser()).data.user;
+    if(u)setAccountFromProfile(u);
+    showToast(inviteDoneText(r.data||{kind:'transfer'}),'success');
+    enterApp();
+  }catch(e){var t=inviteErrorText(e);say(t,true);showToast(t,'error');}
+}
+var _suErr=inviteErrorText;
+inviteErrorText=function(e){
+  var m=String((e&&(e.message||e))||'');
+  if(/too_many_attempts|rate_limited/.test(m))return 'Too many tries. Wait an hour and try again, or ask for a new code.';
+  if(/invalid_or_expired_invite/.test(m))return 'That code did not work. Check the 8 letters and numbers. A code works once and expires after 7 days, so ask for a new one if needed.';
+  return _suErr(e);
+};
+// ---- invite sheet: short code + link, Share via text / Copy link / Send email ----
+function inviteShareText(code,email){
+  var k=codeKey(code);
+  return 'You are invited to EvoAI. Tap to join: '+suLink(k)+'  (invite code '+groupCode(k)+', expires in 7 days)';
+}
+function inviteMailto(code,email){
+  return 'mailto:'+encodeURIComponent(email||'').replace(/%40/g,'@')+'?subject='+encodeURIComponent('Your EvoAI invite')+'&body='+encodeURIComponent(inviteShareText(code,email)+'\n\nOpen the link, enter your email and type the 6-digit code we send you. No password needed.');
+}
+function suShareText(){
+  if(!lastInviteCode)return;var t=inviteShareText(lastInviteCode,lastInviteEmail);
+  if(navigator.share){navigator.share({title:'Your EvoAI invite',text:t}).catch(function(e){if(e&&e.name==='AbortError')return;copyText(t,'Invite message copied');});return;}
+  try{window.location.href='sms:?&body='+encodeURIComponent(t);}catch(e){copyText(t,'Invite message copied');}
+}
+function suCopyLink(){if(lastInviteCode)copyText(suLink(codeKey(lastInviteCode)),'Link copied');}
+function showInviteResult(opts){
+  lastInviteEmail=opts.email||'';
+  if(opts.id)saveInviteCode(opts.id,opts.code);
+  lastInviteCode=groupCode(codeKey(opts.code));
+  elText('invite-title',opts.title);
+  elText('invite-client-name',opts.who||'');
+  elText('invite-code-text',lastInviteCode);
+  elText('invite-expiry','Expires '+fmtDate(String(opts.expires||'').slice(0,10))+' - works once');
+  elText('invite-help',opts.help);
+  var ml=document.getElementById('invite-mailto');if(ml)ml.href=inviteMailto(opts.code,lastInviteEmail);
+  var mod=document.querySelector('#modal-invite .modal');
+  if(mod&&!document.getElementById('su-sheet')){
+    var d=document.createElement('div');d.id='su-sheet';
+    d.innerHTML='<div class="doc-meta" style="margin-top:6px;">Invite link</div><div id="su-link" style="font-size:13px;word-break:break-all;color:var(--gold);user-select:all;-webkit-user-select:all;"></div>'
+     +'<div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px;"><button class="btn btn-primary" type="button" id="su-share" onclick="suShareText()">Share via text</button>'
+     +'<button class="btn btn-ghost" type="button" id="su-copy" onclick="suCopyLink()">Copy link</button>'
+     +'<a class="btn btn-ghost" id="sx-email" href="#" style="text-align:center;">Send email</a></div>'
+     +'<div class="doc-meta" id="sx-email-note" style="margin-top:8px;">Send email opens your own mail app with the link ready, so it always arrives. They join by entering their email and a 6-digit code.</div>';
+    var ex=document.getElementById('invite-expiry');ex.parentNode.insertBefore(d,ex.nextSibling);
+    var old=mod.querySelector('.flex.gap-2.mt-4');if(old){var bs=old.querySelectorAll('button,a'),i;for(i=0;i<bs.length;i++)if(!/Done/.test(bs[i].textContent))bs[i].style.display='none';}
+    var dis=mod.querySelectorAll('.disclaimer');for(i=0;i<dis.length;i++)if(/not emailed automatically/.test(dis[i].textContent))dis[i].style.display='none';
+  }
+  elText('su-link',suLink(codeKey(opts.code)));
+  var se=document.getElementById('sx-email');if(se)se.href=inviteMailto(opts.code,lastInviteEmail);
+  openModal('modal-invite');
+}
+// migration_019 returns redeem failures as {error:"..."} (so the rate-limit attempt row is kept). Map that back to a normal error.
+function suWrapRpc(){
+  try{if(typeof sb==='undefined'||!sb||sb.__suRpc||typeof sb.rpc!=='function')return;
+    var o=sb.rpc.bind(sb);sb.__suRpc=1;
+    sb.rpc=function(n,a,x){var p=o(n,a,x);if(n!=='redeem_invite')return p;
+      return Promise.resolve(p).then(function(r){if(r&&!r.error&&r.data&&typeof r.data==='object'&&r.data.error&&!r.data.kind)return {data:null,error:{code:'P0001',message:String(r.data.error)}};return r;});};
+  }catch(e){}
+}
+window.addEventListener('load',suWrapRpc);
+// ============ v27 FORM SAFETY: no pull-to-refresh, autosaved drafts, unsaved-changes warning ============
+(function(){try{var st=document.createElement('style');st.id='fs-css';
+  st.textContent='html,body{overscroll-behavior-y:none;overscroll-behavior-x:none}.modal-overlay,.modal,.main-content,.page,#app-shell,.sheet-ov{overscroll-behavior-y:contain}'
+   +'.fs-banner{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--gold,#c9a85c);border-radius:4px;padding:10px 12px;margin:0 0 12px;font-size:14px;color:var(--text,#eee)}'
+   +'.trim-sug{margin-top:6px;font-size:15px;color:#F2F0EB}.trim-chip{display:inline-block;margin:4px 6px 0 0;padding:4px 10px;border:1px solid var(--border,#444);border-radius:14px;background:transparent;color:inherit;font-size:15px}.trim-chip.on{border-color:var(--gold,#c9a85c);color:var(--gold,#c9a85c)}';
+  document.head.appendChild(st);}catch(e){}})();
+var FS={forms:{'modal-add-vehicle':'saveVehicle','modal-service':'saveService','modal-expense':'saveExpense','modal-add-client':'addClient','modal-note':'saveNote','modal-inspection':'saveInspection'},dirty:{},saving:{},snap:{},key:'evo_draft_'};
+function fsSub(mid){return mid==='modal-add-vehicle'?(typeof editingVehicleId!=='undefined'&&editingVehicleId?String(editingVehicleId):'new'):'x';}
+function fsFields(mid){var m=document.getElementById(mid);if(!m)return [];return Array.prototype.filter.call(m.querySelectorAll('input[id],select[id],textarea[id]'),function(e){return e.type!=='file'&&e.type!=='password'&&e.type!=='hidden';});}
+function fsRead(mid){var o={};fsFields(mid).forEach(function(e){o[e.id]=(e.type==='checkbox'||e.type==='radio')?(e.checked?'1':''):e.value;});return o;}
+function fsWrite(mid,o){fsFields(mid).forEach(function(e){if(!(e.id in o))return;if(e.type==='checkbox'||e.type==='radio')e.checked=!!o[e.id];else e.value=o[e.id];});}
+function fsGet(mid){try{var d=JSON.parse(localStorage.getItem(FS.key+mid)||'null');if(d&&d.sub===fsSub(mid)&&Date.now()-d.t<7*864e5)return d;}catch(e){}return null;}
+function fsClear(mid){FS.dirty[mid]=false;try{localStorage.removeItem(FS.key+mid);}catch(e){}var b=document.getElementById('fs-banner-'+mid);if(b)b.remove();}
+function fsSave(mid){var cur=fsRead(mid),sn=FS.snap[mid]||{},diff=Object.keys(cur).some(function(k){return cur[k]!==(sn[k]===undefined?'':sn[k]);});
+  FS.dirty[mid]=diff;try{if(diff)localStorage.setItem(FS.key+mid,JSON.stringify({sub:fsSub(mid),t:Date.now(),f:cur}));else localStorage.removeItem(FS.key+mid);}catch(e){}}
+function fsDiscard(mid){fsWrite(mid,FS.snap[mid]||{});fsClear(mid);try{if(mid==='modal-add-vehicle'&&typeof vinChanged==='function')vinChanged();}catch(e){}showToast('Unsaved details discarded','success');}
+function fsOpened(mid){
+  var m=document.getElementById(mid);if(!m)return;
+  var old=document.getElementById('fs-banner-'+mid);if(old)old.remove();
+  FS.snap[mid]=fsRead(mid);FS.dirty[mid]=false;
+  if(!m._fsBound){m._fsBound=1;var h=function(e){if(e.target&&e.target.id&&e.target.type!=='file')fsSave(mid);};m.addEventListener('input',h,true);m.addEventListener('change',h,true);}
+  var d=fsGet(mid);if(!d)return;
+  fsWrite(mid,d.f);FS.dirty[mid]=true;
+  var b=document.createElement('div');b.className='fs-banner';b.id='fs-banner-'+mid;b.setAttribute('role','status');
+  b.innerHTML='<span>Restored your unsaved details.</span><button type="button" class="btn btn-ghost btn-sm" onclick="fsDiscard(\''+mid+'\')">Discard</button>';
+  var hd=m.querySelector('.modal-header');if(hd&&hd.parentNode)hd.parentNode.insertBefore(b,hd.nextSibling);
+}
+var _fsOpen=openModal,_fsClose=closeModal;
+openModal=function(id){_fsOpen(id);if(FS.forms[id])setTimeout(function(){fsOpened(id);},0);};
+closeModal=function(id){if(FS.forms[id]){if(FS.saving[id]&&Date.now()-FS.saving[id]<15000)fsClear(id);else FS.dirty[id]=false;FS.saving[id]=0;}_fsClose(id);};
+Object.keys(FS.forms).forEach(function(mid){var fn=FS.forms[mid],orig=window[fn];if(typeof orig!=='function')return;
+  window[fn]=function(){FS.saving[mid]=Date.now();return orig.apply(this,arguments);};});
+function fsAnyDirty(){return Object.keys(FS.dirty).some(function(k){var m=document.getElementById(k);return FS.dirty[k]&&m&&m._open;});}
+window.addEventListener('beforeunload',function(e){if(fsAnyDirty()){e.preventDefault();e.returnValue='';return '';}});
+window.addEventListener('pagehide',function(){Object.keys(FS.dirty).forEach(function(k){if(FS.dirty[k])fsSave(k);});});
+
+// ============ v27 PHOTO IDENTIFY: small upload (1024px), short timeout, progress text ============
+var ID_DIM=1024,ID_BYTES=300*1024,ID_TIMEOUT=30000;
+var _fsId=autoIdIdentify;
+function idShrinkDataUrl(dataUrl){
+  return new Promise(function(res){
+    try{var im=new Image();im.onload=function(){
+      var w=im.naturalWidth,h=im.naturalHeight,s=Math.min(1,ID_DIM/Math.max(w,h));
+      if(s===1&&dataUrl.length*0.75<=ID_BYTES)return res(dataUrl);
+      var c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);
+      var x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+      var q=0.8,out=c.toDataURL('image/jpeg',q);while(out.length*0.75>ID_BYTES&&q>0.4){q-=0.1;out=c.toDataURL('image/jpeg',q);}res(out);
+    };im.onerror=function(){res(dataUrl);};im.src=dataUrl;}catch(e){res(dataUrl);}
+  });
+}
+var ID_STEPS=[[0,'Preparing the photo...'],[1500,'Identifying your vehicle...'],[9000,'Still working - checking the trim and year...'],[20000,'Almost there. You can keep typing; nothing you enter is replaced.']];
+autoIdIdentify=function(dataUrl){
+  var my=AUTOID.token+1,t0=Date.now();
+  ID_STEPS.forEach(function(s){setTimeout(function(){if(AUTOID.busy&&AUTOID.token===my&&s[0]>0)autoIdNote('loading',s[1]);},s[0]);});
+  idShrinkDataUrl(dataUrl).then(function(small){
+    window.__ID_LAST_BYTES__=Math.round(small.length*0.75);
+    _fsId(small);
+    // replace the 70 s race with a 30 s budget
+    setTimeout(function(){if(AUTOID.busy&&AUTOID.token===my){AUTOID.token++;AUTOID.busy=false;autoIdNote('fail','Auto-identify took too long - enter details manually, or add the VIN for an exact match.');}},ID_TIMEOUT-(Date.now()-t0));
+  });
+};
+
+// ============ v27 TRIM: VIN beats the photo guess; trim is a suggestion with alternatives ============
+var TRIMS={
+  'toyota|tacoma':['SR','SR5','TRD Sport','TRD Off-Road','TRD Pro','Limited','Trailhunter'],
+  'toyota|tundra':['SR','SR5','Limited','Platinum','1794 Edition','TRD Pro','Capstone'],
+  'toyota|4runner':['SR5','TRD Sport','TRD Off-Road','TRD Pro','Limited','Trailhunter','Platinum'],
+  'toyota|*':['SR5','TRD Sport','TRD Off-Road','TRD Pro','Limited'],
+  'ford|f-150':['XL','XLT','Lariat','King Ranch','Platinum','Limited','Tremor','Raptor'],
+  'ford|bronco':['Base','Big Bend','Black Diamond','Outer Banks','Badlands','Wildtrak','Raptor'],
+  'chevrolet|silverado 1500':['WT','Custom','LT','RST','LTZ','Trail Boss','ZR2','High Country'],
+  'jeep|wrangler':['Sport','Sport S','Sahara','Rubicon','Rubicon 392']
+};
+function trimNorm(t){return String(t||'').replace(/\bTRD[\s-]*Off[\s-]*Road\b/i,'TRD Off-Road').replace(/\bTRD[\s-]*Pro\b/i,'TRD Pro').replace(/\bTRD[\s-]*Sport\b/i,'TRD Sport').trim();}
+function trimOptions(make,model){var a=String(make||'').toLowerCase().trim(),b=String(model||'').toLowerCase().trim();return TRIMS[a+'|'+b]||TRIMS[a+'|*']||[];}
+function trimSuggest(src){
+  var inp=document.getElementById('v-trim');if(!inp)return;
+  var box=document.getElementById('trim-sug');if(!box){box=document.createElement('div');box.id='trim-sug';box.className='trim-sug';inp.parentNode.appendChild(box);}
+  var cur=val('v-trim').trim(),opts=trimOptions(val('v-make'),val('v-model'));
+  if(!cur&&!opts.length){box.innerHTML='';return;}
+  if(cur&&opts.indexOf(cur)<0)opts=[cur].concat(opts);
+  box.innerHTML=(cur?'Trim '+(src==='vin'?'from VIN':(src==='photo'?'suggested from photo':''))+' - tap to change:':'Pick a trim:')+'<br>'+opts.map(function(o){return '<button type="button" class="trim-chip'+(o===cur?' on':'')+'" onclick="trimPick(this)" data-t="'+esc(o)+'">'+esc(o)+'</button>';}).join('');
+  box.dataset.src=src||'';
+  if(cur&&(src==='vin'||src==='photo')){var dt=inp.closest&&inp.closest('details');if(dt)dt.open=true;}
+}
+function trimPick(b){setVal('v-trim',b.getAttribute('data-t'));try{if(AUTOID.filled['v-trim']){delete AUTOID.filled['v-trim'];var tg=document.querySelector('#modal-add-vehicle .ai-tag[data-for="v-trim"]');if(tg)tg.remove();}}catch(e){}trimSuggest('user');var m=document.getElementById('modal-add-vehicle');if(m)m.dispatchEvent(new Event('input'));try{fsSave('modal-add-vehicle');}catch(e){}}
+var _fsVp=vinParse;
+vinParse=function(row){var o=_fsVp(row);if(o&&o.trim)o.trim=trimNorm(o.trim);return o;};
+var _fsVd=vinFormDecode;
+vinFormDecode=async function(){
+  // fields the photo AI filled are guesses: let the VIN replace them without a conflict question
+  try{var vin=cleanVin();if(vinOk(vin)&&!vinFormReplica()){var o=await vinFetch(vin);if(o&&cleanVin()===vin){['v-year','v-make','v-model','v-trim'].forEach(function(id){if(AUTOID.filled[id]){setVal(id,'');delete AUTOID.filled[id];var tg=document.querySelector('#modal-add-vehicle .ai-tag[data-for="'+id+'"]');if(tg)tg.remove();}});}}}catch(e){}
+  await _fsVd();
+  if(VIN.form&&VIN.form.o)trimSuggest('vin');else trimSuggest(AUTOID.filled['v-trim']?'photo':'');
+};
+var _fsAs=autoIdSuccess;
+autoIdSuccess=function(my,data){
+  if(data&&data.trim)data.trim=trimNorm(data.trim);
+  // a decoded VIN already filled trim/model: do not let the photo override (fields are only filled when empty anyway)
+  _fsAs(my,data);trimSuggest(AUTOID.filled['v-trim']?'photo':'');
+};
+// ============ v28 RENAME COLLECTION (profiles.collection_name via set_collection_name RPC, migration_020) ============
+function collCustom(c){var id=c&&c.id,p=id&&C.profiles&&C.profiles[id];var n=(p&&p.collection_name)||(c&&c.collectionName)||'';return String(n).trim();}
+function collName(c){return collCustom(c)||(c&&c.name)||'';}
+function collTitle(c){var cu=collCustom(c);if(cu)return cu;var t=ctitleName(c&&c.name);return /\b(collection|collective|garage|stable)\b/i.test(t)?t:'The '+t.replace(/^the\s+/i,'')+' Collection';}
+function ctitleHTML(n,exact){
+  var t=exact?String(n||'').trim():ctitleName(n),coll=/\b(collection|collective|garage|stable)\b/i.test(t);
+  if(!exact&&!coll)t='The '+t.replace(/^the\s+/i,'')+' Collection';
+  return '<div class="ctitle-eyebrow">'+(coll||exact?'The Private Collection':'Private Collection')+'</div><h2 class="ctitle-name">'+esc(t)+'</h2><div class="ctitle-rule" aria-hidden="true"><b></b><i></i></div>';
+}
+function ctitleSet(id,n,exact){
+  var el=document.getElementById(id);if(!el)return;
+  var box=el.closest?el.closest('.ctitle'):null;
+  if(!box){box=document.createElement('div');box.className='ctitle';el.parentNode.insertBefore(box,el);box.appendChild(el);if(box.parentNode.classList)box.parentNode.classList.add('has-ct');}
+  el.className='ctitle-inner';el.innerHTML=ctitleHTML(n,exact);
+  el.setAttribute('data-name',String(n||''));
+}
+// which collection the Account line renames, or null when not allowed
+function rnTarget(){
+  if(!session)return null;
+  var c=ownerClient();                                   // owner (or co-owner), or admin viewing as an owner
+  if(c)return c;
+  if(currentClientId){var d=byId(getClients(),currentClientId);
+    if(d&&(realAdmin()||managedMine(d.id)))return d;}   // admin anywhere; tech only on a client they manage (edit rights)
+  if(realAdmin()&&!viewAsActive()){var me0=C.profiles&&C.profiles[myId()];if(me0)return {id:myId(),name:me0.display_name||session.account.name||'',own:true};}
+  return null;
+}
+function rnLineRender(){
+  var m=document.querySelector('#modal-account .modal');if(!m)return;
+  var row=document.getElementById('rn-line');
+  if(!row){row=document.createElement('button');row.type='button';row.id='rn-line';row.className='rn-line';row.onclick=openRenameSheet;
+    var hd=m.querySelector('.modal-header');var blk=hd&&hd.nextElementSibling;(blk&&blk.parentNode?blk.parentNode.insertBefore(row,blk.nextSibling):m.appendChild(row));}
+  var t=rnTarget();
+  if(!t){row.style.display='none';return;}
+  row.style.display='';
+  row.innerHTML='<span class="rn-l"><span class="rn-k">Rename collection</span><span class="rn-v">'+esc(collTitle(t))+'</span></span><span class="rn-chev" aria-hidden="true">&#8250;</span>';
+}
+var _rnAcct=openAccountModal;
+openAccountModal=function(){_rnAcct.apply(this,arguments);rnLineRender();};
+function rnClean(s){return String(s||'').replace(/\s+/g,' ').trim();}
+function openRenameSheet(){
+  var t=rnTarget();if(!t)return;
+  var cur=collTitle(t);
+  sheetOpen({title:'Rename collection',html:'<div class="rn-cur">'+esc(cur)+'</div>'
+    +'<div class="input-group" style="margin-top:14px;"><label for="rn-input">New name</label><input type="text" id="rn-input" maxlength="60" value="'+esc(cur)+'" autocomplete="off" oninput="rnCount()"></div>'
+    +'<div class="rn-meta"><span id="rn-err" role="status"></span><span id="rn-count"></span></div>',
+    buttons:[{label:'Cancel',fn:sheetClose},{label:'Save',cls:'btn-primary',id:'rn-save',fn:function(){saveCollectionName(t.id);}}]});
+  rnCount();setTimeout(function(){var i=document.getElementById('rn-input');if(i){i.focus();i.select();}},50);
+}
+function rnCount(){var v=val('rn-input');elText('rn-count',v.length+'/60');elText('rn-err','');}
+async function saveCollectionName(ownerId){
+  var n=rnClean(val('rn-input'));
+  if(!n){elText('rn-err','Enter a name.');return;}
+  if(n.length>60){elText('rn-err','Keep it to 60 characters.');return;}
+  var b=document.getElementById('rn-save');if(b){b.disabled=true;b.textContent='Saving...';}
+  try{
+    var r=await sb.rpc('set_collection_name',{p_owner:ownerId,p_name:n});
+    if(r.error)throw r.error;
+    var saved=(typeof r.data==='string'&&r.data)||n;
+    if(C.profiles[ownerId])C.profiles[ownerId].collection_name=saved;
+    var c=byId(getClients(),ownerId);if(c)c.collectionName=saved;
+    sheetClose();rnLineRender();try{viewAsRefreshUI();}catch(e){}
+    refreshCurrent();showToast('Collection renamed','success');
+  }catch(e){
+    if(b){b.disabled=false;b.textContent='Save';}
+    var m=String((e&&e.message)||e||'');
+    elText('rn-err',rpcMissing(e)?NEEDS_BACKEND+'.':(/not_allowed|42501/.test(m+(e&&e.code))?'You cannot rename this collection.':(/invalid_name/.test(m)?'Use 1 to 60 characters.':friendlyError(e))));
+  }
+}
+(function(){try{var st=document.createElement('style');
+  st.textContent='.rn-line{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;background:transparent;border:0;border-bottom:1px solid var(--line);padding:16px 0;margin:0 0 6px;text-align:left;cursor:pointer;color:#fff;min-height:44px}'
+   +'.rn-l{display:flex;flex-direction:column;gap:4px;min-width:0}.rn-k{font-size:19px;color:#fff;font-weight:400}.rn-v{font-size:17px;color:var(--gold,#c9a85c);overflow-wrap:anywhere}.rn-chev{font-size:28px;color:var(--gold,#c9a85c)}'
+   +'.rn-cur{font-size:22px;color:var(--gold,#c9a85c);font-weight:300;overflow-wrap:anywhere}#rn-input{font-size:20px;color:#fff}.rn-meta{display:flex;justify-content:space-between;font-size:15px;color:#fff}#rn-err{color:var(--gold,#c9a85c)}label[for=rn-input]{color:#fff;font-size:15px}';
+  document.head.appendChild(st);}catch(e){}})();
+// ============ v29 SORT BY (carousel + collection lists). Per user + per portfolio in localStorage. Move mode keeps My order. ============
+var ST_OPTS=[{k:'my',l:'My order',s:'My order'},{k:'year_desc',l:'Year, newest first',s:'Year \u2193'},{k:'year_asc',l:'Year, oldest first',s:'Year \u2191'},
+  {k:'name',l:'Name A\u2013Z',s:'Name A\u2013Z'},{k:'added',l:'Date added, newest',s:'Newest added'},{k:'value',l:'Value, highest',s:'Value \u2193'}];
+function stKeyFor(list){var v=(list||[])[0];return 'evo_sort_'+(myId()||'anon')+'_'+(v?phPfKey(v):'none');}
+function stGet(key){try{var k=localStorage.getItem(key);return ST_OPTS.some(function(o){return o.k===k;})?k:'my';}catch(e){return 'my';}}
+function stVal(v){try{if(!can(v,'view_value_estimate')&&!realAdmin()&&!isOwner())return null;var x=Number(aiVal(v));return isFinite(x)&&x>0?x:null;}catch(e){return null;}}
+function stSort(list,mode){
+  var a=(list||[]).map(function(v,i){return {v:v,i:i};}),nm=function(v){return (String(v.make||'')+' '+String(v.model||'')).trim().toLowerCase();},
+      nul=function(x,y,f){var p=x==null,q=y==null;return p&&q?0:p?1:q?-1:f();};
+  var cmp={year_desc:function(x,y){return nul(Number(x.year)||null,Number(y.year)||null,function(){return Number(y.year)-Number(x.year);});},
+    year_asc:function(x,y){return nul(Number(x.year)||null,Number(y.year)||null,function(){return Number(x.year)-Number(y.year);});},
+    name:function(x,y){return nm(x).localeCompare(nm(y));},
+    added:function(x,y){return String(y.createdAt||'').localeCompare(String(x.createdAt||''));},
+    value:function(x,y){var p=stVal(x),q=stVal(y);return nul(p,q,function(){return q-p;});}}[mode];
+  if(!cmp)return list;
+  return a.sort(function(x,y){return cmp(x.v,y.v)||x.i-y.i;}).map(function(o){return o.v;});
+}
+function stApply(list){if(typeof PH!=='undefined'&&PH.move)return list;return stSort(list,stGet(stKeyFor(list)));}
+var ST_CUR=null;
+function stLabel(k){var o=ST_OPTS.filter(function(x){return x.k===k;})[0]||ST_OPTS[0];return 'Sort: '+o.s;}
+function stButton(host,list){
+  if(!host||!(list||[]).length)return;
+  var key=stKeyFor(list),b=host.querySelector('.st-btn');
+  if(!b){b=document.createElement('button');b.type='button';b.className='st-btn';var h=host.querySelector('.ph-hint');(h&&h.nextSibling)?host.insertBefore(b,h.nextSibling):host.appendChild(b);}
+  b.setAttribute('data-key',key);b.textContent=stLabel(stGet(key));b.setAttribute('aria-haspopup','dialog');
+  b.onclick=function(){stOpen(key);};
+}
+function stOpen(key){
+  ST_CUR=key;var cur=stGet(key);
+  sheetOpen({title:'Sort by',html:'<div class="st-list" role="radiogroup">'+ST_OPTS.map(function(o){
+    return '<button type="button" class="st-opt'+(o.k===cur?' on':'')+'" role="radio" aria-checked="'+(o.k===cur)+'" data-k="'+o.k+'" onclick="stPick(\''+o.k+'\')"><span>'+esc(o.l)+(o.k==='my'?'<small>Hold a car to reorder</small>':'')+'</span><b aria-hidden="true">'+(o.k===cur?'\u2713':'')+'</b></button>';}).join('')+'</div>',
+    buttons:[{label:'Close',fn:sheetClose}]});
+}
+function stPick(k){try{if(k==='my')localStorage.removeItem(ST_CUR);else localStorage.setItem(ST_CUR,k);}catch(e){}sheetClose();refreshCurrent();}
+var _wheelMount29=wheelMount;
+wheelMount=function(id,list){var r=_wheelMount29.apply(this,arguments);try{stButton(document.getElementById(id),list);}catch(e){}return r;};
+(function(){try{var st=document.createElement('style');
+  st.textContent='.st-btn{display:block;margin:14px auto 0;background:transparent;border:1px solid var(--gold,#c9a85c);border-radius:999px;color:var(--gold,#c9a85c);font-size:17px;padding:10px 22px;min-height:44px;cursor:pointer}'
+   +'.st-list{display:flex;flex-direction:column;margin:8px 0}.st-opt{display:flex;justify-content:space-between;align-items:center;background:transparent;border:0;border-bottom:1px solid var(--line);padding:16px 2px;color:#fff;font-size:19px;text-align:left;min-height:52px;cursor:pointer}'
+   +'.st-opt small{display:block;font-size:15px;color:var(--gold,#c9a85c);margin-top:3px}.st-opt.on{color:var(--gold,#c9a85c)}.st-opt b{color:var(--gold,#c9a85c);font-size:20px}';
+  document.head.appendChild(st);}catch(e){}})();
+var _rcd29=renderClientDetail;
+renderClientDetail=function(){var r=_rcd29.apply(this,arguments);try{
+  var list=document.getElementById('cd-vehicles'),c=byId(getClients(),currentClientId);if(!list||!c)return r;
+  var vs=activeVehicles(getVehicles()).filter(function(v){return v.clientId===c.id&&!isArchivedVehicle(v);});
+  var bar=document.getElementById('cd-sortbar');if(!bar){bar=document.createElement('div');bar.id='cd-sortbar';list.parentNode.insertBefore(bar,list);}
+  bar.innerHTML='';stButton(bar,vs);}catch(e){}return r;};
 
 </script>
 </body>

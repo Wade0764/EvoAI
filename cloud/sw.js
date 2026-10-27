@@ -1,5 +1,5 @@
 /* EvoAI service worker: caches the app shell only. Never touches Supabase (auth, REST, storage). */
-var CACHE='evoai-shell-v25-presshold';
+var CACHE='evoai-shell-v27-release';
 var KEEP=/^evoai-dt-/;   /* document thumbnail cache (p18), owned by the page */
 var SHELL=['./','evoai-cloud.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png','icons/favicon-32.png','icons/favicon-16.png','icons/icon-maskable-512.png'];
 self.addEventListener('install',function(e){
@@ -13,6 +13,8 @@ self.addEventListener('fetch',function(e){
   if(req.method!=='GET')return;
   if(url.origin!==self.location.origin)return;            /* Supabase and everything cross-origin: network only */
   if(/supabase/i.test(url.hostname)||/\/(auth|rest|storage|functions)\/v1\//.test(url.pathname))return;
+  /* v25b: pages are network-first so an installed PWA gets a new release on the next launch (cache only when offline) */
+  if(req.mode==='navigate'){e.respondWith(fetch(req).then(function(res){if(res&&res.ok&&res.type==='basic'){var cp=res.clone();caches.open(CACHE).then(function(c){c.put(req,cp);});}return res;}).catch(function(){return caches.match(req).then(function(h){return h||caches.match('./').then(function(x){return x||caches.match('evoai-cloud.html');});});}));return;}
   e.respondWith(caches.match(req).then(function(hit){
     var net=fetch(req).then(function(res){
       if(res&&res.ok&&res.type==='basic'){var cp=res.clone();caches.open(CACHE).then(function(c){c.put(req,cp);});}
