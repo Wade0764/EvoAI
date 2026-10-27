@@ -1087,6 +1087,59 @@ input.cb-in-bad{border:3px solid #E5484D!important}
 .im-big.bad{color:#FF9C9F;border-color:#FF9C9F}
 .im-sumline b{color:#F2F0EB}
 
+/* p25 press and hold + merge */
+.whl-card.front{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.whl-card.ph-holding{transform:scale(.955)!important;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s!important;box-shadow:0 0 0 2px #C9AA6B,0 0 38px 6px rgba(201,170,107,.45)!important;border-radius:28px}
+.whl-card.ph-holding::after{content:'Keep holding\2026';position:absolute;left:50%;top:22%;transform:translateX(-50%);z-index:60;color:#F2F0EB;font:600 16px/1.3 Inter,system-ui,sans-serif;background:rgba(0,0,0,.6);padding:5px 14px;border-radius:999px;pointer-events:none;white-space:nowrap;box-shadow:0 0 0 3px #C9AA6B}
+.ph-hint{text-align:center;color:#C9AA6B;font:500 15px Inter,system-ui,sans-serif;margin:8px 0 0}
+html.ph-open,html.ph-open body{overflow:hidden}
+#ph-root .ph-back{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:900;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.ph-sheet{position:fixed;left:0;right:0;bottom:0;z-index:901;background:#141416;border-top:1px solid rgba(201,170,107,.45);border-radius:26px 26px 0 0;padding:20px 20px calc(22px + env(safe-area-inset-bottom));font-family:Inter,system-ui,sans-serif;color:#F2F0EB;max-width:640px;margin:0 auto;max-height:88vh;overflow:auto}
+.ph-head{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.ph-th{width:64px;height:48px;border-radius:12px;background:#222;border:1px solid rgba(201,170,107,.4);flex:none;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#C9AA6B}
+.ph-th img{width:100%;height:100%;object-fit:cover}.ph-noimg svg{width:52px;height:24px}
+.ph-nm{font-size:19px;font-weight:600}.ph-pf{font-size:15px;color:#C9AA6B;margin-top:2px}
+.ph-row{display:flex;align-items:center;gap:14px;width:100%;min-height:62px;padding:8px 18px;margin-top:10px;border-radius:16px;border:1px solid rgba(255,255,255,.16);background:#1D1D20;color:#F2F0EB;font:600 17px Inter,system-ui,sans-serif;text-align:left;cursor:pointer}
+.ph-row b{display:block;font-weight:600}.ph-row small{display:block;font-size:15px;font-weight:400;color:#F2F0EB;margin-top:2px}
+.ph-ic{font-size:20px;width:24px;text-align:center;color:#C9AA6B}
+.ph-cancel{display:block;width:100%;min-height:54px;margin-top:12px;border-radius:16px;border:0;background:transparent;color:#F2F0EB;font:600 17px Inter,system-ui,sans-serif}
+.ph-rt{font-size:22px;font-weight:600;margin:2px 0 8px}.ph-rtxt{font-size:16px;line-height:1.45;margin:0 0 8px}
+.ph-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin-top:10px;border-radius:16px;border:1px solid rgba(255,255,255,.16);background:#1D1D20;color:#F2F0EB;font:600 17px Inter,system-ui,sans-serif}
+.ph-btn.gold{background:#C9AA6B;color:#111;border-color:#C9AA6B}.ph-btn.gold[disabled]{opacity:.45}
+.ph-btn.red{color:#FF8A8A;border-color:rgba(255,107,107,.55);background:#2A1416}
+.ph-note{font-size:15px;color:#C9AA6B;margin-top:12px;line-height:1.4}
+.ph-move{position:fixed;inset:0;z-index:901;background:#0B0B0C;font-family:Inter,system-ui,sans-serif;color:#F2F0EB;padding:calc(18px + env(safe-area-inset-top)) 18px calc(96px + env(safe-area-inset-bottom));overflow:auto}
+.ph-mtop{display:flex;justify-content:space-between;align-items:center;margin:6px 0 4px}.ph-mtop b{font-size:24px;font-weight:600}
+.ph-done{min-height:44px;padding:0 20px;border-radius:999px;background:#C9AA6B;color:#111;border:0;font:700 17px Inter,sans-serif}
+.ph-done.line{background:transparent;color:#C9AA6B;border:1px solid #C9AA6B}
+.ph-mtxt{font-size:16px;line-height:1.45;margin:8px 0 14px}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;touch-action:pan-y}
+.ph-tile{position:relative;border-radius:18px;background:#17171A;border:1px solid rgba(255,255,255,.14);padding:8px 8px 10px;min-height:150px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.ph-tile.sel{border-color:#C9AA6B}.ph-tile.drag{border-color:#C9AA6B;box-shadow:0 14px 36px rgba(0,0,0,.7),0 0 0 2px #C9AA6B;z-index:3;background:#1E1C18;touch-action:none}
+.ph-tile.over{border:2px dashed #C9AA6B}
+.ph-tth{height:78px;border-radius:12px;background:#222;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#C9AA6B}.ph-tth img{width:100%;height:100%;object-fit:cover}
+.ph-tile b{display:block;font-size:15px;font-weight:600;margin:8px 2px 0;line-height:1.25}
+.ph-num{position:absolute;top:12px;left:12px;z-index:1;background:rgba(0,0,0,.75);color:#C9AA6B;border:1px solid #C9AA6B;border-radius:999px;font:700 15px Inter,sans-serif;padding:1px 9px}
+.ph-ar{display:flex;gap:8px;margin-top:8px}.ph-ar button{flex:1;min-height:44px;border-radius:12px;background:#222226;border:1px solid rgba(201,170,107,.45);color:#C9AA6B;font:700 20px Inter,sans-serif}.ph-ar button[disabled]{opacity:.35}
+.ph-mfoot{position:fixed;left:18px;right:18px;bottom:calc(20px + env(safe-area-inset-bottom));font-size:15px;text-align:center;color:#F2F0EB;background:#141416;border:1px solid rgba(201,170,107,.4);border-radius:14px;padding:12px}
+.ph-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#ph-toast{position:fixed;left:16px;right:16px;bottom:calc(96px + env(safe-area-inset-bottom));z-index:950;display:none;align-items:center;justify-content:space-between;gap:12px;background:#1B1B1E;border:1px solid #C9AA6B;border-radius:16px;padding:14px 16px;font:600 16px Inter,sans-serif;color:#F2F0EB;box-shadow:0 10px 30px rgba(0,0,0,.6);max-width:600px;margin:0 auto}
+#ph-toast.on{display:flex}#ph-toast button{min-height:44px;padding:0 18px;border-radius:999px;background:#C9AA6B;color:#111;border:0;font:700 16px Inter,sans-serif}
+.mg-car{display:flex;gap:14px;align-items:center;width:100%;min-height:64px;padding:8px 14px;margin-top:10px;border-radius:16px;border:1px solid rgba(255,255,255,.16);background:#1D1D20;color:#F2F0EB;font:600 17px Inter,system-ui,sans-serif;text-align:left}
+.mg-car.on{border-color:#C9AA6B;box-shadow:0 0 0 1px #C9AA6B}.mg-car small{display:block;font-size:15px;font-weight:400;color:#C9AA6B;margin-top:2px}
+.mg-keep{display:grid;gap:10px}.mg-k{min-height:60px;border-radius:16px;border:1px solid rgba(201,170,107,.5);background:#17171A;color:#F2F0EB;font:600 17px Inter,sans-serif;padding:8px 14px;text-align:left}
+.mg-k.on{background:#2A2418;border-color:#C9AA6B}.mg-k small{display:block;font-size:15px;font-weight:400;color:#C9AA6B}
+.mg-f{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:12px 14px;margin-top:8px;border-radius:14px;background:#17171A;border:1px solid rgba(255,255,255,.12);font-size:16px}
+.mg-f span{font-size:15px;color:#C9AA6B;grid-column:1/-1}.mg-f b{font-weight:600}.mg-f i{font-style:normal;font-size:15px;color:#F2F0EB;text-align:right}
+.mg-f.fill{border-color:rgba(201,170,107,.55)}.mg-f.conf{border-color:#C9AA6B}
+.mg-ch{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.mg-ch button{min-height:48px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#222226;color:#F2F0EB;font:600 16px Inter,sans-serif;padding:4px 8px;word-break:break-word}
+.mg-ch button.on{background:#C9AA6B;color:#111;border-color:#C9AA6B}
+.mg-mv{margin:14px 0 6px;padding:12px 14px;border-radius:14px;border:1px dashed #C9AA6B;font-size:16px;line-height:1.45}.mg-mv b{display:block;color:#C9AA6B;font-size:15px}
+.mg-unm{display:grid;gap:6px;font-size:16px;line-height:1.4;border-color:rgba(201,170,107,.55)!important}.mg-unm b{color:#C9AA6B}.mg-unm button{justify-self:start}
+.im-note25{color:#C9AA6B}
+@media (prefers-reduced-motion:reduce){.whl-card.ph-holding{transition:none!important}}
+
 </style>
 </head>
 <body>
@@ -2202,7 +2255,7 @@ async function loadAll(){
     var r=rows.veh[i],un=unpackX(r.notes),x=un.x,fin=byVeh.fin[r.id],rems=byVeh.rem[r.id]||[],svc=byVeh.svc[r.id]||[],pho=latestBy(byVeh.pho[r.id]||[],'created_at'),est=byVeh.est[r.id]||[];
     var v={id:r.id,clientId:r.owner_id,year:r.year?String(r.year):'',make:r.make||'',model:r.model||'',trim:x.trim||'',isReplica:vrRep(r,x),builder:vrBld(r,x),engine:cleanText(r.engine||x.eng,120),bodyClass:cleanText(r.body_class||x.body,80),vinDecodedAt:r.vin_decoded_at||x.vdec||'',nickname:r.nickname||'',color:r.color||'',mileage:r.mileage||0,vin:r.vin||'',notes:un.text,
       purchasePrice:fin&&fin.purchase_price!==null?Number(fin.purchase_price):0,purchaseDate:fin&&fin.purchase_date?fin.purchase_date:'',insuredValue:Number(x.ins)>0?Number(x.ins):0,
-      archived:!!r.archived,archivedAt:r.archived_at||null,archiveReason:r.archived?'archived':'',createdAt:r.created_at,updatedAt:r.updated_at,
+      archived:!!r.archived,archivedAt:r.archived_at||null,sortOrder:(r.sort_order==null?null:Number(r.sort_order)),createdBy:r.created_by||null,mergedInto:r.merged_into||null,archiveReason:r.archived?'archived':'',createdAt:r.created_at,updatedAt:r.updated_at,
       regExpiry:'',insRenewal:'',insRepeat:x.insRep==='6months'?'6months':'yearly',inspExpiry:'',lastServiceDate:'',nextServiceDate:'',nextServiceMiles:'',
       svcIntervalMonths:(x.svcM===undefined?6:Number(x.svcM)),svcIntervalMiles:(x.svcI===undefined?5000:Number(x.svcI)),
       reminders:[],serviceLog:[],renewals:[],valueLog:[],aiValue:null,aiHealth:null,status:'green',image:null,_rem:{},_photos:[]};
@@ -3704,7 +3757,7 @@ function renderOverview(owner,vehicles){
   var ahv=avgHealth(vehicles);elText(n+'-avg-health',ahv===null?'--':String(ahv));
   elHTML(p+'-attention',attentionHTML(vehicles,5));
   elHTML(p+'-brief',collectionBrief(vehicles));
-  elHTML(p+'-vehicles',vehicles.length?wheelHTML(vehicles,p):emptyCard(owner?'Your collection is empty. Add your first vehicle to get started.<div><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button></div>':'No vehicles yet.','grid-column:1/-1;'));
+  vehicles=phSorted(vehicles);elHTML(p+'-vehicles',vehicles.length?wheelHTML(vehicles,p):emptyCard(owner?'Your collection is empty. Add your first vehicle to get started.<div><button class="btn btn-primary" onclick="openAddVehicleModal()">Add first vehicle</button></div>':'No vehicles yet.','grid-column:1/-1;'));
   wheelMount(p+'-vehicles',vehicles);
   if(owner)elHTML('cp-redeem',vehicles.length?'':redeemCardHTML('ov'));
   var al=document.getElementById(p+'-archive-link');if(al){al.textContent=archN?archN+' archived':'';al.style.display=archN?'':'none';}
@@ -8941,21 +8994,7 @@ function imAnalyze(rows,owner,pfId,res){
   pre.forEach(function(o){if(o.block)return;var f=o.f,vin=imVinClean(f.vin),pk=imPlateKey(f.plate);
     var m=col.filter(function(v){var vv=imVinClean(v.vin);if(vin&&vv&&vv!==vin)return false;return (vin.length>=5&&vv&&vv===vin)||(pk.length>=3&&imPlateKey(v.plate)===pk&&!(vin&&!vv&&imVinRulesOut(vin,v)));})[0];
     if(m&&!taken[m.id]){o.m=m;o.how=imVinClean(m.vin)===vin&&vin?(vin.length===17?'VIN':'chassis number'):'registration';taken[m.id]=o.ri;}});
-  // pass 2: "Same car?" only when one side has no VIN (differing VINs = different cars); the VIN decode can rule a candidate out
-  pre.forEach(function(o){if(o.block||o.m)return;var f=o.f,mk=imMakeKey(f.make),vin=imVinClean(f.vin),cands=[];
-    col.forEach(function(v){if(taken[v.id]!==undefined)return;if(imMakeKey(v.make)!==mk)return;var vv=imVinClean(v.vin);if(vin&&vv&&vin!==vv)return;if(vin&&!vv&&imVinRulesOut(vin,v))return;if(vv&&!vin&&f.make&&imVinRulesOut(vv,{make:f.make,model:f.model}))return;
-      var sim=imModelSim(f.model,v.model),dy=(Number(f.year)&&Number(v.year))?Math.abs(Number(f.year)-Number(v.year)):99;
-      if(sim<0)return;
-      if((sim>=0.5&&dy<=3)||dy===0)cands.push({v:v,sim:sim,dy:dy,strong:sim===1&&dy<=2});});
-    cands.sort(function(a,b){return (b.strong-a.strong)||(a.dy-b.dy)||(b.sim-a.sim);});
-    if(!cands.length)return;
-    var key='m'+o.ri,ch=res[key],def=(cands[0].strong&&!(cands[1]&&cands[1].strong&&cands[1].dy===cands[0].dy))?cands[0].v.id:'new';
-    o.prompt={key:key,ri:o.ri,cands:cands.slice(0,3),def:def};
-    var pick=ch||def;
-    if(pick==='skip'){o.block={type:'skipped',reason:'You chose to skip this car'};}
-    else if(pick!=='new'){var mv=col.filter(function(v){return v.id===pick;})[0];if(mv&&taken[mv.id]===undefined){o.m=mv;o.how=ch?'your answer':(o.prompt.cands[0].dy===0?'same year, make and model':'same make and model (year differs)');taken[mv.id]=o.ri;}}
-    out.prompts.push({key:key,ri:o.ri,car:imCarName(f)+(f.vin?' \u00b7 '+f.vin:''),cands:o.prompt.cands.map(function(c){return {id:c.v.id,name:imVName(c.v)+(c.v.vin?' \u00b7 '+c.v.vin:''),dy:c.dy};}),pick:pick,def:def,chosen:!!ch});
-  });
+  imPass2v25(pre,col,taken,out,res);
   pre.forEach(function(o){
     var f=o.f,row={ri:o.ri,n:o.n,car:o.f?(imCarName(o.f)||('Row '+o.n)):('Row '+o.n),flags:o.f?imFlags(o.f):[]};
     if(o.block){row.bucket=o.block.type==='skipped'?'skipped':'needs';row.reason=o.block.reason;out.rows.push(row);if(o.block.type==='skipped')out.skip[o.ri]=1;return;}
@@ -9041,9 +9080,9 @@ function imTabCheck(A){
   var reps=A.changes.filter(function(x){return x.kind==='replace';});
   if(!A.prompts.length&&!A.conflicts.length&&!reps.length)return '<div class="im-empty">All clear. Nothing to check.</div>';
   var h='';
-  if(A.prompts.length){h+='<p class="im-lead"><b>Same car?</b> These look like cars you already have. Nothing is matched unless the VIN, chassis or registration is the same, so please check.</p>';
+  if(A.prompts.length){h+='<p class="im-lead"><b>Same car?</b> These look like cars you already have. We matched these by name and year (and known other names, like Jolly for a Fiat 500), so please check.</p>';
     A.prompts.forEach(function(p){
-      h+='<div class="im-item im-conf"><div class="im-ct">Same car?</div><div class="im-car">'+imE(p.car)+'</div>'+p.cands.map(function(c){return '<div class="im-kv"><span>Your car</span><b>'+imE(c.name)+(c.dy&&c.dy<99?' ('+c.dy+' yr apart)':'')+'</b></div>';}).join('')+
+      h+='<div class="im-item im-conf"><div class="im-ct">Same car?</div><div class="im-car">'+imE(p.car)+'</div>'+(p.note?'<div class="im-txt im-note25">'+imE(p.note)+'</div>':'')+p.cands.map(function(c){return '<div class="im-kv"><span>Your car</span><b>'+imE(c.name)+(c.dy&&c.dy<99?' ('+c.dy+' yr apart)':'')+'</b></div>';}).join('')+
         '<div class="im-txt">'+(p.pick==='new'?'Will be added as a new car.':p.pick==='skip'?'Skipped.':'Will update your '+imE((p.cands.filter(function(c){return c.id===p.pick;})[0]||{}).name||'car')+'.')+(p.chosen?'':' (suggested)')+'</div>'+
         '<div class="im-acts stack">'+p.cands.map(function(c){return '<button class="im-btn sm '+(p.pick===c.id?'gold':'line')+'" onclick="imResolve(\''+p.key+'\',\''+c.id+'\')">'+(p.pick===c.id?'\u2713 ':'')+'Same as '+imE(c.name)+'</button>';}).join('')+
         '<button class="im-btn sm '+(p.pick==='new'?'gold':'line')+'" onclick="imResolve(\''+p.key+'\',\'new\')">'+(p.pick==='new'?'\u2713 ':'')+'No, add as new</button></div></div>';});}
@@ -9171,6 +9210,239 @@ var _imFlags24=imFlags;imFlags=function(f){var L=_imFlags24(f),d=f.vin?imVinDeco
   if(d&&f.make&&imMakeKey(d.make)!==imMakeKey(f.make))L.push('VIN belongs to a '+d.make+', the sheet says '+f.make);
   else if(d&&d.model&&f.model&&imVinRulesOut(f.vin,{make:f.make,model:f.model}))L.push('VIN looks like a '+d.model+', the sheet says '+f.model);
   return L;};
+/* ===== p25: import duplicate check with model aliases (same release as press and hold) ===== */
+var IM_FAM25=[
+ {mk:'fiat',id:'fiat-500',label:'Fiat 500 / 600 family',re:/\b(jolly|500|600|nuova|giardiniera|topolino)\b/,
+  ranges:[[/\bjolly\b/,1957,1974,'Fiat Jolly']]},
+ {mk:'volkswagen',id:'vw-type2',label:'VW Type 2 (bus)',re:/\b(t1|t2|type 2|type ii|samba|kombi|bus|microbus|transporter|westfalia|split screen|splitscreen|bay window)\b/,
+  ranges:[[/\b(t1|samba|split screen|splitscreen)\b/,1950,1967,'VW T1'],[/\b(t2|bay window)\b/,1967,1979,'VW T2']]},
+ {mk:'porsche',id:'porsche-356-550',label:'Porsche 356 / 550',re:/\b(speedster|spyder|spider|550|356|replica|tribute)\b/,
+  ranges:[[/\bspeedster\b/,1954,1958,'356 Speedster'],[/\b550\b/,1953,1956,'550 Spyder'],[/\b356\b/,1948,1965,'Porsche 356']],soft:/\b(replica|tribute|recreation|kit)\b/}
+];
+function imFam25(make,model){var mk=imMakeKey(make),m=imNorm(model);if(!m)return null;
+  for(var i=0;i<IM_FAM25.length;i++){var F=IM_FAM25[i];if(F.mk===mk&&F.re.test(m))return F;}return null;}
+// why the year on this side may not be the real model year ('' when it looks fine)
+function imYearDoubt25(F,model,year){if(!F)return '';var m=imNorm(model),y=Number(year);
+  if(F.soft&&F.soft.test(m))return 'It is a replica, so its year may be the build year.';
+  if(!y)return 'The year is missing.';
+  for(var i=0;i<F.ranges.length;i++){var r=F.ranges[i];if(r[0].test(m)&&(y<r[1]||y>r[2]))return 'The '+r[3]+' was made '+r[1]+'\u2013'+r[2]+', so '+y+' may be wrong.';}
+  return '';}
+function imPass2v25(pre,col,taken,out,res){
+  var todo=[];
+  pre.forEach(function(o){if(o.block||o.m)return;var f=o.f,mk=imMakeKey(f.make),vin=imVinClean(f.vin),F=imFam25(f.make,f.model),cands=[];
+    var dF=imYearDoubt25(F,f.model,f.year);
+    col.forEach(function(v){if(taken[v.id]!==undefined)return;if(imMakeKey(v.make)!==mk)return;var vv=imVinClean(v.vin);
+      if(vin&&vv&&vin!==vv)return; // both VINs present and different = different cars
+      if(vin&&!vv&&imVinRulesOut(vin,v))return;if(vv&&!vin&&f.make&&imVinRulesOut(vv,{make:f.make,model:f.model}))return;
+      var sim=imModelSim(f.model,v.model),dy=(Number(f.year)&&Number(v.year))?Math.abs(Number(f.year)-Number(v.year)):99,G=imFam25(v.make,v.model);
+      if(F&&G&&F.id===G.id){var dV=imYearDoubt25(G,v.model,v.year),gap=(dF||dV)?15:3;
+        if(dy<=gap)cands.push({v:v,sim:Math.max(sim,0.9),dy:dy,alias:true,doubt:dF||dV,strong:dy<=2&&sim>=0.5});return;}
+      if(F&&G&&F.id!==G.id)return;
+      if(F&&!G&&sim<0.5)return; // e.g. a Speedster is not a 912
+      if(sim<0)return;
+      if((sim>=0.5&&dy<=3)||dy===0)cands.push({v:v,sim:sim,dy:dy,strong:sim===1&&dy<=2});});
+    if(!cands.length)return;
+    cands.sort(function(a,b){return (b.strong-a.strong)||(a.dy-b.dy)||(b.sim-a.sim);});
+    todo.push({o:o,cands:cands,dF:dF});});
+  // best evidence first, so a weak row cannot take a car a strong row needs
+  todo.sort(function(a,b){var x=a.cands[0],y=b.cands[0];return (y.strong-x.strong)||(x.dy-y.dy)||((y.alias?1:0)-(x.alias?1:0))||(a.o.ri-b.o.ri);});
+  var prompts=[];
+  todo.forEach(function(t){var o=t.o,f=o.f,live=t.cands.filter(function(c){return taken[c.v.id]===undefined;});
+    if(!live.length)live=t.cands; // shown for the record; picking a taken car does nothing
+    var key='m'+o.ri,ch=res[key],c0=live[0],free=live.filter(function(c){return taken[c.v.id]===undefined;});
+    var def='new';
+    if(free.length===1&&(free[0].alias||free[0].strong))def=free[0].v.id;
+    else if(free.length>1&&free[0].strong&&!(free[1].strong&&free[1].dy===free[0].dy))def=free[0].v.id;
+    o.prompt={key:key,ri:o.ri,cands:live.slice(0,3),def:def};
+    var pick=ch||def;
+    if(pick==='skip'){o.block={type:'skipped',reason:'You chose to skip this car'};}
+    else if(pick!=='new'){var mv=col.filter(function(v){return v.id===pick;})[0];var pc=live.filter(function(c){return c.v.id===pick;})[0]||c0;
+      if(mv&&taken[mv.id]===undefined){o.m=mv;o.how=ch?'your answer':(pc.alias?'same car, other name: '+(f.model||'')+' = '+(mv.model||''):(pc.dy===0?'same year, make and model':'same make and model (year differs)'));taken[mv.id]=o.ri;}}
+    var note=t.dF||(live.filter(function(c){return c.doubt;})[0]||{}).doubt||'';
+    prompts.push({key:key,ri:o.ri,car:imCarName(f)+(f.vin?' \u00b7 '+f.vin:''),note:note,cands:o.prompt.cands.map(function(c){return {id:c.v.id,name:imVName(c.v)+(c.v.vin?' \u00b7 '+c.v.vin:''),dy:c.dy,alias:!!c.alias};}),pick:pick,def:def,chosen:!!ch});});
+  prompts.sort(function(a,b){return a.ri-b.ri;});
+  prompts.forEach(function(p){out.prompts.push(p);});
+}
+
+/* ===== p25: press and hold on a car (ph-01..05) + Merge duplicates (mg-01..03) ===== */
+var PH={pend:{},timer:null,st:null,suppress:0,move:null,mg:null,toastT:null};
+function phE(s){return esc(String(s==null?'':s));}
+function phPfName(v){try{return (typeof PO!=='undefined'&&PO.on)?poOf(v,v.clientId).name:'your collection';}catch(e){return 'your collection';}}
+function phPfKey(v){return (v&&v.clientId||'')+'|'+((typeof PO!=='undefined'&&PO.on&&v&&v.portfolioId)||'');}
+function phLocalOrder(){try{return JSON.parse(localStorage.getItem('evo.order25')||'{}');}catch(e){return {};}}
+function phSorted(list){var lo=phLocalOrder();var a=(list||[]).map(function(v,i){var so=v.sortOrder;if(so==null){var l=lo[phPfKey(v)];if(l){var k=l.indexOf(v.id);if(k>=0)so=k+1;}}return {v:v,i:i,so:so};});
+  a.sort(function(x,y){var xs=x.so==null?1e9:x.so,ys=y.so==null?1e9:y.so;return (xs-ys)||(x.i-y.i);});return a.map(function(x){return x.v;});}
+function phFind(id){return getVehicles().filter(function(v){return v.id===id;})[0];}
+function phCanMove(v){return !!v&&canEditVehicle(v)&&!isArchivedVehicle(v);}
+function phCanDelete(v){if(!v)return false;try{if(realAdmin()||isRealOwnerOf(v))return true;}catch(e){}return !!v.createdBy&&v.createdBy===myId();}
+function phCanRemove(v){return !!v&&(canEditVehicle(v)||phCanDelete(v));}
+function phThumb(v){var s='';try{s=imgSrc(v);}catch(e){}return s?'<img src="'+phE(s)+'" alt="">':'<span class="ph-noimg">'+(typeof CAR_SVG!=='undefined'?CAR_SVG:'')+'</span>';}
+function phVibe(){try{if(navigator.vibrate)navigator.vibrate(15);}catch(e){}}
+function phLayer(){var r=document.getElementById('ph-root');if(!r){r=document.createElement('div');r.id='ph-root';document.body.appendChild(r);}return r;}
+function phClose(){var r=document.getElementById('ph-root');if(r)r.innerHTML='';document.documentElement.classList.remove('ph-open');}
+function phOpenLayer(html,label){var r=phLayer();r.innerHTML='<div class="ph-back" onclick="if(event.target===this)phClose()"></div>'+html;document.documentElement.classList.add('ph-open');
+  var d=r.querySelector('[role=dialog]');if(d){d.setAttribute('aria-label',label||'Car options');var b=d.querySelector('button');if(b)try{b.focus({preventScroll:true});}catch(e){}}}
+/* --- gesture --- */
+function phCancelHold(){if(PH.timer){clearTimeout(PH.timer);PH.timer=null;}if(PH.ringT){clearTimeout(PH.ringT);PH.ringT=null;}
+  var c=document.querySelector('.ph-holding');if(c)c.classList.remove('ph-holding');PH.st=null;}
+function phAttach(stage){if(!stage||stage._ph25)return;stage._ph25=1;
+  stage.addEventListener('pointerdown',function(e){phCancelHold();if(e.button&&e.button!==0)return;
+    if(e.isPrimary===false){return;}
+    var card=e.target.closest&&e.target.closest('.whl-card.front');if(!card||e.target.closest('.whl-arrow'))return;
+    if(e.clientX<24)return; // left edge belongs to swipe-back
+    PH.st={x:e.clientX,y:e.clientY,id:card.getAttribute('data-id'),card:card,stage:stage,pid:e.pointerId,t:Date.now()};
+    PH.ringT=setTimeout(function(){if(PH.st){PH.st.card.classList.add('ph-holding');}},150);
+    PH.timer=setTimeout(phFire,500);},true);
+  stage.addEventListener('pointermove',function(e){if(!PH.st||e.pointerId!==PH.st.pid)return;var dx=e.clientX-PH.st.x,dy=e.clientY-PH.st.y;if(dx*dx+dy*dy>100)phCancelHold();},true);
+  ['pointerup','pointercancel'].forEach(function(t){stage.addEventListener(t,function(e){if(e._ph25)return;if(PH.st&&e.pointerId===PH.st.pid)phCancelHold();},true);});
+  stage.addEventListener('touchstart',function(e){if(e.touches&&e.touches.length>1)phCancelHold();},{passive:true,capture:true});
+  stage.addEventListener('contextmenu',function(e){if(e.target.closest&&e.target.closest('.whl-card')){e.preventDefault();}},true);
+  stage.addEventListener('click',function(e){if(PH.suppress&&Date.now()-PH.suppress<700){e.preventDefault();e.stopPropagation();PH.suppress=0;}},true);
+  stage.addEventListener('keydown',function(e){if((e.key==='ContextMenu')||(e.shiftKey&&e.key==='F10')){var c=stage.querySelector('.whl-card.front');if(c){e.preventDefault();phSheet(c.getAttribute('data-id'));}}});
+}
+window.addEventListener('scroll',function(){if(PH.st)phCancelHold();},{passive:true,capture:true});
+function phFire(){var st=PH.st;PH.timer=null;if(!st)return;st.card.classList.remove('ph-holding');PH.st=null;
+  var v=phFind(st.id);if(!v||!(phCanMove(v)||phCanRemove(v)))return;
+  phVibe();PH.suppress=Date.now();
+  try{var ev=new PointerEvent('pointercancel',{bubbles:true,pointerId:st.pid});ev._ph25=1;st.stage.dispatchEvent(ev);}catch(e){}
+  phSheet(st.id);}
+var _wheelMount25=wheelMount;
+wheelMount=function(id,list){var r=_wheelMount25.apply(this,arguments);try{var host=document.getElementById(id);var stage=host&&(host.querySelector('.whl-stage')||host);phAttach(stage);
+  if(host&&!host.querySelector('.ph-hint')&&(list||[]).some(function(v){return phCanMove(v)||phCanRemove(v);})){var h=document.createElement('div');h.className='ph-hint';h.textContent='Hold a car for options';host.appendChild(h);}}catch(e){}return r;};
+/* --- action sheet (ph-02) --- */
+function phHead(v){return '<div class="ph-head"><div class="ph-th">'+phThumb(v)+'</div><div><div class="ph-nm">'+phE(vFull(v))+'</div><div class="ph-pf">'+phE(phPfName(v))+'</div></div></div>';}
+function phSheet(id){var v=phFind(id);if(!v)return;var h='<div class="ph-sheet" role="dialog" aria-modal="true">'+phHead(v);
+  if(phCanMove(v))h+='<button class="ph-row" onclick="phMoveOpen(\''+v.id+'\')"><span class="ph-ic">\u2194</span><span><b>Move to another spot</b><small>Change the order of your cars</small></span></button>';
+  if(phCanMove(v)&&mgOthers(v).length)h+='<button class="ph-row" onclick="mgOpen(\''+v.id+'\')"><span class="ph-ic">\u29c9</span><span><b>Merge with\u2026</b><small>Two entries for the same car? Combine them</small></span></button>';
+  if(phCanRemove(v))h+='<button class="ph-row" onclick="phRemove(\''+v.id+'\')"><span class="ph-ic">\u2715</span><span><b>Remove from portfolio</b><small>Archive or delete this car</small></span></button>';
+  h+='<button class="ph-cancel" onclick="phClose()">Cancel</button></div>';phOpenLayer(h,'Options for '+vFull(v));}
+/* --- move mode (ph-03) --- */
+function phPortfolioCars(v){var key=phPfKey(v);return phSorted(activeVehicles(getVehicles()).filter(function(x){return phPfKey(x)===key&&!isArchivedVehicle(x);}));}
+function phMoveOpen(id){var v=phFind(id);if(!v)return;PH.move={pf:v.portfolioId||null,owner:v.clientId,key:phPfKey(v),name:phPfName(v),ids:phPortfolioCars(v).map(function(x){return x.id;}),focus:id};phMoveRender();}
+function phMoveRender(){var M=PH.move;if(!M)return;var n=M.ids.length;
+  var h='<div class="ph-move" role="dialog" aria-modal="true"><div class="ph-mtop"><b>Move cars</b><button class="ph-done" onclick="phMoveDone()">Done</button></div>'+
+   '<p class="ph-mtxt">Drag a car to a new spot, or use the arrows. Everyone who views this collection sees the new order.</p><div class="ph-grid" id="ph-grid">'+
+   M.ids.map(function(id,i){var v=phFind(id)||{};return '<div class="ph-tile'+(id===M.focus?' sel':'')+'" data-id="'+id+'"><span class="ph-num">'+(i+1)+'</span><div class="ph-tth">'+phThumb(v)+'</div><b>'+phE(vFull(v))+'</b>'+
+     '<div class="ph-ar"><button aria-label="Move '+phE(vFull(v))+' earlier" '+(i===0?'disabled':'')+' onclick="phStep(\''+id+'\',-1)">\u2039</button><button aria-label="Move '+phE(vFull(v))+' later" '+(i===n-1?'disabled':'')+' onclick="phStep(\''+id+'\',1)">\u203a</button></div></div>';}).join('')+
+   '</div><div class="ph-mfoot">Order saves for '+phE(M.name)+' when you tap Done</div><div class="ph-live" aria-live="polite" id="ph-live"></div></div>';
+  phOpenLayer(h,'Move cars');phDragWire();}
+function phAnnounce(t){var l=document.getElementById('ph-live');if(l)l.textContent=t;}
+function phStep(id,d){var M=PH.move,i=M.ids.indexOf(id),j=i+d;if(i<0||j<0||j>=M.ids.length)return;M.ids.splice(i,1);M.ids.splice(j,0,id);M.focus=id;phMoveRender();
+  var b=document.querySelector('.ph-tile[data-id="'+id+'"] .ph-ar button:'+(d<0?'first-child':'last-child'));if(b&&!b.disabled)b.focus();else{b=document.querySelector('.ph-tile[data-id="'+id+'"] .ph-ar button:not([disabled])');if(b)b.focus();}
+  phAnnounce(vFull(phFind(id))+' is now number '+(j+1)+' of '+M.ids.length);}
+function phDragWire(){var g=document.getElementById('ph-grid');if(!g)return;var D=null;
+  g.addEventListener('pointerdown',function(e){var t=e.target.closest('.ph-tile');if(!t||e.target.closest('button'))return;
+    D={t:t,id:t.getAttribute('data-id'),x:e.clientX,y:e.clientY,on:false,pid:e.pointerId};
+    var start=function(){if(!D)return;D.on=true;t.classList.add('drag');try{g.setPointerCapture(D.pid);}catch(x){}};
+    if(e.pointerType==='mouse')start();else D.tm=setTimeout(start,250);});
+  g.addEventListener('pointermove',function(e){if(!D)return;if(!D.on){if(Math.abs(e.clientX-D.x)+Math.abs(e.clientY-D.y)>10){clearTimeout(D.tm);D=null;}return;}
+    e.preventDefault();D.t.style.transform='translate('+(e.clientX-D.x)+'px,'+(e.clientY-D.y)+'px)';
+    var over=null;Array.prototype.forEach.call(g.querySelectorAll('.ph-tile'),function(o){o.classList.remove('over');if(o===D.t)return;var r=o.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)over=o;});
+    if(over){over.classList.add('over');D.over=over.getAttribute('data-id');}else D.over=null;});
+  var end=function(){if(!D)return;clearTimeout(D.tm);var d=D;D=null;if(!d.on)return;d.t.style.transform='';
+    if(d.over){var M=PH.move,i=M.ids.indexOf(d.id),j=M.ids.indexOf(d.over);M.ids.splice(i,1);M.ids.splice(j,0,d.id);M.focus=d.id;phMoveRender();phAnnounce(vFull(phFind(d.id))+' is now number '+(j+1)+' of '+M.ids.length);}
+    else d.t.classList.remove('drag');};
+  g.addEventListener('pointerup',end);g.addEventListener('pointercancel',end);}
+async function phMoveDone(){var M=PH.move;if(!M)return;PH.move=null;var ids=M.ids.slice(),saved=false,err=null;
+  try{var r=await sb.rpc('save_vehicle_order',{p_portfolio:M.pf,p_ids:ids});if(r.error)err=r.error;else saved=true;}catch(e){err=e;}
+  if(!saved&&err&&err.code!=='PGRST202'&&err.code!=='42883'){phClose();showToast(err.code==='42501'?'You cannot change the order of this collection.':'Could not save the order. Try again.');return;}
+  ids.forEach(function(id,i){var v=phFind(id);if(v){v.sortOrder=saved?i+1:null;if(SNAP.vehicles&&SNAP.vehicles[id])SNAP.vehicles[id].sortOrder=v.sortOrder;}});
+  if(!saved){var lo=phLocalOrder();lo[M.key]=ids;try{localStorage.setItem('evo.order25',JSON.stringify(lo));}catch(e){}}
+  phClose();try{audit('vehicle.reordered','Changed the order of '+ids.length+' cars in '+M.name);}catch(e){}
+  showToast(saved?'Order saved for '+M.name:'Order saved on this device');refreshCurrent();}
+/* --- remove (ph-04) + toast (ph-05) --- */
+function phRemove(id){var v=phFind(id);if(!v)return;var del=phCanDelete(v),arc=canEditVehicle(v);
+  var h='<div class="ph-sheet" role="dialog" aria-modal="true"><div class="ph-rt">Remove '+phE(vFull(v))+'?</div>'+
+   '<p class="ph-rtxt">Archive keeps its history, photos and documents. You can bring it back any time from Archived cars.</p>'+
+   (arc?'<button class="ph-btn gold" onclick="phArchive(\''+id+'\')">Archive</button>':'')+
+   (del?'<button class="ph-btn red" onclick="phDelete(\''+id+'\')">Delete permanently</button>':'')+
+   '<p class="ph-note">Delete permanently is only for the owner or admin. Technicians can only delete cars they added. This cannot be undone after 10 seconds.</p>'+
+   '<button class="ph-cancel" onclick="phClose()">Cancel</button></div>';phOpenLayer(h,'Remove '+vFull(v));}
+function phToast(text,undo){var t=document.getElementById('ph-toast');if(!t){t=document.createElement('div');t.id='ph-toast';t.setAttribute('role','status');document.body.appendChild(t);}
+  t.innerHTML='<span>'+phE(text)+'</span>'+(undo?'<button onclick="phUndo()">Undo</button>':'');t.className='on';PH.undo=undo||null;clearTimeout(PH.toastT);
+  PH.toastT=setTimeout(function(){t.className='';var u=PH.undo;PH.undo=null;if(u&&u.expire)u.expire();},10000);}
+function phUndo(){var u=PH.undo;PH.undo=null;clearTimeout(PH.toastT);var t=document.getElementById('ph-toast');if(t)t.className='';if(u&&u.undo)u.undo();}
+function phArchive(id){var v=phFind(id);if(!v)return;phClose();var before={a:v.archived,at:v.archivedAt,r:v.archiveReason};
+  v.archived=true;v.archivedAt=new Date().toISOString();v.archiveReason='archived';setVehicles(getVehicles());try{audit('vehicle.archived','Archived '+vFull(v),v.id);}catch(e){}refreshCurrent();
+  phToast(vFull(v)+' archived',{undo:function(){var w=phFind(id);if(!w)return;w.archived=before.a||false;w.archivedAt=before.at||null;w.archiveReason=before.r||null;setVehicles(getVehicles());try{audit('vehicle.unarchived','Undo archive of '+vFull(w),w.id);}catch(e){}refreshCurrent();}});}
+var _activeVehicles25=activeVehicles;
+activeVehicles=function(list){var r=_activeVehicles25.apply(this,arguments);return Array.isArray(r)?r.filter(function(v){return !(v&&PH.pend[v.id]);}):r;};
+function phDelete(id){var v=phFind(id);if(!v)return;phClose();PH.pend[id]=1;refreshCurrent();var name=vFull(v);
+  phToast(name+' deleted',{undo:function(){delete PH.pend[id];refreshCurrent();showToast(name+' kept');},
+    expire:async function(){var ok=false;try{var r=await sb.rpc('delete_vehicle_permanently',{p_id:id});
+      if(!r.error)ok=true;else if(r.error.code==='PGRST202'||r.error.code==='42883'){setVehicles(getVehicles().filter(function(x){return x.id!==id;}));ok=true;}
+      else{delete PH.pend[id];refreshCurrent();showToast(r.error.code==='42501'?'You can only delete cars you added. '+name+' was not deleted.':'Could not delete '+name+'. It is still here.');return;}}
+      catch(e){delete PH.pend[id];refreshCurrent();showToast('Could not delete '+name+'. It is still here.');return;}
+      if(ok){try{audit('vehicle.deleted','Deleted '+name,id);}catch(e){}delete PH.pend[id];try{await reloadAll(true);}catch(e){}refreshCurrent();}}});}
+window.addEventListener('pagehide',function(){var u=PH.undo;if(u&&u.expire){PH.undo=null;u.expire();}});
+
+/* ===== Merge duplicates (mg-01..03) ===== */
+var MG_F=[['year','Year'],['make','Make'],['model','Model'],['color','Colour'],['nickname','Nickname'],['vin','VIN / chassis'],['plate','Plate'],['plateRegion','Plate region'],['mileage','Mileage'],['purchasePrice','Purchase price'],['purchaseDate','Purchase date']];
+var MG_COL={year:'year',make:'make',model:'model',color:'color',nickname:'nickname',vin:'vin',plate:'plate',plateRegion:'plate_region',mileage:'mileage',purchasePrice:'fin_purchase_price',purchaseDate:'fin_purchase_date'};
+function mgBlank(x){return x==null||x===''||x===0;}
+function mgFmt(k,x){if(mgBlank(x))return '\u2014';if(k==='mileage')return Number(x).toLocaleString('en-US')+' mi';if(k==='purchasePrice')return '$'+Number(x).toLocaleString('en-US');return String(x);}
+function mgSame(k,a,b){if(k==='vin')return imVinClean(a)===imVinClean(b);return imNorm(a)===imNorm(b);}
+function mgScore(a,b){if(a.id===b.id||a.clientId!==b.clientId||imMakeKey(a.make)!==imMakeKey(b.make))return -1;var va=imVinClean(a.vin),vb=imVinClean(b.vin);if(va&&vb&&va!==vb)return -1;
+  if(va&&vb&&va===vb)return 100;var dy=(Number(a.year)&&Number(b.year))?Math.abs(a.year-b.year):99,F=imFam25(a.make,a.model),G=imFam25(b.make,b.model),sim=imModelSim(a.model,b.model);
+  if(F&&G&&F.id===G.id){var gap=(imYearDoubt25(F,a.model,a.year)||imYearDoubt25(G,b.model,b.year))?15:3;if(dy<=gap)return 60-dy;}
+  if(sim>=0.5&&dy<=3)return 70-dy+sim*10;return 0;}
+function mgOthers(v){return activeVehicles(getVehicles()).filter(function(x){return x.id!==v.id&&x.clientId===v.clientId&&!isArchivedVehicle(x)&&!x.mergedInto;});}
+function mgPairs(owner,prefer){var l=activeVehicles(getVehicles()).filter(function(x){return x.clientId===owner&&!isArchivedVehicle(x);}),out=[];
+  for(var i=0;i<l.length;i++)for(var j=i+1;j<l.length;j++){var s=mgScore(l[i],l[j]);if(s>0){if(prefer&&(prefer[l[i].id]||prefer[l[j].id]))s+=5;out.push({a:l[i],b:l[j],s:s});}}
+  out.sort(function(x,y){return y.s-x.s;});return out.slice(0,8);}
+function mgOpen(id,prefer){var v=id?phFind(id):null;PH.mg={a:id||null,b:null,keep:null,pick:{},prefer:prefer||null,owner:v?v.clientId:(typeof IM!=='undefined'&&IM.owner)||ownerClientId()};mgStep1();}
+function mgStep1(){var G=PH.mg,h='<div class="ph-move mg" role="dialog" aria-modal="true"><div class="ph-mtop"><b>Merge duplicates</b><button class="ph-done line" onclick="phClose()">Close</button></div>';
+  if(G.a){var a=phFind(G.a),others=mgOthers(a).map(function(x){return {v:x,s:mgScore(a,x)};}).filter(function(o){return o.s>=0;});others.sort(function(x,y){return y.s-x.s;});
+    h+='<p class="ph-mtxt">Which car is the same as <b>'+phE(vFull(a))+'</b>?</p>'+others.map(function(o){return '<button class="mg-car'+(G.b===o.v.id?' on':'')+'" onclick="mgPickB(\''+o.v.id+'\')"><span class="ph-th">'+phThumb(o.v)+'</span><span><b>'+phE(vFull(o.v))+'</b><small>'+phE((o.v.vin?o.v.vin+' \u00b7 ':'')+phPfName(o.v))+(o.s>0?' \u00b7 Looks like the same car':'')+'</small></span></button>';}).join('');
+    if(!others.length)h+='<p class="ph-mtxt">No other car in this collection can be merged with it. Cars with two different VINs are always different cars.</p>';}
+  else{var ps=mgPairs(G.owner,G.prefer);h+='<p class="ph-mtxt">These look like the same car entered twice. Pick a pair to merge.</p>'+(ps.length?ps.map(function(p){return '<button class="mg-car" onclick="mgPickPair(\''+p.a.id+'\',\''+p.b.id+'\')"><span><b>'+phE(vFull(p.a))+'</b><small>and '+phE(vFull(p.b))+'</small></span></button>';}).join(''):'<p class="ph-mtxt">No likely duplicates found. You can also hold a car on the home screen and choose Merge with\u2026</p>');}
+  if(G.a&&G.b){var A=phFind(G.a),B=phFind(G.b);h+='<p class="ph-mtxt"><b>Which one do you keep?</b> The other is archived after its photos, documents and records move over.</p><div class="mg-keep">'+[A,B].map(function(x){return '<button class="mg-k'+(G.keep===x.id?' on':'')+'" onclick="mgKeep(\''+x.id+'\')">'+(G.keep===x.id?'\u2713 ':'')+'Keep '+phE(vFull(x))+'<small>'+phE(x.vin?'VIN / chassis '+x.vin:'No VIN')+(x.color?' \u00b7 '+x.color:'')+'</small></button>';}).join('')+'</div>'+
+    '<button class="ph-btn gold" '+(G.keep?'':'disabled')+' onclick="mgStep2()">Next: check details</button>';}
+  h+='</div>';phOpenLayer(h,'Merge duplicates');}
+function mgPickB(id){PH.mg.b=id;PH.mg.keep=null;mgStep1();}
+function mgPickPair(a,b){PH.mg.a=a;PH.mg.b=b;PH.mg.keep=null;mgStep1();}
+function mgKeep(id){PH.mg.keep=id;mgStep1();}
+function mgCounts(v){var c={ins:0,ex:0,dc:0,rc:0,lg:0};try{c=recCountsFor(v.id)||c;}catch(e){}var ph=(v._photos||[]).length,n={photos:ph,docs:c.dc||0,reminders:c.rc||0,expenses:c.ex||0,service:c.lg||0};n.total=ph+(c.dc||0)+(c.rc||0)+(c.ex||0)+(c.lg||0);return n;}
+function mgPair(){var G=PH.mg,k=phFind(G.keep),d=phFind(G.keep===G.a?G.b:G.a);return {k:k,d:d};}
+var MG_T=[['vehicle_photos','photo'],['documents','document'],['reminders','reminder'],['expenses','expense'],['service_records','service record']];
+async function mgLoadCounts(id){var out={};await Promise.all(MG_T.map(async function(t){try{var r=await sb.from(t[0]).select('id').eq('vehicle_id',id);out[t[0]]=r.error?null:(r.data||[]).length;}catch(e){out[t[0]]=null;}}));return out;}
+function mgStep2(){var G=PH.mg,P=mgPair(),k=P.k,d=P.d,rows='',nc=0;
+  if(!G.cnt||G.cnt.id!==d.id){G.cnt={id:d.id,n:null};mgLoadCounts(d.id).then(function(n){if(PH.mg===G&&G.cnt.id===d.id){G.cnt.n=n;if(document.querySelector('.mg-mv'))mgStep2();}});}
+  MG_F.forEach(function(f){var key=f[0],kv=k[key],dv=d[key];if(mgBlank(kv)&&mgBlank(dv))return;
+    if(mgBlank(dv)||mgSame(key,kv,dv)){rows+='<div class="mg-f"><span>'+f[1]+'</span><b>'+phE(mgFmt(key,kv))+'</b><i>Kept</i></div>';return;}
+    if(mgBlank(kv)){if(G.pick[key]===undefined)G.pick[key]='d';rows+='<div class="mg-f fill"><span>'+f[1]+'</span><b>'+phE(mgFmt(key,dv))+'</b><i>Filled in from the other car</i></div>';return;}
+    nc++;var p=G.pick[key]||'k';rows+='<div class="mg-f conf"><span>'+f[1]+' \u00b7 pick one</span><div class="mg-ch">'+
+      '<button class="'+(p==='k'?'on':'')+'" onclick="mgChoose(\''+key+'\',\'k\')">'+(p==='k'?'\u2713 ':'')+phE(mgFmt(key,kv))+'</button>'+
+      '<button class="'+(p==='d'?'on':'')+'" onclick="mgChoose(\''+key+'\',\'d\')">'+(p==='d'?'\u2713 ':'')+phE(mgFmt(key,dv))+'</button></div></div>';});
+  var cn=G.cnt.n,mv=cn?MG_T.map(function(t){var n=cn[t[0]];return n==null?null:n+' '+t[1]+(n===1?'':'s');}).filter(Boolean):['Counting\u2026'];
+  var h='<div class="ph-move mg" role="dialog" aria-modal="true"><div class="ph-mtop"><b>Check details</b><button class="ph-done line" onclick="mgStep1()">Back</button></div>'+
+   '<p class="ph-mtxt">Keeping <b>'+phE(vFull(k))+'</b>. Blanks are filled from <b>'+phE(vFull(d))+'</b>'+(nc?'. Pick the right value where they differ.':'.')+'</p>'+rows+
+   '<div class="mg-mv"><b>Moves to the car you keep</b><span>'+mv.join(' \u00b7 ')+', plus estimates and money records</span></div>'+
+   '<p class="ph-rtxt">'+phE(vFull(d))+' is then archived and marked as merged. You can undo the merge.</p>'+
+   '<button class="ph-btn gold" onclick="mgDo()">Merge cars</button><button class="ph-cancel" onclick="phClose()">Cancel</button></div>';
+  phOpenLayer(h,'Check details');}
+function mgChoose(k,v){PH.mg.pick[k]=v;mgStep2();}
+async function mgDo(){var G=PH.mg,P=mgPair(),k=P.k,d=P.d,f={};
+  MG_F.forEach(function(x){var key=x[0];if(G.pick[key]==='d'&&!mgBlank(d[key])){var v=d[key];if(key==='vin')v=imVinClean(v)||v;f[MG_COL[key]]=v;}});
+  var r;try{r=await sb.rpc('merge_vehicles',{p_keep:k.id,p_drop:d.id,p_fields:f});}catch(e){r={error:e};}
+  if(r.error){var c=r.error.code;showToast(c==='PGRST202'||c==='42883'?'Merging needs database update 017. Nothing was changed.':c==='42501'?'You cannot merge cars in this collection.':'Could not merge: '+(r.error.message||'try again'));return;}
+  var res=r.data||{},kn=vFull(k),dn=vFull(d);try{audit('vehicle.merged','Merged '+dn+' into '+kn,k.id);}catch(e){}
+  try{await reloadAll(true);}catch(e){}refreshCurrent();
+  var m=res.moved||{},tot=0;for(var t in m)if(m.hasOwnProperty(t))tot+=Number(m[t])||0;
+  phOpenLayer('<div class="ph-sheet" role="dialog" aria-modal="true"><div class="ph-rt">Cars merged</div><p class="ph-rtxt"><b>'+phE(kn)+'</b> now has everything from '+phE(dn)+' ('+tot+' item'+(tot===1?'':'s')+' moved). '+phE(dn)+' is archived.</p>'+
+   '<button class="ph-btn gold" onclick="phClose()">Done</button><button class="ph-btn line" onclick="mgUndo(\''+phE(res.merge_id||'')+'\')">Undo merge</button></div>','Cars merged');
+  PH.lastMerge=res.merge_id;}
+async function mgUndo(id){var r;try{r=await sb.rpc('undo_merge',{p_merge:id});}catch(e){r={error:e};}
+  if(r.error){showToast('Could not undo the merge: '+(r.error.message||'try again'));return;}
+  phClose();try{audit('vehicle.merge_undone','Undid a merge',id);}catch(e){}try{await reloadAll(true);}catch(e){}refreshCurrent();showToast('Merge undone. Both cars are back.');}
+/* ===== import: cars of yours not on the sheet ===== */
+function imUnmatched25(A){if(!A||typeof IM==='undefined'||!IM.owner)return [];var got={};for(var k in A.matched)if(A.matched.hasOwnProperty(k))got[A.matched[k]]=1;
+  return imCollection(IM.owner).filter(function(v){return !got[v.id];});}
+function imUnmLine25(l){if(!l||!l.length)return '';var names=l.slice(0,3).map(imVName).join(', ')+(l.length>3?' and '+(l.length-3)+' more':'');
+  return '<div class="im-card mg-unm"><b>'+l.length+' of your car'+(l.length===1?' is':'s are')+' not on this sheet</b><span>'+imE(names)+'. If one of them is a sheet car under another name, merge them after importing.</span><button class="im-btn sm line" onclick="mgFromImport()">Merge duplicates</button></div>';}
+function mgFromImport(){var p={};(IM._unm25||[]).forEach(function(v){p[v.id]=1;});mgOpen(null,p);}
+var _phStep3=imStep3;imStep3=function(){var h=_phStep3();try{IM._unm25=imUnmatched25(imA());var l=imUnmLine25(IM._unm25);if(l)h=h.replace('<div class="im-tabs"',l+'<div class="im-tabs"');}catch(e){}return h;};
+var _phStep4=imStep4;imStep4=function(){var h=_phStep4();try{var d=IM.done;if(d&&!d.undone&&IM._unm25){var l=imUnmLine25(IM._unm25.filter(function(v){var w=phFind(v.id);return w&&!isArchivedVehicle(w);}));var i=h.indexOf('</p>');if(l&&i>=0)h=h.slice(0,i+4)+l+h.slice(i+4);}}catch(e){}return h;};
 
 </script>
 </body>
