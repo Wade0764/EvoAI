@@ -1,5 +1,5 @@
 /* EvoAI service worker: caches the app shell only. Never touches Supabase (auth, REST, storage). */
-var CACHE='evoai-shell-v28-refresh';
+var CACHE='evoai-shell-v29-scan-inspect';
 var KEEP=/^evoai-dt-/;   /* document thumbnail cache (p18), owned by the page */
 var SHELL=['./','evoai-cloud.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png','icons/favicon-32.png','icons/favicon-16.png','icons/icon-maskable-512.png'];
 self.addEventListener('install',function(e){

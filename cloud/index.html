@@ -1157,6 +1157,50 @@ html.ph-open,html.ph-open body{overflow:hidden}
 .vq-why{color:#F2F0EB;font-size:15px}
 .vq-why b{color:#C9AA6B}
 
+/* v31 inspection report: compact step header, owner mode, 15px+ white/gold text */
+#modal-inspection .wizard-steps{display:none}
+#modal-inspection .ins-intro{font-size:15px;line-height:1.45;color:#fff;margin:0 0 18px}
+#modal-inspection .ins-prog{margin:0 0 20px}
+#modal-inspection .ins-prog-lbl{font-size:15px;color:var(--gold);letter-spacing:.04em;margin-bottom:8px}
+#modal-inspection .ins-prog-lbl b{color:#fff;font-weight:600}
+#modal-inspection .ins-bar{height:3px;background:rgba(201,170,107,.25);border-radius:2px;overflow:hidden}
+#modal-inspection .ins-bar i{display:block;height:100%;background:var(--gold);transition:width .2s}
+#modal-inspection .input-group label,#modal-inspection .check-label,#modal-inspection .draft-label,#modal-inspection .disclaimer{font-size:15px;color:#fff}
+#modal-inspection input,#modal-inspection select,#modal-inspection textarea{font-size:16px;color:#fff}
+#modal-inspection .btn{font-size:15px}
+#modal-inspection .ins-owner-car{font-size:15px;color:#fff}
+#modal-inspection .modal-title,#modal-inspection .modal-close{color:#fff}
+
+.ss-box{border:1.5px solid #C9AA6B;border-radius:14px;padding:16px;margin:0 0 14px;background:#14120C}
+.ss-h{font-size:18px;font-weight:600;color:#C9AA6B;margin-bottom:4px}
+.ss-p{font-size:15px;color:#FFFFFF;margin-bottom:12px}
+.ss-row{display:flex;gap:10px}.ss-row .btn{flex:1;min-height:48px;font-size:16px}
+.ss-btn-cam{background:#C9AA6B!important;color:#07080A!important;border-color:#C9AA6B!important;font-weight:600}
+.ss-btn-file{background:none!important;color:#C9AA6B!important;border:1.5px solid #C9AA6B!important;font-weight:600}
+.ss-or{font-size:15px;color:#FFFFFF;text-align:center;margin:0 0 6px}
+.ss-msg{font-size:15px;color:#FFFFFF;border-left:3px solid #E08A74;padding:8px 10px;margin-top:12px;background:#1A0F0C}
+.ss-busy,.ss-done{display:flex;gap:14px;align-items:center}
+.ss-thumb{width:56px;height:72px;border-radius:6px;overflow:hidden;background:#F2F0EB;flex:none;display:flex;align-items:center;justify-content:center;position:relative}
+.ss-thumb img{width:100%;height:100%;object-fit:cover}.ss-pdf{color:#07080A;font-weight:700;font-size:15px}
+.ss-busy .ss-thumb:after{content:"";position:absolute;left:0;right:0;height:3px;background:#C9AA6B;box-shadow:0 0 14px 5px #C9AA6B;animation:ssScan 1.4s ease-in-out infinite}
+@keyframes ssScan{0%{top:6%}50%{top:90%}100%{top:6%}}
+.ss-t{font-size:17px;font-weight:600;color:#FFFFFF}.ss-s{font-size:15px;color:#C9AA6B;margin-top:2px}
+.ss-link{background:none;border:0;color:#C9AA6B;font-size:15px;padding:10px 0 10px 8px;cursor:pointer;margin-left:auto;white-space:nowrap}
+.ss-tag{display:inline-block;margin-left:8px;font-size:15px;font-weight:700;padding:1px 8px;border-radius:6px;letter-spacing:0;text-transform:none;line-height:1.5}
+.ss-tag-ai{background:#C9AA6B;color:#07080A}.ss-tag-miss{background:#E08A74;color:#07080A}
+#modal-service input.ss-ai,#modal-service select.ss-ai{border-color:#C9AA6B!important}
+#modal-service input.ss-miss,#modal-service select.ss-miss{border-color:#E08A74!important}
+#modal-service label{color:#FFFFFF;font-size:15px}
+#modal-service .disclaimer{color:#FFFFFF;font-size:15px}
+#modal-service input::placeholder{color:#C9AA6B;opacity:1}
+#modal-service input.ss-miss::placeholder{color:#E08A74}
+.ss-row .btn{padding:10px 8px;white-space:nowrap}
+
+/* v33 p33 portfolio pick: 15px+, white or gold only */
+.im-lead.pf-only{font-size:18px;color:#F2F0EB}.im-lead.pf-only b{color:#C9AA6B;font-weight:700}
+.im-pf-t span{color:#F2F0EB}
+.im-file-ic{font-size:15px}
+
 </style>
 </head>
 <body>
@@ -1550,6 +1594,16 @@ html.ph-open,html.ph-open body{overflow:hidden}
 <div class="modal-overlay" id="modal-service">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">Log service</div><button class="modal-close" onclick="closeModal('modal-service')">&#10005;</button></div>
+    <div class="ss-box" id="ss-box">
+      <div id="ss-entry"><div class="ss-h">Scan or upload receipt</div><div class="ss-p">AI reads it and fills in everything for you.</div>
+        <div class="ss-row"><button type="button" class="btn ss-btn-cam" onclick="ssPick('cam')">&#128247; Camera</button><button type="button" class="btn ss-btn-file" onclick="ssPick('file')">&#128193; Upload file</button></div>
+        <input type="file" id="ss-cam" accept="image/*" capture="environment" style="display:none" onchange="ssFile(this)">
+        <input type="file" id="ss-file" accept="image/*,application/pdf,.pdf" style="display:none" onchange="ssFile(this)"></div>
+      <div id="ss-busy" class="ss-busy" style="display:none"><div class="ss-thumb" id="ss-thumb-busy"></div><div><div class="ss-t">Reading your receipt...</div><div class="ss-s">Finding the vehicle, date, mileage, work and cost</div></div></div>
+      <div id="ss-done" class="ss-done" style="display:none"><div class="ss-thumb" id="ss-thumb-done"></div><div><div class="ss-t">Receipt attached</div><div class="ss-s" id="ss-done-sub"></div></div><button type="button" class="ss-link" onclick="ssReset()">Replace</button></div>
+      <div id="ss-msg" class="ss-msg" style="display:none"></div>
+    </div>
+    <div class="ss-or" id="ss-or">Or enter it yourself</div>
     <div class="form-grid">
       <div class="input-group form-full"><label>Vehicle</label><select id="svc-vehicle" onchange="updateServiceNext()"><option value="">Select vehicle</option></select></div>
       <div class="input-group"><label>Date</label><input type="date" id="svc-date" onchange="updateServiceNext()"></div>
@@ -1590,7 +1644,7 @@ html.ph-open,html.ph-open body{overflow:hidden}
 <!-- INSPECTION WIZARD -->
 <div class="modal-overlay" id="modal-inspection">
   <div class="modal modal-lg">
-    <div class="modal-header"><div class="modal-title">Inspection</div><button class="modal-close" onclick="closeModal('modal-inspection')">&#10005;</button></div>
+    <div class="modal-header"><div class="modal-title">Vehicle inspection report</div><button class="modal-close" onclick="closeModal('modal-inspection')">&#10005;</button></div>
     <div class="wizard-steps">
       <div class="wizard-step active" onclick="goWizardStep(0)">Vehicle</div>
       <div class="wizard-step" onclick="goWizardStep(1)">Work done</div>
@@ -1598,9 +1652,11 @@ html.ph-open,html.ph-open body{overflow:hidden}
       <div class="wizard-step" onclick="goWizardStep(3)">Condition</div>
       <div class="wizard-step" onclick="goWizardStep(4)">Notes</div>
     </div>
+    <p class="ins-intro" id="ins-intro"></p>
+    <div class="ins-prog" aria-live="polite"><div class="ins-prog-lbl" id="ins-prog-lbl">Step 1 of 5 &middot; <b>Vehicle</b></div><div class="ins-bar"><i id="ins-bar-fill" style="width:20%"></i></div></div>
     <div class="wizard-panel active" id="wp-0">
       <div class="form-grid">
-        <div class="input-group"><label>Client</label><select id="insp-client" onchange="updateInspectionVehicles()"><option value="">Select client</option></select></div>
+        <div class="input-group" id="insp-client-group"><label>Client</label><select id="insp-client" onchange="updateInspectionVehicles()"><option value="">Select client</option></select></div>
         <div class="input-group"><label>Vehicle</label><select id="insp-vehicle"><option value="">Select vehicle</option></select></div>
         <div class="input-group"><label>Date</label><input type="date" id="insp-date"></div>
         <div class="input-group"><label>Tech</label><input type="text" id="insp-tech" maxlength="60" placeholder="Your name"></div>
@@ -4349,7 +4405,9 @@ function openInspectionModal(){
   populateClientSelect('insp-client',null);
   updateInspectionVehicles();
   var pv=byId(getVehicles(),prefVehicleId());
-  if(pv){populateClientSelect('insp-client',pv.clientId);populateVehicleSelect('insp-vehicle',pv.clientId,pv.id,'can_add_service');}
+  if(inspOwnerMode()){populateVehicleSelect('insp-vehicle',null,pv?pv.id:null,'can_add_service');}
+  else if(pv){populateClientSelect('insp-client',pv.clientId);populateVehicleSelect('insp-vehicle',pv.clientId,pv.id,'can_add_service');}
+  inspPickOnly();
   openModal('modal-inspection');
 }
 function openInspectionForVehicle(){
@@ -4360,10 +4418,11 @@ function openInspectionForVehicle(){
   resetInspectionForm();
   populateClientSelect('insp-client',v?v.clientId:null);
   populateVehicleSelect('insp-vehicle',v?v.clientId:null,v?v.id:null);
+  inspOwnerMode();
   if(v&&v.mileage)setVal('insp-mileage-start',v.mileage);
   openModal('modal-inspection');
 }
-function updateInspectionVehicles(){populateVehicleSelect('insp-vehicle',val('insp-client')||null,null,'can_add_service');}
+function updateInspectionVehicles(){populateVehicleSelect('insp-vehicle',val('insp-client')||null,null,'can_add_service');inspPickOnly();}
 function inspectionStepError(upTo){
   if(upTo>=1&&!val('insp-vehicle'))return {step:0,msg:'Select a vehicle'};
   if(upTo>=1){var d=val('insp-date');if(d&&d>todayISO())return {step:0,msg:'Service date cannot be in the future'};}
@@ -4386,6 +4445,7 @@ function goWizardStep(step,force){
   var panels=document.querySelectorAll('#modal-inspection .wizard-panel');
   for(var i=0;i<steps.length;i++){steps[i].classList.toggle('active',i===step);steps[i].classList.toggle('done',i<step);}
   for(var j=0;j<panels.length;j++)panels[j].classList.toggle('active',j===step);
+  inspProg(step);
 }
 function toggleCheck(el){el.classList.toggle('checked');}
 // Draft helper: keyword templates that rephrase the tech's notes. Not a live AI model.
@@ -10146,6 +10206,178 @@ vqPanel=function(vs){
   if(bad.length){var p='<p class="vq-p vq-why"><b>Could not be valued yet:</b> '+bad.slice(0,6).map(function(v){return esc(vName(v))+' \u2014 '+esc(RB.why[v.id]);}).join('; ')+'</p>';h=h.replace('<div class="vq" data-noptr>','<div class="vq" data-noptr>'+p);}
   return h;
 };
+// v31 inspection report: one-line step label + bar, owner gets no client picker, single car preselected
+var INSP_STEPS=['Vehicle','Work done','Vitals','Condition','Notes'];
+function inspProg(step){
+  var l=document.getElementById('ins-prog-lbl'),b=document.getElementById('ins-bar-fill');
+  if(l)l.innerHTML='Step '+(step+1)+' of '+INSP_STEPS.length+' &middot; <b>'+INSP_STEPS[step]+'</b>';
+  if(b)b.style.width=((step+1)/INSP_STEPS.length*100)+'%';
+}
+function inspOwnerMode(){
+  var own=isOwner(),g=document.getElementById('insp-client-group');
+  if(g)g.style.display=own?'none':'';
+  var ti=document.getElementById('insp-tech'),tl=ti&&ti.parentNode.querySelector('label');if(tl)tl.textContent=own?'Done by':'Tech';
+  var intro=document.getElementById('ins-intro');
+  if(intro)intro.textContent=own?'Write down a check-up you did on your car: work done, battery and tyre readings, condition and notes. It is saved to the car\u2019s service history. This does not book or request an inspection.':'Record a check-up visit on a client\u2019s car: work done, battery and tyre readings, condition and notes. It is saved to the car\u2019s service history and the owner can read it. This does not book or request an inspection.';
+  return own;
+}
+function inspPickOnly(){
+  var s=document.getElementById('insp-vehicle');if(!s||s.value)return;
+  var o=[].filter.call(s.options,function(x){return x.value;});
+  if(o.length===1)s.value=o[0].value;
+}
+// ============ v32 (p32): LOG SERVICE - SCAN OR UPLOAD RECEIPT ============
+// Reuses the scan-document Edge Function (migration_007): file_base64 + mime + vehicle_id in, strict JSON out.
+// The receipt is saved to the matched vehicle's documents and linked to the new service record (documents.service_record_id).
+var SS={tok:0,busy:0,file:null,thumb:'',scan:null,filled:{},missing:{}};
+var SS_MONTH_CAP=60; // per user per month, client side; the server keeps its own daily (and, once applied, monthly) cap
+var SS_F={vehicle:'svc-vehicle',date:'svc-date',miles:'svc-miles',note:'svc-note',cost:'svc-cost'};
+function ssEsc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function ssShow(mode,msg){
+  ['entry','busy','done'].forEach(function(k){var e=document.getElementById('ss-'+k);if(e)e.style.display=(k===mode?'':'none');});
+  var m=document.getElementById('ss-msg');if(m){m.textContent=msg||'';m.style.display=msg?'':'none';}
+  var or=document.getElementById('ss-or');if(or)or.style.display=mode==='entry'?'':'none';
+  var th=SS.thumb?'<img src="'+ssEsc(SS.thumb)+'" alt="Receipt">':'<span class="ss-pdf">PDF</span>';
+  ['ss-thumb-busy','ss-thumb-done'].forEach(function(id){var e=document.getElementById(id);if(e)e.innerHTML=th;});
+}
+function ssTag(key,kind){
+  var inp=document.getElementById(SS_F[key]);if(!inp)return;
+  var lab=inp.parentNode&&inp.parentNode.querySelector('label');if(!lab)return;
+  var t=lab.querySelector('.ss-tag');if(t)t.parentNode.removeChild(t);
+  inp.classList.remove('ss-ai','ss-miss');
+  if(inp.dataset.ssPh!==undefined){inp.placeholder=inp.dataset.ssPh;delete inp.dataset.ssPh;}
+  if(!kind)return;
+  if(kind==='miss'&&inp.tagName==='INPUT'){inp.dataset.ssPh=inp.placeholder||'';inp.placeholder='Not on the receipt - enter it';}
+  var s=document.createElement('span');s.className='ss-tag '+(kind==='ai'?'ss-tag-ai':'ss-tag-miss');
+  s.textContent=kind==='ai'?(key==='vehicle'&&SS.how?'AI filled - '+SS.how:'AI filled'):'Missing';
+  lab.appendChild(s);inp.classList.add(kind==='ai'?'ss-ai':'ss-miss');
+}
+function ssClearTags(){for(var k in SS_F)ssTag(k,null);SS.filled={};SS.missing={};SS.how='';}
+function ssReset(){SS.tok++;SS.busy=0;SS.file=null;SS.thumb='';SS.scan=null;ssClearTags();
+  ['ss-cam','ss-file'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});ssShow('entry','');}
+function ssPick(k){if(SS.busy)return;var i=document.getElementById(k==='cam'?'ss-cam':'ss-file');if(i){i.value='';i.click();}}
+function ssMonthKey(){return 'ss_scans_'+(myId()||'x')+'_'+todayISO().slice(0,7);}
+function ssMonthUsed(){try{return Number(localStorage.getItem(ssMonthKey()))||0;}catch(e){return 0;}}
+function ssMonthBump(){try{localStorage.setItem(ssMonthKey(),String(ssMonthUsed()+1));}catch(e){}}
+function ssB64(blob){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(String(r.result).replace(/^data:[^,]*,/,''));};r.onerror=function(){rej(new Error('read'));};r.readAsDataURL(blob);});}
+function ssFile(input){
+  var f=input&&input.files&&input.files[0];if(!f)return;
+  var isPdf=f.type==='application/pdf'||/\.pdf$/i.test(f.name||'');
+  var isImg=(f.type&&f.type.indexOf('image/')===0)||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name||'');
+  if(!isPdf&&!isImg){ssShow('entry','Please choose a photo or a PDF of the receipt.');return;}
+  if(isPdf){if(f.size>10*1024*1024){ssShow('entry','That PDF is over 10 MB. Choose a smaller file, or enter the details below.');return;}
+    SS.file={blob:f,mime:'application/pdf',name:f.name||'receipt.pdf'};SS.thumb='';ssRun();return;}
+  shrinkPhotoToDataUrl(f,MAX_PHOTO_DIM,MAX_PHOTO_BYTES,'#fff').then(function(out){
+    SS.file={blob:dataUrlToBlob(out),mime:'image/jpeg',name:'receipt.jpg'};SS.thumb=out;ssRun();
+  },function(){ssShow('entry','Could not read that photo. Try another one, or enter the details below.');});
+}
+function ssVehicles(){var sel=document.getElementById('svc-vehicle'),vs=getVehicles(),out=[];if(!sel)return out;
+  for(var i=0;i<sel.options.length;i++){var v=byId(vs,sel.options[i].value);if(v)out.push(v);}return out;}
+function ssNorm(s){return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function ssMatch(s,list){
+  var vin=ssNorm(s.vin),i,hit=[];
+  if(vin){for(i=0;i<list.length;i++){var vv=ssNorm(list[i].vin);if(vv&&(vv===vin||(vin.length>=8&&vv.slice(-8)===vin.slice(-8))))return {v:list[i],how:'VIN'};}}
+  var pl=ssNorm(s.plate);
+  if(pl){for(i=0;i<list.length;i++)if(ssNorm(list[i].plate)===pl)return {v:list[i],how:'plate'};}
+  var txt=' '+[s.make,s.model,s.title,s.summary,s.vendor,(s.services||[]).join(' ')].join(' ').toUpperCase()+' ';
+  for(i=0;i<list.length;i++){var v=list[i],mk=String(v.make||'').toUpperCase().trim(),md=String(v.model||'').toUpperCase().trim().split(/\s+/)[0];
+    if(mk&&md&&txt.indexOf(mk)>=0&&txt.indexOf(md)>=0)hit.push(v);}
+  if(hit.length===1)return {v:hit[0],how:'make and model'};
+  return null;
+}
+function ssFail(err,body){
+  var st=err&&err.context&&err.context.status,bc=body&&body.error;
+  if(st===429&&bc==='monthly_cap')return 'AI scanning has reached this month\'s limit. Enter the details below.';
+  var c=docAiClassify(err,body);return c.msg.replace('Your document is saved - enter','Enter');
+}
+async function ssRun(){
+  var my=++SS.tok;ssClearTags();SS.scan=null;
+  if(ssMonthUsed()>=SS_MONTH_CAP){ssShow('entry','You have used this month\'s AI scans. Enter the details below.');return;}
+  var list=ssVehicles(),vid=val('svc-vehicle')||(list[0]&&list[0].id);
+  if(!vid){ssShow('entry','Add a vehicle first, then scan the receipt.');return;}
+  if(!docAiFnAvailable()){ssShow('entry','AI scanning is not turned on yet. Enter the details below.');return;}
+  SS.busy=1;ssShow('busy','');
+  var r;
+  try{var b64=await ssB64(SS.file.blob);r=await sb.functions.invoke('scan-document',{body:{file_base64:b64,mime:SS.file.mime,vehicle_id:vid}});}
+  catch(e){r={data:null,error:e};}
+  if(my!==SS.tok)return;SS.busy=0;
+  if(r&&r.error){var body=null;try{if(r.error.context&&typeof r.error.context.json==='function')body=await r.error.context.json();}catch(e){}
+    ssShow('entry',ssFail(r.error,body));return;}
+  var s=r&&r.data;
+  if(!s||typeof s!=='object'||!s.category){ssShow('entry','We could not read that receipt. Try a clearer photo, or enter the details below.');return;}
+  ssMonthBump();SS.scan=s;ssFill(s,list);
+}
+function ssFill(s,list){
+  var m=ssMatch(s,list),n=0;
+  if(m){setVal('svc-vehicle',m.v.id);SS.how=m.how;SS.filled.vehicle=1;}else SS.missing.vehicle=1;
+  if(s.doc_date&&s.doc_date<=todayISO()){setVal('svc-date',s.doc_date);SS.filled.date=1;}else SS.missing.date=1;
+  if(s.mileage!=null&&s.mileage>=0){setVal('svc-miles',String(s.mileage));SS.filled.miles=1;}else{setVal('svc-miles','');SS.missing.miles=1;}
+  var work=(s.services&&s.services.length?s.services.join(', '):(s.title||'')).slice(0,160);
+  if(work){setVal('svc-note',work);SS.filled.note=1;}else SS.missing.note=1;
+  if(s.amount!=null&&s.amount>=0){setVal('svc-cost',String(s.amount));SS.filled.cost=1;}else{setVal('svc-cost','');SS.missing.cost=1;}
+  for(var k in SS_F){if(SS.filled[k]){ssTag(k,'ai');n++;}else if(SS.missing[k])ssTag(k,'miss');}
+  try{updateServiceNext();}catch(e){}
+  var miss=Object.keys(SS.missing).length;
+  var t=document.getElementById('ss-done-sub');if(t)t.textContent=n+' of 5 filled'+(miss?'. Fill in the red one'+(miss>1?'s':'')+', then save.':'. Check and save.');
+  ssShow('done','');
+}
+function ssEdited(e){var t=e&&e.target;if(!t)return;for(var k in SS_F)if(SS_F[k]===t.id&&SS.missing[k]&&String(t.value||'').trim()){delete SS.missing[k];ssTag(k,null);}}
+async function ssAttach(v,sid,file,scan){
+  var name=((scan&&scan.title)||'Service receipt').slice(0,120);
+  var d={id:uid(),vehicleId:v.id,clientId:v.clientId,type:'service',name:name,expiry:'',notes:'Receipt for service on '+fmtDate(val('svc-date')||todayISO()),_file:file,by:myId()};
+  try{await docUpload(d);}catch(e){showToast('Service saved, but the receipt could not be attached: '+friendlyError(e),'error');return;}
+  var row={service_record_id:sid};
+  if(scan){row.doc_category=scan.category||'receipt';row.doc_date=scan.doc_date||null;row.vendor=scan.vendor||null;row.mileage=scan.mileage==null?null:scan.mileage;
+    row.amount=scan.amount==null?null:scan.amount;row.services=scan.services||[];row.ai_status='scanned';row.ai_summary=String(scan.summary||'').slice(0,600)||null;
+    row.ai_confidence=scan.confidence==null?null:Math.max(0,Math.min(1,+scan.confidence));row.ai_model=scan.model||null;row.scanned_at=new Date().toISOString();}
+  for(var a=0;a<4;a++){
+    var r=await sb.from('documents').update(row).eq('id',d.id);
+    if(!(r&&r.error))break;
+    if(docAiMissingCol(r.error)&&row.ai_status){row={service_record_id:sid};continue;}
+    await new Promise(function(z){setTimeout(z,1200);});
+  }
+  try{var sl=v.serviceLog||[];for(var i=0;i<sl.length;i++)if(sl[i]&&sl[i].id===sid)sl[i].docId=d.id;}catch(e){}
+  try{audit('document.added','Receipt attached to service for '+vName(v)+': '+name,{clientId:v.clientId,vehicleId:v.id});}catch(e){}
+  try{await loadAll();refreshCurrent();}catch(e){}
+  showToast('Receipt saved to the service and documents','success');
+}
+var _ssOpen=openServiceModal;
+openServiceModal=function(){var r=_ssOpen.apply(this,arguments);ssReset();return r;};
+var _ssSave=saveService;
+saveService=function(){
+  var vid=val('svc-vehicle'),v0=byId(getVehicles(),vid),n0=v0&&v0.serviceLog?v0.serviceLog.length:0,file=SS.file,scan=SS.scan;
+  if(SS.busy){showToast('Still reading the receipt...','error');return;}
+  var r=_ssSave.apply(this,arguments);
+  var v=byId(getVehicles(),vid),sl=v&&v.serviceLog||[];
+  if(file&&v&&sl.length>n0){var sid=sl[sl.length-1].id;SS.file=null;SS.scan=null;ssAttach(v,sid,file,scan);}
+  return r;
+};
+document.addEventListener('input',ssEdited,true);document.addEventListener('change',ssEdited,true);
+// ===== v33 (p33): "Which portfolio?" import step - approved mockup pf-04 (Option B, Oct 25).
+// Adds on top of p20/p24: one portfolio -> preselected with a clear "goes into X" line; the chosen
+// portfolio is always valid (falls back to the default); ZAR (South Africa) in the new-portfolio
+// currency list; picking a country sets its currency. Portfolio rows need migration_013 (+021 for
+// ZAR purchase prices). Without 013 the app keeps one implicit portfolio and this step only confirms it.
+var PF_CUR_LIST=['USD','EUR','GBP','ZAR'];
+var PF_COUNTRY_CUR={US:'USD',CA:'USD',GB:'GBP',ZA:'ZAR',IE:'EUR',DE:'EUR',FR:'EUR',IT:'EUR',ES:'EUR',NL:'EUR',MC:'EUR'};
+function pfImValid(owner,id){var l=poList(owner);for(var i=0;i<l.length;i++)if(l[i].id===id)return l[i];return null;}
+function pfImEnsure(){if(!IM.owner||IM.newPf)return;if(!pfImValid(IM.owner,IM.pfId))IM.pfId=poDefault(IM.owner).id;}
+function pfImSetCountry(c){if(!IM.newPf)return;IM.newPf.country=c||'';var cu=PF_COUNTRY_CUR[IM.newPf.country];if(cu)IM.newPf.currency=cu;imRender();}
+var pfImStep2Base=imStep2;
+imStep2=function(){
+  pfImEnsure();
+  var h=pfImStep2Base();
+  if(IM.owner&&!IM.newPf){var l=poList(IM.owner);
+    if(l.length===1){var nm=imE(l[0].name);
+      h=h.replace('<p class="im-lead">Choose where these vehicles go.</p>','<p class="im-lead pf-only">You have one portfolio, so these vehicles go into <b>'+nm+'</b>.'+(PO.on?' Or start a new one below.':'')+'</p>');}
+  }
+  // currency list with ZAR, country picks currency
+  h=h.replace(/<select id="im-np-cur"([^>]*)>[\s\S]*?<\/select>/,function(m,a){var np=IM.newPf||{};return '<select id="im-np-cur"'+a+'>'+PF_CUR_LIST.map(function(c){return '<option'+(c===np.currency?' selected':'')+'>'+c+'</option>';}).join('')+'</select>';});
+  h=h.replace('id="im-np-country" class="im-in" onchange="IM.newPf.country=this.value"','id="im-np-country" class="im-in" onchange="pfImSetCountry(this.value)"');
+  return h;
+};
+var pfImToReviewBase=imToReview;
+imToReview=async function(){pfImEnsure();return pfImToReviewBase();};
 
 </script>
 </body>
