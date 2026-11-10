@@ -1,0 +1,14 @@
+const L=require('./lib.js');
+(async()=>{await L.launch();
+const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1';
+let r={};
+let p=await L.open({pre:`Object.defineProperty(navigator,'userAgent',{get:()=>${JSON.stringify(UA)}});`});await L.sleep(400);
+r.iosSafariHint=await p.evaluate(()=>document.getElementById('a2hs-card').style.display!=='none');await p.close();
+p=await L.open({pre:`Object.defineProperty(navigator,'userAgent',{get:()=>${JSON.stringify(UA)}});Object.defineProperty(navigator,'standalone',{get:()=>true});`});await L.sleep(400);
+r.iosStandaloneHint=await p.evaluate(()=>document.getElementById('a2hs-card').style.display!=='none');
+r.meta=await p.evaluate(()=>({cap:document.querySelector('meta[name=apple-mobile-web-app-capable]').content,title:document.querySelector('meta[name=apple-mobile-web-app-title]').content,bar:document.querySelector('meta[name=apple-mobile-web-app-status-bar-style]').content,theme:document.querySelector('meta[name=theme-color]').content,vp:document.querySelector('meta[name=viewport]').content,manifest:document.querySelector('link[rel=manifest]').getAttribute('href'),touch:document.querySelector('link[rel=apple-touch-icon]').getAttribute('href')}));
+await L.sleep(1500);
+r.sw=await p.evaluate(async()=>{const regs=await navigator.serviceWorker.getRegistrations();return regs.map(x=>x.scope+' '+(x.active?x.active.state:'?'));});
+r.cached=await p.evaluate(async()=>{const ks=await caches.keys();const c=await caches.open(ks[0]);return (await c.keys()).map(x=>x.url.replace(location.origin,''));});
+r.net=await p.evaluate(async()=>{const m=await (await fetch('manifest.webmanifest')).json();const res=[];for(const i of m.icons){const x=await fetch(i.src);res.push(i.src+':'+x.status);}return {name:m.name,display:m.display,icons:res};});
+console.log(JSON.stringify(r,null,1));await L.close();})();

@@ -1,0 +1,17 @@
+.cb-box{border:4px solid #E5484D;border-radius:14px;padding:14px 16px;margin:8px 0 6px;background:rgba(229,72,77,.10)}
+.cb-box.ok{border:2px solid rgba(201,170,107,.7);background:rgba(201,170,107,.06)}
+.cb-amt{font-size:30px;font-weight:700;color:#FFFFFF;letter-spacing:.2px;line-height:1.2;word-break:break-word}
+.cb-why{font-size:18px;font-weight:700;color:#FF9C9F;margin-top:6px}
+.cb-ask{font-size:16px;color:#F2F0EB;margin-top:4px}
+.cb-ok{font-size:17px;font-weight:600;color:#C9AA6B;margin-top:6px}
+.cb-row{display:flex;gap:8px}.cb-row select{flex:0 0 96px}.cb-row input{flex:1;font-size:20px}
+.cb-cap{margin-top:10px}
+.im-pair.one{grid-template-columns:1fr}
+.im-state.cb-need,.cb-need-bar{color:#FF9C9F;font-weight:700;font-size:16px}
+.cb-need-bar{text-align:center;padding:9px 12px;margin:0 0 10px;background:#2A1214;border:2px solid #E5484D;border-radius:12px;color:#FFD2D3;font-weight:600}
+.cb-acts{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}.cb-acts .btn{flex:1 1 140px;min-height:48px;font-size:16px}
+#cb-form .cb-amt{font-size:28px}
+input.cb-in-bad{border:3px solid #E5484D!important}
+.cb-page{margin:4px 0 12px}.cb-page .cb-box{margin:6px 0}
+.ms-row.cb-row-flag .ms-val{color:#FF9C9F}
+.im-kv.cb-kv span,.im-kv.cb-kv b{color:#FF9C9F}

@@ -1,0 +1,92 @@
+// v27 simple secure sign-up: short code invite sheet, link landing, email OTP, success, admin view-as message. Mocked backend.
+const L=require('./lib.js');
+let pass=0,fail=0;
+function ok(c,m){if(c){pass++;console.log('  ok   '+m);}else{fail++;console.log('  FAIL '+m);}}
+const SC='/workspace/vehicle-app/cloud/screens/';
+const CODE='K7QM4XPA';
+const SETUP=function(CODE){
+  var S=window.__MOCK_STATE__;
+  var ci=S.rpcHandlers.create_invite,rd=S.rpcHandlers.redeem_invite;
+  S.rpcHandlers.create_invite=function(a){var r=ci(a);r.data[0].code=CODE;r.data[0].expires_at=new Date(Date.now()+7*864e5).toISOString();return r;};
+  S.rpcHandlers.redeem_invite=function(a){if(a.p_code===CODE)return {data:{kind:'client_owner'},error:null};return rd(a);};
+};
+const OTP=function(){
+  var S=window.__MOCK_STATE__;S.otp=[];
+  sb.auth.signInWithOtp=function(c){S.otp.push(c);S.emails.push({type:'otp',to:c.email,redirect:c.options&&c.options.emailRedirectTo});return Promise.resolve({data:{},error:null});};
+  sb.auth.verifyOtp=function(c){
+    if(c.token!=='123456')return Promise.resolve({data:null,error:{message:'Token has expired or is invalid'}});
+    var id='e0000000-0000-4000-a000-000000000077',last=S.otp[S.otp.length-1];
+    S.tables.profiles.push({id:id,role:'owner',display_name:(last.options.data.display_name)||'New',email:c.email});
+    S.users.push({id:id,email:c.email,confirmed:true,meta:last.options.data});
+    S.session={access_token:'t',user:{id:id,email:c.email,user_metadata:last.options.data}};S.emit('SIGNED_IN');
+    return Promise.resolve({data:{user:S.session.user,session:S.session},error:null});};
+};
+(async()=>{
+await L.launch();
+console.log('1) tech creates an invite: short code + link + share options');
+let p=await L.open({});await p.evaluate(SETUP,CODE);
+await L.login(p,'tom@test.com');
+await p.evaluate(async()=>{var row=await createInviteRpc('client_owner',null,'new.owner@test.com',null);showInviteResult({id:row.invite_id,code:row.code,expires:row.expires_at,title:'Invite a client',who:'new.owner@test.com',help:'Send it by text or email.',email:'new.owner@test.com'});});
+await L.sleep(400);
+const sheet=await p.evaluate(()=>({code:document.getElementById('invite-code-text').textContent,link:document.getElementById('su-link').textContent,share:!!document.getElementById('su-share'),copy:!!document.getElementById('su-copy'),mail:document.getElementById('sx-email').getAttribute('href')}));
+ok(sheet.code==='K7QM-4XPA','code shown as XXXX-XXXX: '+sheet.code);
+ok(/\/cloud\/\?invite=K7QM4XPA$/.test(sheet.link),'link is .../cloud/?invite=CODE: '+sheet.link);
+ok(sheet.share&&sheet.copy,'Share via text and Copy link buttons');
+ok(/^mailto:new\.owner@test\.com\?/.test(sheet.mail)&&/invite%3DK7QM4XPA/.test(sheet.mail),'Send email opens mail app with the link: '+String(sheet.mail).slice(0,60));
+ok(await p.evaluate(()=>/^[A-HJ-KMNP-Z2-9]{8}$/.test(codeKey('k7qm-4xpa'))),'pasted lowercase/dashed code normalizes');
+await p.screenshot({path:SC+'su-01-invite-sheet.png'});
+ok(!p.errors.length,'no page errors: '+p.errors.join('|'));
+await p.close();
+
+console.log('2) link landing -> email code -> success');
+p=await L.open({q:'?invite=k7qm-4xpa'});await p.evaluate(SETUP,CODE);await p.evaluate(OTP);await L.sleep(700);
+ok(await p.evaluate(()=>window.location.search===''),'?invite removed from address bar');
+ok(await p.evaluate(()=>!!document.getElementById('su-landing')&&val('sl-code')==='K7QM-4XPA'),'landing shows with code prefilled');
+await p.evaluate(()=>{var t=document.getElementById('toast-container');if(t)t.style.display='none';});
+await p.screenshot({path:SC+'su-02-link-landing.png'});
+await p.evaluate(()=>{setVal('sl-name','Nina New');setVal('sl-email','Nina.New@test.com');suSendCode();});await L.sleep(300);
+let st=await p.evaluate(()=>window.__MOCK_STATE__.otp);
+ok(st.length===1&&st[0].email==='nina.new@test.com'&&st[0].options.shouldCreateUser===true,'signInWithOtp called with normalized email');
+ok(st[0].options.data.pending_invite===CODE&&/invite=K7QM4XPA/.test(st[0].options.emailRedirectTo),'magic link carries the invite; code saved in metadata');
+ok(await p.evaluate(()=>document.getElementById('sl-step-code').style.display!=='none'),'6-digit code step shown');
+await p.evaluate(()=>suSendCode(true));await L.sleep(200);
+ok((await p.evaluate(()=>window.__MOCK_STATE__.otp.length))===1&&/wait/i.test(await p.evaluate(()=>document.getElementById('sl-msg').textContent)),'resend is rate-limited (60 s)');
+await p.evaluate(()=>{setVal('sl-otp','123456');suSay('');});
+await p.screenshot({path:SC+'su-03-email-code.png'});
+await p.evaluate(()=>{setVal('sl-otp','000000');suVerify();});await L.sleep(300);
+ok(/did not work|expired/.test(await p.evaluate(()=>document.getElementById('sl-msg').textContent)),'wrong code -> clear error');
+await p.evaluate(()=>{setVal('sl-otp','123456');suVerify();});await L.sleep(2000);
+let s=await L.state(p);
+ok(s.rpcs.some(r=>r.name==='redeem_invite'&&r.args.p_code===CODE),'invite auto-redeemed after sign-in');
+ok(await p.evaluate(()=>document.getElementById('auth-screen').style.display==='none'),'user is in the app');
+ok(await p.evaluate(()=>!!document.getElementById('evo-sheet')&&/Welcome to EvoAI/.test(document.getElementById('evo-sheet').innerText)),'success sheet shown');
+ok(await p.evaluate(()=>localStorage.getItem('evo_pending_invite')===null),'pending code cleared');
+await p.evaluate(()=>{var t=document.getElementById('toast-container');if(t)t.style.display='none';});
+await p.screenshot({path:SC+'su-04-success.png'});
+ok(!p.errors.length,'no page errors: '+p.errors.join('|'));
+await p.close();
+
+console.log('2b) server-side {error} from migration_019 maps to a normal error');
+p=await L.open({});await p.evaluate(SETUP,CODE);await L.login(p,'dana@test.com');
+await p.evaluate(()=>{window.__MOCK_STATE__.rpcHandlers.redeem_invite=function(){return {data:{error:'too_many_attempts'},error:null};};});
+await p.evaluate(()=>{var i=document.createElement('input');i.id='tc';i.value='ABCD-EFGH';document.body.appendChild(i);var m=document.createElement('div');m.id='tc-msg';document.body.appendChild(m);redeemCodeFrom('tc','tc-msg');});await L.sleep(500);
+ok(/Too many tries/.test(await p.evaluate(()=>document.getElementById('tc-msg').textContent)),'rate-limit message shown');
+await p.close();
+console.log('3) admin in View as Owner: Redeem explains how to test');
+p=await L.open({});await p.evaluate(SETUP,CODE);
+await L.login(p,'wade@evo.test');
+await p.evaluate(()=>setViewAs('owner'));await L.sleep(500);
+await p.evaluate(()=>openAccountModal());await L.sleep(300);
+await p.evaluate(c=>{setVal('acct-code',c);redeemCodeFrom('acct-code','acct-code-msg');},'K7QM-4XPA');await L.sleep(400);
+s=await L.state(p);
+ok(!s.rpcs.some(r=>r.name==='redeem_invite'),'no redeem call as admin');
+const am=await p.evaluate(()=>document.getElementById('su-admin-msg')&&document.getElementById('su-admin-msg').textContent);
+ok(/You're signed in as admin\. To test sign-up, open this link in a private tab or on another device/.test(am||''),'admin message: '+am);
+ok(await p.evaluate(()=>!!document.getElementById('su-admin-copy')&&/invite=K7QM4XPA/.test(document.getElementById('evo-sheet').innerText)),'Copy link button with the invite link');
+await p.screenshot({path:SC+'su-05-admin-mode.png'});
+ok(!p.errors.length,'no page errors: '+p.errors.join('|'));
+await p.close();
+await L.close();
+console.log('signup.js: '+pass+' passed, '+fail+' failed');
+process.exit(fail?1:0);
+})().catch(e=>{console.error(e);process.exit(1);});

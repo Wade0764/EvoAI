@@ -1,0 +1,64 @@
+<div id="boot-loading" style="display:none;"><div class="boot-card"><div class="auth-logo" style="margin:0 0 20px;"><i class="evo-lockup evo-lockup-sm" role="img" aria-label="EvoAI"></i></div><div class="boot-spin"></div><div id="boot-loading-text" class="doc-meta" style="margin-top:14px;">Opening your collection...</div></div></div>
+<div id="net-banner" role="status" style="display:none;">You are offline. Changes will not save until you reconnect.</div>
+<div id="sync-badge" role="status" style="display:none;">Saving...</div>
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo"><i class="evo-lockup" role="img" aria-label="EvoAI"></i></div>
+    <div class="auth-title">Your collection, in order.</div>
+    <div class="auth-tag">Private records for high-end vehicle collections: values, service, documents and reminders.</div>
+    <div class="role-select">
+      <button class="role-btn active" id="role-advisor" onclick="selectRole('advisor')">Advisor / Tech</button>
+      <button class="role-btn" id="role-client" onclick="selectRole('client')">Owner</button>
+    </div>
+    <div id="auth-login-panel">
+      <div class="input-group"><label>Email</label><input type="email" id="auth-email" placeholder="you@evolvedetail.com" autocomplete="username" autocapitalize="none"></div>
+      <div class="input-group"><label>Password</label><input type="password" id="auth-password" placeholder="Enter password" autocomplete="current-password" onkeydown="authKey(event)"></div>
+      <div class="auth-error" id="auth-error"></div>
+      <button class="btn btn-primary w-full" id="auth-login-btn" onclick="login()">Sign in</button>
+      <div class="auth-note" id="auth-resend-wrap" style="display:none;">Did not get the email? <span class="auth-link" onclick="resendConfirm()">Send it again</span></div>
+      <div class="auth-note"><span class="auth-link" onclick="showForgot(true)">Forgot password?</span></div>
+      <div class="auth-note" id="auth-signup-link-wrap">New here? <span class="auth-link" onclick="showSignup(true)">Create an account</span></div>
+    </div>
+    <div id="auth-signup-panel" style="display:none;">
+      <div class="input-group"><label>Full name</label><input type="text" id="su-name" placeholder="Your full name" autocomplete="name"></div>
+      <div class="input-group"><label>Email</label><input type="email" id="su-email" placeholder="you@email.com" autocomplete="username" autocapitalize="none"></div>
+      <div class="input-group"><label>Password (min 8 characters)</label><input type="password" id="su-password" placeholder="Create password" autocomplete="new-password"></div>
+      <div class="input-group"><label id="su-code-label">Invite code (optional)</label><input type="text" id="su-code" placeholder="EVO-XXXX-XXXX" autocapitalize="characters" autocomplete="off"></div>
+      <div class="auth-error" id="su-error"></div>
+      <button class="btn btn-primary w-full" id="su-btn" onclick="signupOwner()">Create account</button>
+      <div class="auth-note"><span class="auth-link" onclick="showSignup(false)">Back to sign in</span></div>
+    </div>
+    <div id="auth-confirm-panel" style="display:none;">
+      <div class="auth-title" style="font-size:26px;">Check your email</div>
+      <div class="auth-note" style="margin-top:0;">We sent a confirmation link to <b id="confirm-email-label"></b>. Open it on this device to finish creating your account, then come back and sign in.</div>
+      <div class="auth-note">If it does not arrive in a minute, check your spam folder.</div>
+      <div class="auth-note"><span class="auth-link" onclick="resendFromConfirm()">Send it again</span> &nbsp;/&nbsp; <span class="auth-link" onclick="showSignup(false)">Back to sign in</span></div>
+    </div>
+    <div id="auth-forgot-panel" style="display:none;">
+      <div class="auth-note" style="margin-top:0;margin-bottom:14px;">Enter your email and we will send a link to choose a new password.</div>
+      <div class="input-group"><label>Email</label><input type="email" id="fg-email" placeholder="you@email.com" autocomplete="username" autocapitalize="none"></div>
+      <div class="auth-error" id="fg-msg"></div>
+      <button class="btn btn-primary w-full" onclick="sendReset()">Send reset link</button>
+      <div class="auth-note"><span class="auth-link" onclick="showForgot(false)">Back to sign in</span></div>
+    </div>
+    <div id="auth-newpw-panel" style="display:none;">
+      <div class="auth-title" style="font-size:26px;">Choose a new password</div>
+      <div class="input-group"><label>New password (min 8 characters)</label><input type="password" id="np-new" autocomplete="new-password"></div>
+      <div class="input-group"><label>Confirm password</label><input type="password" id="np-confirm" autocomplete="new-password"></div>
+      <div class="auth-error" id="np-error"></div>
+      <button class="btn btn-primary w-full" onclick="saveNewPassword()">Save password</button>
+    </div>
+    <div id="auth-retry-panel" style="display:none;">
+      <div class="auth-title" style="font-size:26px;">We could not reach EVOai</div>
+      <div class="auth-note" style="margin-top:0;margin-bottom:16px;" id="retry-msg">Please check your connection.</div>
+      <button class="btn btn-primary w-full" onclick="retryBoot()">Try again</button>
+      <div class="auth-note"><span class="auth-link" onclick="forceLogout()">Sign out</span></div>
+    </div>
+    <div id="a2hs-card" class="pwa-hint" style="display:none;">
+      <button class="pwa-x" onclick="dismissA2HS()" aria-label="Dismiss">&#10005;</button>
+      <div class="lab" style="margin-bottom:6px;">Add to Home Screen</div>
+      <div class="doc-meta">For the full-screen app experience on iPhone: tap the <b>Share</b> button in Safari, then <b>Add to Home Screen</b>.</div>
+    </div>
+    <div class="auth-note">Your records are stored securely in your private EVOai account and protected by sign-in.</div>
+  </div>
+</div>

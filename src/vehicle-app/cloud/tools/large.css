@@ -1,0 +1,39 @@
+/* ===== v15 larger type, contrast, tap targets, gold ring loader ===== */
+:root{--text-secondary:#C9CCD1;--text-muted:#B3B7BE}
+/* brand */
+.evo-lockup{width:260px;max-width:76%}
+.evo-lockup-sm{width:200px}
+.evo-lockup-nt{aspect-ratio:440/604;background-size:100% auto!important;background-position:50% 0!important}
+.evo-tag{margin-top:10px;font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:#E6CF9C;font-weight:500;padding-left:.42em}
+.sidebar-brand .evo-mark{width:60px;height:60px}
+/* ring loader */
+.evo-spin{position:relative;display:inline-block;overflow:hidden;border-radius:50%;width:44px;height:44px;flex:none;vertical-align:middle}
+.evo-spin .evr-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.evo-spin .evo-o{position:absolute;left:11.5%;top:11.5%;width:77%;height:77%;border-radius:50%;
+  background-image:var(--evo-lockup-img);background-size:126.44% auto;background-position:48.9% 16.04%;background-repeat:no-repeat}
+.evo-spin .evr-svg{transform-origin:50% 50%;animation:evrrot 16s linear infinite}
+.evr-s{animation:evrpulse 1.68s ease-in-out infinite;opacity:.42}
+@keyframes evrrot{to{transform:rotate(360deg)}}
+@keyframes evrpulse{0%,100%{opacity:.42}18%{opacity:1}40%{opacity:.6}}
+@media (prefers-reduced-motion:reduce){.evo-spin .evr-svg{animation:evrbreathe 2.4s ease-in-out infinite}.evr-s{animation:none;opacity:1}}
+@keyframes evrbreathe{50%{opacity:.6}}
+.evo-spin-lg{width:min(220px,58vw);height:min(220px,58vw)}
+.evo-spin-sm{width:26px;height:26px;margin-right:10px;vertical-align:-7px}
+/* splash */
+#boot-loading .boot-card{width:auto!important;max-width:100%!important;display:flex;flex-direction:column;align-items:center;padding:0 24px}
+.evo-boot{display:flex;flex-direction:column;align-items:center}
+.evo-wm{display:block;width:min(240px,64vw);aspect-ratio:440/124;margin-top:22px;background-image:var(--evo-lockup-img);background-size:100% auto;background-position:50% 92.9%;background-repeat:no-repeat}
+.boot-text{margin-top:26px!important;font-size:18px!important;color:var(--text-secondary)!important;letter-spacing:.01em}
+/* replace old thin spinners */
+.boot-spin{display:none!important}
+.ai-spin.evo-spin,.dai-spin.evo-spin{border:0;animation:none;border-radius:0;width:26px;height:26px;margin-right:10px;vertical-align:-7px}
+/* tap targets */
+button,.btn,.pfg-chip,.pfg-btn,.pfg-zoom,.role-btn,.auth-link,.sidebar-logout,.fb-btn,select{min-height:44px}
+.pfg-zoom{min-width:44px}
+.auth-link{display:inline-flex;align-items:center}
+.sidebar-logout{display:inline-flex;align-items:center}
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]){min-height:46px}
+#due-banner-text{display:block;min-height:44px;padding:10px 0;cursor:pointer;flex:1}
+.pfa-pick{flex-wrap:wrap}.pfa-pick span{white-space:nowrap}@media (max-width:520px){.pfa-pick em{flex-basis:100%;margin-left:32px;letter-spacing:.04em}}
+.whl-op span{letter-spacing:.08em;white-space:nowrap}.whl-lvchip{text-transform:none;letter-spacing:.02em;white-space:nowrap;max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis}
+.nav-item{min-height:48px}.sh a[onclick]{display:inline-flex;align-items:center;min-height:44px;padding:0 4px}

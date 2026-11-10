@@ -1,0 +1,65 @@
+// v19: Replica / Kit car toggle visible in the Add vehicle form (main grid, not inside "More details") and in Edit. Mocked backend.
+const L=require('./lib.js');
+const SC='/workspace/vehicle-app/cloud/screens/';
+let pass=0,fail=0;const ok=(c,m)=>{if(c){pass++;console.log('  ok   '+m);}else{fail++;console.log('  FAIL '+m);}};
+const V1='d0000000-0000-4000-a000-000000000011';
+const PRE=`try{if(!sessionStorage.__c){localStorage.clear();sessionStorage.__c=1;}localStorage.setItem('pwa_hint_dismissed','1')}catch(e){};
+(function(){var C=window.__SCHEMA_COLS__;C.vehicles.push('is_replica','builder');(window.__MOCK_STATE__.tables.vehicles||[]).forEach(function(v){v.is_replica=false;v.builder=null;});
+ C.vehicle_owner_values=['vehicle_id','owner_id','owner_value','owner_value_set_at','set_by','created_at','updated_at'];})();`;
+const T=p=>p.evaluate(()=>window.__MOCK_STATE__.tables);
+const vis=p=>p.evaluate(()=>{var g=document.getElementById('v-replica-group');if(!g)return null;var r=g.getBoundingClientRect(),n=g.querySelector('.vr-name'),l=g.querySelector('.vr-tgl');
+  return {shown:r.height>0&&getComputedStyle(g).display!=='none',inMore:!!g.closest('#v-more'),inDetails:!!g.closest('details'),fs:parseFloat(getComputedStyle(n).fontSize),h:l.getBoundingClientRect().height,
+   help:(g.querySelector('.vr-help')||{}).textContent||'',label:n.textContent,role:document.getElementById('v-replica').getAttribute('role')};});
+(async()=>{
+await L.launch();
+const p=await L.open({pre:PRE,w:390,h:844});
+await L.login(p,'olivia@test.com');await L.sleep(600);
+// ---- Add form
+await p.evaluate(()=>openAddVehicleModal());await L.sleep(400);
+let s=await vis(p);
+ok(s&&s.shown,'Add form: Replica / Kit car row visible without opening anything');
+ok(s&&!s.inMore&&!s.inDetails,'Add form: row is not inside a collapsed <details>');
+ok(s&&s.label==='Replica / Kit car','label text "Replica / Kit car"');
+ok(s&&s.fs>=17,'label font >= 17px ('+(s&&s.fs)+')');
+ok(s&&s.h>=48,'tap target >= 48px ('+(s&&s.h)+')');
+ok(s&&/replica/i.test(s.help),'short helper text');
+ok(s&&s.role==='switch','role=switch');
+ok(await p.evaluate(()=>getComputedStyle(document.getElementById('v-builder-row')).display==='none'),'Builder hidden while off');
+await p.evaluate(()=>{document.getElementById('v-replica-group').scrollIntoView({block:'center'});});await L.sleep(200);
+await p.screenshot({path:SC+'rp-01-add-switch-off-390.png'});
+await p.click('label.vr-tgl-lg');await L.sleep(200);
+ok(await p.evaluate(()=>document.getElementById('v-replica').checked),'tapping the row turns the switch on');
+ok(await p.evaluate(()=>getComputedStyle(document.getElementById('v-builder-row')).display!=='none'),'Builder field appears when on');
+const before=(await T(p)).vehicles.map(v=>v.id);
+await p.evaluate(()=>{var sel=document.getElementById('v-client');if(sel&&!sel.value&&sel.options.length>1)sel.selectedIndex=1;
+  setVal('v-year','1958');setVal('v-make','Porsche');setVal('v-model','550 Spyder');setVal('v-builder','JPS Motorsport');});
+await p.evaluate(()=>{document.getElementById('v-builder').scrollIntoView({block:'center'});});await L.sleep(200);
+await p.screenshot({path:SC+'rp-02-add-switch-on-builder-390.png'});
+await p.evaluate(()=>saveVehicle());await L.sleep(1800);
+let t=await T(p);const nw=t.vehicles.filter(v=>before.indexOf(v.id)<0)[0];
+ok(!!nw,'Add: new vehicle inserted');
+ok(nw&&nw.is_replica===true&&nw.builder==='JPS Motorsport','Add: is_replica=true + builder saved to vehicles '+JSON.stringify(nw&&{r:nw.is_replica,b:nw.builder}));
+ok(nw&&/JPS Motorsport/.test(nw.notes||''),'Add: replica mirrored in notes extras (fallback without migration_009)');
+// ---- Edit form
+await p.evaluate(i=>openVehicleDetail(i),V1);await L.sleep(500);
+await p.evaluate(()=>editCurrentVehicle());await L.sleep(400);
+s=await vis(p);
+ok(s&&s.shown&&!s.inDetails,'Edit form: row visible in the main Vehicle section');
+ok(await p.evaluate(()=>!document.getElementById('v-replica').checked),'Edit: off for an original car');
+await p.evaluate(()=>{document.getElementById('v-replica-group').scrollIntoView({block:'center'});});await L.sleep(200);
+await p.screenshot({path:SC+'rp-03-edit-switch-390.png'});
+await p.click('label.vr-tgl-lg');await L.sleep(150);
+await p.evaluate(()=>{setVal('v-builder','Beck');saveVehicle();});await L.sleep(1500);
+t=await T(p);const r=t.vehicles.filter(v=>v.id===V1)[0];
+ok(r&&r.is_replica===true&&r.builder==='Beck','Edit: is_replica + builder saved');
+await p.evaluate(i=>{openVehicleDetail(i);editCurrentVehicle();},V1);await L.sleep(500);
+ok(await p.evaluate(()=>document.getElementById('v-replica').checked&&document.getElementById('v-builder').value==='Beck'),'Edit reopens with switch on + builder');
+await p.evaluate(()=>{document.getElementById('v-replica-group').scrollIntoView({block:'center'});});await L.sleep(200);
+await p.screenshot({path:SC+'rp-04-edit-switch-on-390.png'});
+await p.evaluate(()=>openAddVehicleModal());await L.sleep(300);
+ok(await p.evaluate(()=>!document.getElementById('v-replica').checked&&getComputedStyle(document.getElementById('v-builder-row')).display==='none'),'Add resets the switch after an edit');
+const v=(await L.state(p)).v;ok(v.length===0,'no schema violations '+JSON.stringify(v).slice(0,200));
+ok(p.errors.length===0,'no page errors '+JSON.stringify(p.errors).slice(0,300));
+await p.close();await L.close();
+console.log('REPLICA_ADD: '+pass+' passed, '+fail+' failed');process.exit(fail?1:0);
+})().catch(e=>{console.error(e);process.exit(1);});

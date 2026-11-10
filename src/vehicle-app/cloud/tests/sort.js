@@ -1,0 +1,56 @@
+// v29 Sort by: button under the carousel, sheet with 6 options, per user + portfolio memory, move mode keeps My order, client list sorted. Mocked backend.
+const L=require('./lib.js');
+let pass=0,fail=0;
+function ok(c,m){if(c){pass++;console.log('  ok   '+m);}else{fail++;console.log('  FAIL '+m);}}
+const SC='/workspace/vehicle-app/cloud/screens/';
+const O='b0000000-0000-4000-a000-000000000002';
+const hide=p=>p.evaluate(()=>{var t=document.getElementById('toast-container');if(t)t.style.display='none';});
+const SETUP=function(O){var S=window.__MOCK_STATE__,T=function(n){return S.tables[n]||(S.tables[n]=[]);};
+  if(!T('vehicles').some(function(v){return v.id==='d0000000-0000-4000-a000-000000000099';}))
+    T('vehicles').push({id:'d0000000-0000-4000-a000-000000000099',owner_id:O,year:1995,make:'Acura',model:'NSX',color:'Red',mileage:60000,archived:false,notes:'',created_at:'2026-05-01T00:00:00Z',updated_at:'2026-05-01T00:00:00Z'});};
+const PRE="try{if(!sessionStorage.__c){localStorage.clear();sessionStorage.__c=1;}}catch(e){}";
+const order=(p,sel)=>p.evaluate(sel=>[].map.call(document.querySelectorAll(sel),function(e){var t=e.textContent;return /NSX/.test(t)?'NSX':/Corvette/.test(t)?'Vette':/911/.test(t)?'911':'?';}).filter(function(x){return x!=='?';}),sel);
+const WH='.whl-ring > *';
+(async()=>{
+await L.launch();
+let p=await L.open({pre:PRE});await p.evaluate(SETUP,O);await L.login(p,'olivia@test.com');await L.sleep(600);
+console.log('1) button + sheet');
+const host=await p.evaluate(()=>{var b=document.querySelector('.st-btn');return b?b.parentNode.id:null;});
+ok(!!host,'Sort button under the carousel ('+host+')');
+ok(await p.evaluate(()=>{var b=document.querySelector('.st-btn'),h=b.parentNode.querySelector('.ph-hint');return b.textContent==='Sort: My order'&&!!h&&!!(h.compareDocumentPosition(b)&4);}),'shows "Sort: My order", right after the hold hint');
+ok(await p.evaluate(()=>{var s=getComputedStyle(document.querySelector('.st-btn'));return parseFloat(s.fontSize)>=16&&s.color!=='rgb(128, 128, 128)';}),'large gold text');
+const mine=await order(p,'#'+host+' '+WH);
+await p.evaluate(()=>document.querySelector('.st-btn').scrollIntoView({block:'center'}));await hide(p);await p.screenshot({path:SC+'st-01-button.png'});
+await p.evaluate(()=>document.querySelector('.st-btn').click());await L.sleep(400);
+ok(await p.evaluate(()=>{var o=[].map.call(document.querySelectorAll('#evo-sheet .st-opt'),function(e){return e.getAttribute('data-k');});return o.join()==='my,year_desc,year_asc,name,added,value'&&document.querySelector('#evo-sheet .st-opt.on').getAttribute('data-k')==='my';}),'6 options, My order checked');
+ok(await p.evaluate(()=>getComputedStyle(document.querySelector('.st-opt:not(.on)')).color==='rgb(255, 255, 255)'),'white option text');
+await hide(p);await p.screenshot({path:SC+'st-02-sheet.png'});
+console.log('2) sorting');
+await p.evaluate(()=>stPick('year_desc'));await L.sleep(500);
+ok((await order(p,'#'+host+' '+WH)).join()==='911,NSX,Vette','Year newest first');
+ok(await p.evaluate(()=>document.querySelector('.st-btn').textContent==='Sort: Year \u2193'),'button reads "Sort: Year ↓"');
+ok(await p.evaluate(()=>Object.keys(localStorage).some(function(k){return k.indexOf('evo_sort_b0000000-0000-4000-a000-000000000002_')===0&&localStorage[k]==='year_desc';})),'saved per user + portfolio');
+await L.sleep(1200);await p.evaluate(()=>document.querySelector('.st-btn').scrollIntoView({block:'center'}));await L.sleep(400);await hide(p);await p.screenshot({path:SC+'st-03-sorted.png'});
+await p.evaluate(()=>{ST_CUR=document.querySelector('.st-btn').getAttribute('data-key');stPick('year_asc');});await L.sleep(400);
+ok((await order(p,'#'+host+' '+WH)).join()==='Vette,NSX,911','Year oldest first');
+await p.evaluate(()=>{ST_CUR=document.querySelector('.st-btn').getAttribute('data-key');stPick('name');});await L.sleep(400);
+ok((await order(p,'#'+host+' '+WH)).join()==='NSX,Vette,911','Name A–Z (Acura, Chevrolet, Porsche)');
+await p.evaluate(()=>{ST_CUR=document.querySelector('.st-btn').getAttribute('data-key');stPick('added');});await L.sleep(400);
+ok((await order(p,'#'+host+' '+WH)).join()==='NSX,Vette,911','Date added newest');
+ok(await p.evaluate(()=>{var a=[{id:1,year:1,make:'a'},{id:2,year:2,make:'b'},{id:3,year:3,make:'c'}];var old=aiVal;aiVal=function(v){return {1:5e4,2:null,3:9e4}[v.id];};var r=stSort(a,'value').map(function(v){return v.id;}).join();aiVal=old;return r==='3,1,2';}),'Value highest first, unvalued last');
+console.log('3) move mode + memory');
+ok(await p.evaluate(()=>{var id=document.querySelector('.whl-ring > *')?null:null;var v=getVehicles().filter(function(x){return x.clientId===ownerClientId();})[0];phMoveOpen(v.id);var ids=PH.move.ids.slice();var r=ids.join()===phPortfolioCars(v).map(function(x){return x.id;}).join();try{PH.move=null;var m=document.getElementById('ph-move');if(m)m.remove();}catch(e){}return r;}),'move mode uses My order');
+await p.evaluate(()=>{refreshCurrent();});await L.sleep(400);
+ok(await p.evaluate(()=>document.querySelector('.st-btn').textContent==='Sort: Newest added'),'choice remembered on re-render');
+await p.evaluate(()=>{ST_CUR=document.querySelector('.st-btn').getAttribute('data-key');stPick('my');});await L.sleep(400);
+ok((await order(p,'#'+host+' '+WH)).join()===mine.join(),'My order restores the hold-to-reorder order');
+ok(!p.errors.length,'no page errors: '+p.errors.join('|'));await p.close();
+console.log('4) admin client list uses its own choice');
+p=await L.open({pre:PRE});await p.evaluate(SETUP,O);await L.login(p,'wade@evo.test');await L.sleep(500);
+await p.evaluate(O=>{localStorage.setItem('evo_sort_'+myId()+'_'+O+'|','year_asc');openClientDetail(O);},O);await L.sleep(500);
+ok((await order(p,'#cd-vehicles > *')).join()==='Vette,NSX,911','client collection list sorted (admin key, oldest first)');
+ok(await p.evaluate(()=>{var b=document.querySelector('#cd-sortbar .st-btn');return b&&b.textContent==='Sort: Year \u2191';}),'client list has its own Sort button');
+ok(await p.evaluate(()=>!Object.keys(localStorage).some(function(k){return /b0000000-0000-4000-a000-000000000002_/.test(k)&&k.indexOf('evo_sort_b0')===0;})),'other user choice not shared');
+ok(!p.errors.length,'no page errors: '+p.errors.join('|'));await p.close();
+await L.close();console.log('sort: '+pass+' pass, '+fail+' fail');process.exit(fail?1:0);
+})().catch(e=>{console.log('ERROR',e);process.exit(1);});

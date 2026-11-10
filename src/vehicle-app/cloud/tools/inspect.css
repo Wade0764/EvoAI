@@ -1,0 +1,13 @@
+/* v31 inspection report: compact step header, owner mode, 15px+ white/gold text */
+#modal-inspection .wizard-steps{display:none}
+#modal-inspection .ins-intro{font-size:15px;line-height:1.45;color:#fff;margin:0 0 18px}
+#modal-inspection .ins-prog{margin:0 0 20px}
+#modal-inspection .ins-prog-lbl{font-size:15px;color:var(--gold);letter-spacing:.04em;margin-bottom:8px}
+#modal-inspection .ins-prog-lbl b{color:#fff;font-weight:600}
+#modal-inspection .ins-bar{height:3px;background:rgba(201,170,107,.25);border-radius:2px;overflow:hidden}
+#modal-inspection .ins-bar i{display:block;height:100%;background:var(--gold);transition:width .2s}
+#modal-inspection .input-group label,#modal-inspection .check-label,#modal-inspection .draft-label,#modal-inspection .disclaimer{font-size:15px;color:#fff}
+#modal-inspection input,#modal-inspection select,#modal-inspection textarea{font-size:16px;color:#fff}
+#modal-inspection .btn{font-size:15px}
+#modal-inspection .ins-owner-car{font-size:15px;color:#fff}
+#modal-inspection .modal-title,#modal-inspection .modal-close{color:#fff}
