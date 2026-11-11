@@ -1,0 +1,8 @@
+.vq{margin:12px 0 4px;padding:14px 16px;border:1px solid rgba(201,170,107,.35);border-radius:14px;background:#141414;color:#F2F0EB;font-size:15px;line-height:1.45}
+.vq-p{margin:6px 0;font-size:15px;color:#F2F0EB}
+.vq-p b{color:#C9AA6B;font-weight:600}
+.vq-status{font-size:15px;color:#C9AA6B;margin-bottom:6px;font-weight:600}
+.vq-btn{min-height:44px;margin-top:8px;font-size:15px;background:#C9AA6B;color:#0B0B0B;border:0;border-radius:12px;padding:10px 18px;font-weight:600}
+.vq-btn[disabled]{background:#2A2620;color:#F2F0EB;opacity:1}
+#vq-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 84px);z-index:900;background:#1A1814;color:#F2F0EB;border:1px solid #C9AA6B;border-radius:999px;padding:10px 18px;font-size:15px;display:none;max-width:calc(100vw - 32px);text-align:center}
+#vq-toast.on{display:block}

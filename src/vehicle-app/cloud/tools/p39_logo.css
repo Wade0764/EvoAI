@@ -1,0 +1,18 @@
+/* v39 logo (p39): final EvoAI mark - gold dotted ring + obsidian/emerald-star centre, Cormorant wordmark */
+.evo-spin .evo-o{left:@IN@%!important;top:@IN@%!important;width:@W@%!important;height:@W@%!important}
+.evo-spin .evo-o,#ptr .ptr-ring .evo-o{background-image:var(--evo-centre)!important;background-size:100% 100%!important;background-position:50% 50%!important}
+.evo-mark{background:var(--evo-emblem) center/contain no-repeat!important}
+.evo-lockup.evo-lg-new{width:min(150px,40vw)!important;aspect-ratio:1!important;background:var(--evo-emblem) center/contain no-repeat!important}
+.evo-wmt{font-family:'EvoDisplay','Cormorant Garamond',Didot,Georgia,serif;font-weight:500;font-size:clamp(34px,9.6vw,42px);letter-spacing:.42em;padding-left:.42em;line-height:1;margin-top:20px;text-align:center;
+  background:linear-gradient(180deg,#F4E4BA,#D2B577 55%,#A88543);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.evo-wmt+.evo-tag{position:relative;padding-top:12px}
+.evo-wmt+.evo-tag::before{content:"";position:absolute;top:0;left:50%;width:min(140px,36vw);height:1px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,#E8D6A6,transparent)}
+.auth-logo .evo-tag{font-size:15px!important}
+/* v39 brand bar: emblem + EVOAI at the left of the sticky top bar (above banners; fixed height, no jank) */
+.va-brand{display:inline-flex;align-items:center;gap:10px;flex:none;margin-right:auto;min-height:44px;text-decoration:none}
+.va-brand i{width:34px;height:34px;flex:none;background:var(--evo-emblem) center/contain no-repeat}
+.va-brand b{font-family:'EvoDisplay','Cormorant Garamond',Didot,Georgia,serif;font-weight:500;font-size:19px;letter-spacing:.34em;line-height:1;color:#E2C58E;padding-top:2px}
+.va-row .va-static{margin-left:auto}
+.va-row .va-btn{margin-left:auto}
+@media(max-width:899px){.va-row .va-btn{flex:0 1 auto;max-width:62%!important}.va-menu{left:auto!important;right:0;width:min(100%,380px)!important}}
+@media(max-width:360px){.va-brand b{font-size:16px;letter-spacing:.24em}}

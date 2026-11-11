@@ -1,0 +1,28 @@
+/* v41 roles, estimates, tech dashboard. Emerald only on primary actions. Text stays 15px or larger, white or gold. */
+.inv-cars{margin:8px 0 16px}
+.inv-cars .lab,.td-kicker,.rq-kicker{font-family:"Cormorant Garamond",Georgia,serif;letter-spacing:.18em;text-transform:uppercase;color:#C9AA6B;font-size:15px;margin:0 0 8px}
+.cov-note,.pf-world,.td-empty,.td-meta,.vx-lead,.vx-row span{color:#F4F1EA;font-size:15px;line-height:1.45}
+.cov-note,.pf-world{border-top:1px solid rgba(201,170,107,.45);padding-top:12px;margin-top:12px}
+.td-board{margin:8px 0 22px;padding-bottom:18px;border-bottom:1px solid rgba(201,170,107,.45)}
+.td-h{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:32px;letter-spacing:.04em;color:#fff;margin:0 0 14px}
+.td-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:720px){.td-grid{grid-template-columns:1fr 1fr}}
+.td-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:#0B0C0F;border:1px solid rgba(201,170,107,.55);color:#fff;padding:14px 16px;min-height:72px;width:100%}
+.td-card .td-name,.td-card .td-meta,.cov-note,.pf-world,.vx-lead,.vx-row,.vx-row b,.vx-row span{color:#F7F4EE}
+.td-card:focus{outline:2px solid #10D98A;outline-offset:2px}
+.td-card.td-on{border-color:#10D98A}
+.td-name{font-size:18px;letter-spacing:.04em}
+.rq-est{border-color:rgba(201,170,107,.7)}
+.rq-kicker{margin-bottom:6px}
+.vx-sec{margin-top:18px}
+.vx-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(201,170,107,.35);font-size:16px;color:#fff}
+.od-band{margin:8px 0 18px;padding:14px 0 4px;border-top:1px solid rgba(201,170,107,.55)}
+.od-eye{font-family:"Cormorant Garamond",Georgia,serif;letter-spacing:.18em;text-transform:uppercase;color:#C9AA6B;font-size:15px;margin:0 0 6px}
+.od-band h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:28px;color:#fff;margin:0 0 10px}
+.od-lead{color:#F7F4EE;font-size:16px;line-height:1.45;margin:0 0 12px}
+.co-row{flex-wrap:wrap;align-items:flex-start}
+.co-tools{flex:1 1 100%;margin-top:8px}
+.co-title{margin-top:8px}
+.co-mgmt{display:block;color:#F7F4EE;font-size:16px;margin-top:8px}
+.co-mgmt select{color:#fff;background:#0B0C0F;font-size:16px;min-height:44px}
+.rq-in,.rq-f input,.rq-f select,#rq-form input,#rq-form select,#rq-form textarea{font-size:16px;color:#fff}

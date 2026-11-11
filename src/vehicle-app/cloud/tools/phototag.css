@@ -1,0 +1,14 @@
+/* ===== AI photo dump ===== */
+.pt-note{font-size:12px;line-height:1.45;color:var(--text-muted);margin-top:12px;letter-spacing:.01em}
+.pfa-tg.pt-auto{border-style:dashed;color:#EBD6A6;border-color:rgba(201,170,107,.55)}
+.pfa-tg.pt-none{color:var(--text-muted)}
+.pfa-tg.pt-ai{border-color:rgba(201,170,107,.6)}
+.pfa-tg em{font-style:normal;font-size:8px;margin-left:5px;padding:1px 4px;border-radius:3px;background:var(--gold);color:#111;letter-spacing:.06em;vertical-align:1px}
+.pfa-tg{min-height:30px}
+.pt-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-right:6px;animation:ptpulse 1s ease-in-out infinite}
+@keyframes ptpulse{50%{opacity:.25}}
+.pt-scan{position:absolute;left:6px;right:6px;top:6px;font:inherit;font-size:10px;letter-spacing:.06em;color:#141210;background:linear-gradient(180deg,#E2C892,#C9AA6B);border:0;border-radius:999px;padding:6px 6px;min-height:30px;cursor:pointer}
+.pfa-it.done .pt-ok{top:8px;right:8px;left:auto;transform:none;font-size:9px;padding:3px 7px;border-radius:999px;background:rgba(7,8,10,.6)}
+.pfa-it.done:has(.pt-scan) .pt-ok{display:none}
+.pfa-it.done img{opacity:.9}
+@media (prefers-reduced-motion:reduce){.pt-dot{animation:none}}

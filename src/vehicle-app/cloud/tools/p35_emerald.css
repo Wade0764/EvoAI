@@ -1,0 +1,42 @@
+/* EvoAI - Emerald accent layer (mockup only). Obsidian palette + gold logo untouched. */
+:root{--em:#10D98A;--em-deep:#00C27A;--em-ink:#07080A;
+ --em-glow:0 0 0 1px rgba(16,217,138,.55),0 0 18px rgba(16,217,138,.28),0 0 42px rgba(0,194,122,.14);
+ --em-edge:linear-gradient(135deg,#3BF0A8 0%,#10D98A 45%,#00A868 100%);
+ --text-secondary:#ECEEF0;--text-muted:#E8EAED}
+/* primary buttons */
+.btn-primary,#im-root .im-savebar .btn,#im-root button.btn-primary{background:var(--em-edge)!important;color:var(--em-ink)!important;border-color:transparent!important;font-weight:650!important;box-shadow:var(--em-glow),inset 0 1px 0 rgba(255,255,255,.35)!important;transition:box-shadow .25s,transform .15s}
+.btn-primary:hover{box-shadow:0 0 0 1px rgba(16,217,138,.8),0 0 26px rgba(16,217,138,.4),0 0 60px rgba(0,194,122,.2)!important}
+/* active tab / nav */
+.im-tab.on{background:rgba(16,217,138,.12)!important;color:#fff!important;border-color:var(--em)!important;box-shadow:var(--em-glow)!important}
+.nav-item.active{color:#fff!important;position:relative;background:linear-gradient(90deg,rgba(16,217,138,.16),transparent 80%)}
+.nav-item.active::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:var(--em-edge);box-shadow:0 0 12px rgba(16,217,138,.7)}
+/* import progress */
+.im-bar.on{background:var(--em-edge)!important;box-shadow:0 0 10px rgba(16,217,138,.55)}
+.im-stepn{color:var(--gold)!important}
+/* completeness chip + ring */
+.ms-chip{border-color:var(--em)!important;color:#fff!important;box-shadow:var(--em-glow);display:inline-flex!important;align-items:center;gap:12px}
+.em-ring{width:34px;height:34px;flex:none;filter:drop-shadow(0 0 6px rgba(16,217,138,.6))}
+/* focus states */
+input:focus,select:focus,textarea:focus{border-color:var(--em)!important;box-shadow:0 0 0 3px rgba(16,217,138,.22),0 0 18px rgba(16,217,138,.18)!important;outline:none!important}
+:focus-visible{outline:2px solid var(--em)!important;outline-offset:3px!important}
+/* key highlights: subtle emerald edge on primary cards */
+#vd-key,.im-sum,#cp-total-value{position:relative;border-radius:14px;box-shadow:inset 0 1px 0 rgba(16,217,138,.35),0 0 0 1px rgba(16,217,138,.18),0 10px 40px -18px rgba(16,217,138,.35)}
+/* readability: no small grey text */
+body{color:#F4F4F2}
+.im-savebar button:not([disabled]),.im-savebar button{background:var(--em-edge)!important;color:var(--em-ink)!important;border-color:transparent!important;font-weight:700!important;box-shadow:var(--em-glow),inset 0 1px 0 rgba(255,255,255,.35)!important}
+/* p35 emerald: global readability */
+:root{--text-secondary:#ECEEF0!important;--text-muted:#E8EAED!important}
+.doc-meta,.muted,.sub,.hint,small{color:#ECEEF0}
+/* mobile/sidebar active item: emerald lit edge (overrides gold strip) */
+.sidebar .nav-item.active{color:#fff!important;background:linear-gradient(90deg,rgba(16,217,138,.16),transparent 85%)}
+.sidebar .nav-item.active::before{background:var(--em-edge)!important;box-shadow:0 0 12px rgba(16,217,138,.7)!important}
+@media(max-width:899px){.sidebar .nav-item.active{background:linear-gradient(180deg,rgba(16,217,138,.16),transparent 90%)}.sidebar .nav-item.active::before{height:3px!important;top:0!important;left:12px!important;right:12px!important;width:auto!important}}
+.tab-btn.active{border-color:var(--em)!important;color:#fff!important;box-shadow:var(--em-glow)}
+/* red only for alerts / Missing */
+.ms-chip .em-ring+*{color:#fff}
+/* splash: logo ~22% smaller + tagline */
+.evo-spin-lg{width:min(172px,45vw)!important;height:min(172px,45vw)!important}
+#boot-loading .evo-wm{width:min(188px,50vw)!important}
+#boot-loading .evo-tag{margin-top:14px;font-size:clamp(13px,3.3vw,14px)!important;letter-spacing:clamp(2px,.75vw,3.3px)!important;padding-left:clamp(2px,.75vw,3.3px);white-space:nowrap;color:#E6CF9C!important;font-weight:500}
+/* vault primary CTA = primary button */
+.bnd-cta:not(.ghost){background:var(--em-edge)!important;color:var(--em-ink)!important;border-color:transparent!important;box-shadow:var(--em-glow),inset 0 1px 0 rgba(255,255,255,.35)!important}

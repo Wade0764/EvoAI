@@ -1,0 +1,16 @@
+/* v20 Missing indicators (p19) */
+#vd-key{margin:22px 0 8px}
+.ms-top{margin:0 0 14px}
+.ms-chip{display:inline-block;background:transparent;border:2px solid var(--gold);color:var(--gold);border-radius:999px;padding:8px 16px;font:inherit;font-size:18px;font-weight:600;cursor:pointer;min-height:44px}
+.ms-chip.ms-full{background:var(--gold);color:#111}
+.ms-card{background:#0C0E11;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:4px 18px}
+.ms-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.ms-row:last-child{border-bottom:0}
+.ms-lab{font-size:17px;font-weight:600;color:var(--gold);flex:0 0 auto}
+.ms-val{font-size:20px;color:#F2F0EB;text-align:right;word-break:break-word}
+.ms-val.mono{font-family:ui-monospace,Menlo,monospace;font-size:18px}
+.ms-none{color:#F2F0EB;opacity:.9}
+.ms-miss{background:transparent;border:0;border-bottom:3px solid #E5484D;color:#FFFFFF;font:inherit;font-size:20px;font-weight:700;padding:6px 0 2px;cursor:pointer;min-height:44px}
+.ms-miss:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.ms-hint{font-size:18px;color:#F2F0EB;margin:12px 2px 0}
+.input-group.ms-focus{outline:2px solid var(--gold);outline-offset:6px;border-radius:6px}

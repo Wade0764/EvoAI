@@ -1,0 +1,25 @@
+/* v23 undo import (p23) - large white/gold text, no grey */
+.un-note{font-size:17px;color:#F2F0EB;margin:-2px 0 14px}
+.un-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(242,240,235,.15)}
+.un-row:first-of-type{border-top:0}
+.un-row-t{flex:1;min-width:0}
+.un-row-t b{display:block;font-size:19px;color:#F2F0EB;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.un-row-t span{display:block;font-size:17px;color:#F2F0EB;margin-top:2px}
+.un-tag{flex:0 0 auto;min-height:44px;min-width:76px;border-radius:999px;border:0;background:#C9AA6B;color:#07080A;font:inherit;font-size:16px;font-weight:800;letter-spacing:.06em;cursor:pointer;padding:0 14px}
+.un-state{flex:0 0 auto;font-size:16px;font-weight:700;color:#E6C989}
+.un-dim{position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:20}
+.un-sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:88vh;overflow-y:auto;background:#121317;border-top:2px solid #E5484D;border-radius:26px 26px 0 0;padding:12px 20px calc(24px + env(safe-area-inset-bottom,0px));max-width:560px;margin:0 auto}
+.un-grab{width:46px;height:5px;border-radius:3px;background:#F2F0EB;margin:0 auto 14px}
+.un-h{font-size:27px;font-weight:600;color:#F2F0EB;margin:0 0 10px}
+.un-warn{border:2px solid #FFB547;background:rgba(255,181,71,.12);border-radius:16px;padding:14px 16px;font-size:18px;line-height:1.4;color:#F2F0EB;margin:0 0 14px}
+.un-cars{background:#0C0E11;border:1.5px solid rgba(242,240,235,.3);border-radius:18px;padding:4px 16px;margin:0 0 14px}
+.un-car{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(242,240,235,.15);font-size:19px;color:#F2F0EB}
+.un-car:last-child{border-bottom:0}
+.un-th{flex:0 0 auto;width:52px;height:40px;border-radius:8px;background:linear-gradient(135deg,#2a2722,#14130f);border:1px solid rgba(201,170,107,.5)}
+.un-car small{display:block;font-size:16px;color:#E6C989;margin-top:2px}
+.un-car small.ed{color:#FFB547;font-weight:700}
+.un-more{font-size:18px;font-weight:700;color:#E6C989;padding:12px 0}
+.im-btn.un-red{background:#E5484D;border-color:#E5484D;color:#fff}
+.im-btn.un-keep{background:transparent;border-color:#C9AA6B;color:#F2F0EB}
+.un-big{width:76px;height:76px;border-radius:50%;border:3px solid #C9AA6B;color:#E6C989;font-size:40px;display:flex;align-items:center;justify-content:center;margin:18px 0 10px}
+#im-root .im-cap{font-size:15px}

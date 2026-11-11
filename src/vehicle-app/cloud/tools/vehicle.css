@@ -1,0 +1,48 @@
+/* ===== v15 calm vehicle page ===== */
+.vb .vb-sub{margin-top:8px;font-size:15px;color:var(--text-secondary);line-height:1.5}
+.vb .vb-none{font-size:22px;color:var(--text-secondary);letter-spacing:0;font-weight:300}
+.vb .vb-low{color:#E6CF9C}
+.vb .delta{margin-top:10px}
+.vb-more{margin-top:14px;border-top:1px solid var(--line);padding-top:4px}
+.vb-more summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:15px;color:var(--gold);list-style:none}
+.vb-more summary::-webkit-details-marker{display:none}
+.vb-more summary::after{content:'';width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);margin-left:10px;margin-top:-4px;transition:transform .2s}
+.vb-more[open] summary::after{transform:rotate(225deg);margin-top:4px}
+.vb-more p{margin:8px 0;font-size:16px;line-height:1.55}
+.vb-fine{font-size:15px;color:var(--text-secondary);line-height:1.55}
+.vb-list{margin:6px 0 0 18px;padding:0}
+.vb-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;align-items:center}
+.vb-acts .vb-btn{display:contents}
+.vb-acts .doc-meta{flex-basis:100%}
+.ov-form{margin-top:16px;padding:16px;border:1px solid var(--line2);border-radius:18px;background:rgba(201,170,107,.05)}
+.ov-form label{display:block;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:8px}
+.ov-row{display:flex;gap:10px;flex-wrap:wrap}
+.ov-row input{flex:1 1 160px;min-width:0;background:transparent;border:0;border-bottom:1px solid var(--line2);color:var(--text);font:inherit;font-size:22px;padding:8px 0}
+.ov-form .vb-fine{margin-top:10px}
+.vr-line{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:15px;color:var(--text-secondary)}
+.vr-badge{display:inline-flex;align-items:center;min-height:28px;padding:4px 12px;border-radius:999px;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#E6CF9C;
+  border:1px solid rgba(201,170,107,.55);background:linear-gradient(180deg,rgba(226,200,146,.14),rgba(201,170,107,.04))}
+.vr-group{margin-top:4px}
+.vr-tgl{display:flex!important;align-items:center;gap:12px;min-height:48px;cursor:pointer;text-transform:none!important;letter-spacing:0!important;font-size:17px!important;color:var(--text)!important}
+.vr-tgl input{position:absolute;opacity:0;width:1px;height:1px}
+.vr-sw{position:relative;width:46px;height:28px;border-radius:999px;background:#1A1D22;border:1px solid var(--line2);flex:none;transition:background .2s}
+.vr-sw::after{content:'';position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#C9CCD1;transition:transform .2s}
+.vr-tgl input:checked+.vr-sw{background:linear-gradient(180deg,#E2C892,#C9AA6B);border-color:transparent}
+.vr-tgl input:checked+.vr-sw::after{transform:translateX(18px);background:#141210}
+.vr-tgl input:focus-visible+.vr-sw{outline:2px solid var(--gold);outline-offset:2px}
+#v-builder-row{margin-top:8px}
+.vr-hint{margin-top:12px;padding:14px 16px;border-radius:16px;border:1px solid rgba(201,170,107,.5);background:rgba(201,170,107,.07)}
+.vr-hint-t{font-size:16px;color:#E6CF9C;font-weight:500}
+.vr-hint-b{font-size:15px;color:var(--text-secondary);margin-top:4px;line-height:1.5}
+.vr-hint-a{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.dsec{margin-top:44px}
+.dsec-desc{font-size:16px;line-height:1.55;color:var(--text-secondary);margin:4px 0 16px}
+.dsec-btn{min-height:48px;padding:0 24px}
+.dsec-lab{margin-top:26px;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-secondary);padding-bottom:10px;border-bottom:1px solid var(--line)}
+.dsec-due{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:16px}
+.dsec-due em{font-style:normal;color:var(--text-secondary);white-space:nowrap}
+.dsec-due.soon span{color:#E6CF9C}.dsec-due.over span{color:var(--red)}
+#vd-doc #vd-airem .dai-sec{margin-top:0}
+#vd-doc #vd-airem .sh{display:none}
+#vd-doc #vd-airem .dai-card{padding:12px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;margin:0}
+#vd-next{display:none}

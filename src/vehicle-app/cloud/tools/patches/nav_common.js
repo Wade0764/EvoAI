@@ -1,0 +1,3 @@
+// Shared: toggles .nav-at-start/.nav-at-end on the bottom bar (passive scroll, rAF-throttled). No touch handlers -> swipe-back untouched.
+window.__navEdges=function(sb,cb){var t=0;function u(){t=0;var m=sb.scrollWidth-sb.clientWidth;sb.classList.toggle('nav-at-start',sb.scrollLeft<4);sb.classList.toggle('nav-at-end',sb.scrollLeft>m-4);cb&&cb(sb.scrollLeft,m);}
+sb.addEventListener('scroll',function(){if(!t)t=requestAnimationFrame(u)},{passive:true});addEventListener('resize',u,{passive:true});u();var a=sb.querySelector('.nav-item.active');if(a&&a.scrollIntoView)a.scrollIntoView({inline:'center',block:'nearest'});return u;};

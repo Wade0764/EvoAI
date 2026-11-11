@@ -1,0 +1,35 @@
+// v17 (F): a 30 MB 8064x6048 JPEG is resized, never rejected on input size, on every photo path.
+const L=require('./lib.js'),fs=require('fs'),cp=require('child_process');
+const BIG=__dirname+'/fixtures/big.jpg';
+if(!fs.existsSync(BIG))cp.execSync('python3 '+__dirname+'/fixtures/make_big.py '+BIG);
+let pass=0,fail=0;const ok=(c,m)=>{if(c){pass++;console.log('  ok   '+m);}else{fail++;console.log('  FAIL '+m);}};
+const PRE=`try{if(!sessionStorage.__c){localStorage.clear();sessionStorage.__c=1;}localStorage.setItem('pwa_hint_dismissed','1')}catch(e){};`;
+(async()=>{
+await L.launch();
+const sz=fs.statSync(BIG).size;ok(sz>29*1024*1024,'fixture is '+(sz/1048576).toFixed(1)+' MB');
+let p=await L.open({pre:PRE,w:390,h:844});await L.login(p,'olivia@test.com');await L.sleep(500);
+await p.evaluate(()=>{window.__T=[];var t0=showToast;showToast=function(m,k){window.__T.push(String(m));return t0.apply(this,arguments);};
+  var i=document.createElement('input');i.type='file';i.id='szf';document.body.appendChild(i);});
+const inp=await p.$('#szf');await inp.uploadFile(BIG);
+const f=await p.evaluate(()=>{var f=document.getElementById('szf').files[0];return {n:f.size,t:f.type};});
+ok(f.n===sz&&f.t==='image/jpeg','file is in the page ('+f.n+' bytes)');
+console.log('SIZEFIX readResized (cover photo, document photos)');
+let r=await p.evaluate(()=>new Promise(res=>{var f=document.getElementById('szf').files[0];readResized(f,null,function(out){var i=new Image();i.onload=function(){res({b:dataUrlBytes(out),w:i.naturalWidth,h:i.naturalHeight});};i.src=out;});setTimeout(function(){res({to:1,t:window.__T});},60000);}));
+ok(!r.to&&r.b<=1.5*1048576&&r.w===1280&&r.h===960,'resized to '+r.w+'x'+r.h+', '+Math.round(r.b/1024)+' KB');
+console.log('SIZEFIX add vehicle / identify');
+r=await p.evaluate(()=>new Promise(res=>{openAddVehicleModal();window.autoIdIdentify=function(){};var t0=Date.now();handleVehicleImage(document.getElementById('szf'));
+  (function w(){if(pendingVehicleImage&&pendingVehicleImage!=='__remove__')return res({b:dataUrlBytes(pendingVehicleImage)});if(Date.now()-t0>60000)return res({to:1});setTimeout(w,200);})();}));
+ok(!r.to&&r.b<=1.5*1048576,'add-vehicle photo accepted ('+Math.round((r.b||0)/1024)+' KB)');
+await p.evaluate(()=>{closeModal&&closeModal();});
+console.log('SIZEFIX bulk portfolio upload');
+r=await p.evaluate(async()=>{try{var o=await pfProcess(document.getElementById('szf').files[0]);return {o:o.orig.size,d:o.disp.size,t:o.thumb.size};}catch(e){return {e:String(e&&e.message||e)};}});
+ok(!r.e&&r.o<=14*1048576&&r.d>0&&r.t>0,'pfProcess ok: orig '+Math.round((r.o||0)/1024)+' KB, display '+Math.round((r.d||0)/1024)+' KB'+(r.e?' err '+r.e:''));
+const T=await p.evaluate(()=>window.__T);
+ok(!T.some(t=>/too large|over 15 MB|over 1\.5 MB/i.test(t)),'no size rejection toast');
+console.log('SIZEFIX shrinkPhotoBlob steps down');
+r=await p.evaluate(async()=>{var f=document.getElementById('szf').files[0];var b=await shrinkPhotoBlob(f,1280,60*1024,'#fff');return {b:b.size};});
+ok(r.b<=60*1024,'60 KB cap: re-encoded smaller to '+Math.round(r.b/1024)+' KB');
+ok(await p.evaluate(()=>!/MAX_RAW_BYTES\)|over 15 MB|Error\('toolarge'/.test([].slice.call(document.scripts).map(function(x){return x.textContent;}).join(''))),'no input-size checks left in the build');
+await p.close();await L.close();
+console.log('SIZEFIX '+pass+' passed, '+fail+' failed');process.exit(fail?1:0);
+})().catch(e=>{console.error(e);process.exit(1);});

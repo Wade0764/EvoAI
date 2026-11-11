@@ -1,0 +1,74 @@
+// v27 form safety (no pull-to-refresh, autosaved drafts, unload warning), faster photo identify, VIN-first trim. Mocked backend.
+const L=require('./lib.js');
+let pass=0,fail=0;
+function ok(c,m){if(c){pass++;console.log('  ok   '+m);}else{fail++;console.log('  FAIL '+m);}}
+const SC='/workspace/vehicle-app/cloud/screens/';
+function vinWith(b){const T={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,J:1,K:2,L:3,M:4,N:5,P:7,R:9,S:2,T:3,U:4,V:5,W:6,X:7,Y:8,Z:9},W=[8,7,6,5,4,3,2,10,0,9,8,7,6,5,4,3,2];let s=0;for(let i=0;i<17;i++){const c=b[i];s+=(/[0-9]/.test(c)?+c:(T[c]||0))*W[i];}const r=s%11;return b.slice(0,8)+(r===10?'X':String(r))+b.slice(9);}
+const VINX=vinWith('3TMCZ5AN0MM123456');
+const hide=p=>p.evaluate(()=>{var t=document.getElementById('toast-container');if(t)t.style.display='none';});
+const PRE="try{if(!sessionStorage.__c){localStorage.clear();sessionStorage.__c=1;}}catch(e){}";
+const MOCKS=function(VINX){
+  window.__ID_CALLS__=[];window.__ID_DELAY__=50;
+  sb.functions.invoke=function(n,o){window.__ID_CALLS__.push({n:n,len:o.body.image_base64.length});return new Promise(function(r){setTimeout(function(){r({data:{year:2021,make:'Toyota',model:'Tacoma',trim:'SR5',color:'Gray',confidence:0.82,notes:''},error:null});},window.__ID_DELAY__);});};
+  var f=window.fetch;window.fetch=function(u,o){if(/vpic\.nhtsa/.test(String(u)))return Promise.resolve({ok:true,json:function(){return Promise.resolve({Results:[{ModelYear:'2021',Make:'TOYOTA',Model:'Tacoma',Trim:'TRD Off Road',Series:'',DisplacementL:'3.5',EngineCylinders:'6',FuelTypePrimary:'Gasoline',BodyClass:'Pickup'}]});}});return f.apply(this,arguments);};
+};
+const bigPhoto=p=>p.evaluate(()=>{var c=document.createElement('canvas');c.width=3000;c.height=2000;var x=c.getContext('2d');for(var i=0;i<400;i++){x.fillStyle='hsl('+(i*37%360)+',60%,'+(20+i%60)+'%)';x.fillRect(Math.random()*3000,Math.random()*2000,300,200);}return c.toDataURL('image/jpeg',0.95);});
+(async()=>{
+await L.launch();
+console.log('1) pull-to-refresh off + draft survives a reload');
+let p=await L.open({pre:PRE});await L.login(p,'wade@evo.test');
+ok(await p.evaluate(()=>getComputedStyle(document.documentElement).overscrollBehaviorY==='none'&&getComputedStyle(document.body).overscrollBehaviorY==='none'),'html/body overscroll-behavior-y: none');
+ok(await p.evaluate(()=>{openAddVehicleModal();return getComputedStyle(document.querySelector('#modal-add-vehicle .modal')).overscrollBehaviorY==='contain';}),'modal scroll container contains overscroll');
+await L.sleep(300);
+await p.evaluate(()=>{[['v-year','2021'],['v-make','Toyota'],['v-model','Tacoma'],['v-color','Cement'],['v-notes','Bought from Joe, needs bed liner']].forEach(function(a){var e=document.getElementById(a[0]);e.value=a[1];e.dispatchEvent(new Event('input',{bubbles:true}));});});
+ok(await p.evaluate(()=>{var d=JSON.parse(localStorage.getItem('evo_draft_modal-add-vehicle'));return d&&d.f['v-model']==='Tacoma'&&d.sub==='new';}),'draft autosaved on input');
+ok(await p.evaluate(()=>{var e=new Event('beforeunload',{cancelable:true});window.dispatchEvent(e);return e.defaultPrevented;}),'beforeunload warns while there are unsaved changes');
+await p.reload({waitUntil:'load'});await L.sleep(800);
+if(await p.evaluate(()=>document.getElementById('auth-screen').style.display!=='none'))await L.login(p,'wade@evo.test');
+await p.evaluate(()=>openAddVehicleModal());await L.sleep(400);
+ok(await p.evaluate(()=>!!document.getElementById('fs-banner-modal-add-vehicle')&&/Restored your unsaved details/.test(document.getElementById('fs-banner-modal-add-vehicle').innerText)),'Restored banner after reload');
+ok(await p.evaluate(()=>val('v-model')==='Tacoma'&&val('v-notes')==='Bought from Joe, needs bed liner'),'typed values restored');
+await hide(p);await p.screenshot({path:SC+'fs-01-restored-draft.png'});
+await p.evaluate(()=>fsDiscard('modal-add-vehicle'));await L.sleep(200);
+ok(await p.evaluate(()=>val('v-model')===''&&!localStorage.getItem('evo_draft_modal-add-vehicle')&&!document.getElementById('fs-banner-modal-add-vehicle')),'Discard clears fields, draft and banner');
+await p.evaluate(()=>{['v-year:1990','v-make:Mazda','v-model:Miata'].forEach(function(s){var a=s.split(':'),e=document.getElementById(a[0]);e.value=a[1];e.dispatchEvent(new Event('input',{bubbles:true}));});});
+ok(await p.evaluate(()=>!!localStorage.getItem('evo_draft_modal-add-vehicle')),'new draft saved');
+await p.evaluate(()=>{var c=document.getElementById('v-client');if(c&&!c.value){var o=[].filter.call(c.options,function(x){return x.value;})[0];if(o)c.value=o.value;}saveVehicle();});await L.sleep(600);
+ok(await p.evaluate(()=>!localStorage.getItem('evo_draft_modal-add-vehicle')),'draft cleared on save');
+ok(await p.evaluate(()=>{var e=new Event('beforeunload',{cancelable:true});window.dispatchEvent(e);return !e.defaultPrevented;}),'no unload warning after save');
+ok(!p.errors.length,'no page errors: '+p.errors.join('|'));
+await p.close();
+
+console.log('2) photo identify: resized to 1024px, progress text, timeout');
+p=await L.open({pre:PRE});await L.login(p,'wade@evo.test');await p.evaluate(MOCKS,VINX);
+await p.evaluate(()=>openAddVehicleModal());await L.sleep(300);
+let big=await bigPhoto(p);
+await p.evaluate(d=>{window.__ID_DELAY__=12000;autoIdIdentify(d);},big);await L.sleep(10500);
+const calls=await p.evaluate(()=>window.__ID_CALLS__);
+ok(calls.length===1&&calls[0].len*0.75<=300*1024,'upload is small: '+Math.round(calls[0].len*0.75/1024)+' KB (original '+Math.round(big.length*0.75/1024)+' KB)');
+ok(await p.evaluate(()=>/Still working/.test(document.getElementById('modal-add-vehicle').innerText)),'progress text while waiting');
+await hide(p);await p.screenshot({path:SC+'fs-02-identify-progress.png'});
+await p.waitForFunction(()=>!AUTOID.busy,{timeout:15000}).catch(()=>{});await L.sleep(300);console.log('   trim now',await p.evaluate(()=>val('v-trim')+' busy='+AUTOID.busy+' note='+document.getElementById('modal-add-vehicle').innerText.slice(0,0)));
+ok(await p.evaluate(()=>val('v-trim')==='SR5'&&/suggested from photo/.test((document.getElementById('trim-sug')||{}).innerText||'')),'photo trim shown as a suggestion');
+ok(await p.evaluate(()=>/TRD Off-Road/.test(document.getElementById('trim-sug').innerText)&&/TRD Pro/.test(document.getElementById('trim-sug').innerText)),'alternatives offered (SR5, TRD Sport, TRD Off-Road, TRD Pro, Limited)');
+console.log('3) VIN beats the photo guess');
+await p.evaluate(v=>{setVal('v-vin',v);vinChanged();},VINX);await L.sleep(1500);
+ok(await p.evaluate(()=>!document.getElementById('vin-sheet')),'no conflict question for AI-guessed fields');
+ok(await p.evaluate(()=>val('v-trim')==='TRD Off-Road'&&val('v-model')==='Tacoma'),'trim from VIN: '+await p.evaluate(()=>val('v-trim')));
+ok(await p.evaluate(()=>/from VIN/.test(document.getElementById('trim-sug').innerText)),'labelled "from VIN"');
+await p.evaluate(()=>{var b=document.querySelector('#trim-sug .trim-chip[data-t="TRD Pro"]');b.click();});
+ok(await p.evaluate(()=>val('v-trim')==='TRD Pro'),'user can change trim with one tap');
+await p.evaluate(()=>{var b=document.querySelector('#trim-sug .trim-chip[data-t="TRD Off-Road"]');b.click();document.getElementById('v-trim').scrollIntoView({block:'center'});});
+await hide(p);await p.screenshot({path:SC+'fs-03-vin-trim.png'});
+await p.evaluate(()=>{AUTOID.token++;});
+await p.evaluate(()=>closeModal('modal-add-vehicle'));
+console.log('4) identify timeout');
+await p.evaluate(()=>{openAddVehicleModal();});await L.sleep(300);
+await p.evaluate(()=>{ID_TIMEOUT=1500;window.__ID_DELAY__=5000;});
+await p.evaluate(d=>autoIdIdentify(d),big);await L.sleep(2500);
+ok(await p.evaluate(()=>/took too long/.test(document.getElementById('modal-add-vehicle').innerText)&&!AUTOID.busy),'times out with clear text');
+ok(!p.errors.length,'no page errors: '+p.errors.join('|'));
+await p.close();await L.close();
+console.log('formsafe.js: '+pass+' passed, '+fail+' failed');
+process.exit(fail?1:0);
+})().catch(e=>{console.error(e);process.exit(1);});

@@ -1,0 +1,6 @@
+/* v36b intro splash (p39b): shown from first paint on every app open, min ~1.7s, then fades */
+#boot-loading{transition:opacity .5s ease}
+#boot-loading.evo-fade{opacity:0;pointer-events:none}
+#boot-loading.evo-intro #boot-loading-text{visibility:hidden}
+#boot-ring:empty{background:var(--evo-emblem) center/contain no-repeat}
+@media (prefers-reduced-motion:reduce){#boot-loading{transition:none}#boot-loading .evr-svg,#boot-loading .evr-s{animation:none!important;opacity:1!important}}

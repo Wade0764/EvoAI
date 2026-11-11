@@ -1,0 +1,36 @@
+/* ===== AI document scanning ===== */
+.dai-pill{display:inline-block;margin-left:8px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,170,107,.45);border-radius:999px;padding:2px 8px;vertical-align:2px}
+.dai-svc{font-size:12px;color:var(--text-muted);margin-top:4px;overflow-wrap:anywhere}
+.dai-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.dai-row{align-items:flex-start}
+@media(max-width:899px){.dai-row{flex-wrap:wrap}.dai-btns{width:100%;justify-content:flex-start;padding-left:56px}}
+.dai-sorted{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted)}
+.dai-state{font-size:14px;line-height:1.45;padding:12px 14px;border:1px solid var(--line2);border-radius:4px;margin-bottom:20px;color:var(--text-secondary,#bbb)}
+.dai-state.dai-done{border-color:rgba(201,170,107,.45);color:#EBD6A6;background:rgba(201,170,107,.06)}
+.dai-state.dai-scanning{color:#EBD6A6}
+.dai-spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(201,170,107,.3);border-top-color:var(--gold);border-radius:50%;margin-right:10px;vertical-align:-2px;animation:daispin .8s linear infinite}
+@keyframes daispin{to{transform:rotate(360deg)}}
+#modal-docscan textarea{width:100%;background:transparent;border:0;border-bottom:1px solid var(--line2);color:var(--text);font:inherit;font-size:16px;font-weight:300;padding:8px 0;resize:vertical}
+.dai-rems-wrap{margin-top:26px}
+.dai-rem{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line);cursor:pointer}
+.dai-rem input[type=checkbox]{width:22px;height:22px;min-width:22px;margin-top:2px;accent-color:#C9AA6B}
+.dai-rem:not(.on) .dai-rem-body{opacity:.5}
+.dai-rem-body{flex:1;min-width:0}
+.dai-rem-top{display:flex;gap:8px;align-items:center}
+.dai-kind{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.dai-ai{font-size:9px;letter-spacing:.14em;color:#0b0b0c;background:var(--gold);border-radius:3px;padding:1px 5px;font-weight:600}
+.dai-rem-t{font-size:15px;color:var(--text)}
+.dai-rem-t.big{font-size:17px;font-weight:300;margin-top:6px}
+.dai-rem-due{font-size:13px;color:var(--text-secondary,#bbb);margin-top:4px}
+.dai-why{font-size:13px;color:var(--text-muted);margin-top:6px;line-height:1.45}
+.dai-why b{color:#EBD6A6;font-weight:500}
+.dai-rem-edit{display:flex;gap:12px;margin-top:8px}
+.dai-rem-edit input{font-size:14px;padding:6px 0}
+.dai-card{border:1px solid var(--line2);border-left:2px solid var(--gold);padding:14px 16px;margin-bottom:12px;border-radius:2px}
+.dai-card.overdue{border-left-color:#c0645a}
+.dai-src{font-size:12px;color:var(--text-muted);margin-top:8px}
+.dai-src a{color:var(--gold);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.dai-rem-act{display:flex;gap:8px;margin-top:10px}
+.dai-actions{align-items:center;flex-wrap:wrap}
+#doc-scan-btn{background:linear-gradient(180deg,#E2C892,#C9AA6B);color:#141210;border-color:transparent}
+.dai-sec{margin-top:34px}

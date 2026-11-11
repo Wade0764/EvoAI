@@ -1,0 +1,53 @@
+// v31 inspection report: no overlapping step labels at 390px, owner has no client picker, single car preselected, intro, 15px+ white/gold text. Mocked backend.
+const L=require('./lib.js');
+let pass=0,fail=0;
+function ok(c,m){if(c){pass++;console.log('  ok   '+m);}else{fail++;console.log('  FAIL '+m);}}
+const SC=process.env.INSP_SC||'/workspace/vehicle-app/cloud/screens/';
+const PRE="try{if(!sessionStorage.__c){localStorage.clear();sessionStorage.__c=1;}}catch(e){}";
+const hide=p=>p.evaluate(()=>{var t=document.getElementById('toast-container');if(t)t.style.display='none';});
+const common=async(p,who)=>{
+  ok(await p.evaluate(()=>document.querySelector('#modal-inspection .modal-title').textContent==='Vehicle inspection report'),who+': title');
+  ok(await p.evaluate(()=>/service history/.test(document.getElementById('ins-intro').textContent)&&/does not book or request/.test(document.getElementById('ins-intro').textContent)),who+': intro explains purpose');
+  ok(await p.evaluate(()=>getComputedStyle(document.querySelector('#modal-inspection .wizard-steps')).display==='none'),who+': crammed 5-label row hidden');
+  ok(await p.evaluate(()=>document.getElementById('ins-prog-lbl').textContent.replace(/\s+/g,' ')==='Step 1 of 5 \u00b7 Vehicle'),who+': "Step 1 of 5 · Vehicle"');
+  ok(await p.evaluate(()=>{var e=document.getElementById('ins-prog-lbl'),r=e.getBoundingClientRect();return e.scrollWidth<=e.clientWidth+1&&r.right<=window.innerWidth;}),who+': step label fits on 390px');
+  const bad=await p.evaluate(()=>{var out=[];[].forEach.call(document.querySelectorAll('#modal-inspection .wizard-panel.active label,#modal-inspection .ins-intro,#modal-inspection .ins-prog-lbl,#modal-inspection .ins-prog-lbl b,#modal-inspection .modal-title'),function(e){if(!e.offsetParent)return;var s=getComputedStyle(e),c=s.color;if(parseFloat(s.fontSize)<15||(c!=='rgb(255, 255, 255)'&&c!=='rgb(201, 170, 107)'))out.push(e.textContent.slice(0,20)+' '+s.fontSize+' '+c);});return out;});
+  ok(!bad.length,who+': visible text 15px+ white/gold '+bad.join('|'));
+};
+(async()=>{
+await L.launch();
+console.log('1) owner, several cars');
+let p=await L.open({pre:PRE});await L.login(p,'olivia@test.com');await L.sleep(700);
+await p.evaluate(()=>{showPage('inspections');openInspectionModal();});await L.sleep(400);
+await common(p,'owner');
+ok(await p.evaluate(()=>document.getElementById('insp-client-group').style.display==='none'),'owner: client field hidden');
+ok(await p.evaluate(()=>document.getElementById('insp-tech').parentNode.querySelector('label').textContent==='Done by'),'owner: field labelled Done by');
+ok(await p.evaluate(()=>document.getElementById('insp-vehicle').options.length>2),'owner: picks among own cars');
+await hide(p);await p.screenshot({path:SC+'insp-owner-step1.png'});
+await p.evaluate(()=>{var s=document.getElementById('insp-vehicle');s.value=s.options[1].value;goWizardStep(1);});await L.sleep(200);
+ok(await p.evaluate(()=>document.getElementById('ins-prog-lbl').textContent.replace(/\s+/g,' ')==='Step 2 of 5 \u00b7 Work done'&&document.getElementById('ins-bar-fill').style.width==='40%'),'owner: step 2 label + bar');
+await p.evaluate(()=>goWizardStep(3));await L.sleep(200);
+ok(await p.evaluate(()=>/Step 4 of 5/.test(document.getElementById('ins-prog-lbl').textContent)),'owner: step 4 label');
+await hide(p);await p.screenshot({path:SC+'insp-owner-step4.png'});
+await p.evaluate(()=>goWizardStep(4));await L.sleep(100);
+const before=await p.evaluate(()=>getInspections().length);
+await p.evaluate(()=>saveInspection());await L.sleep(500);
+ok(await p.evaluate(n=>getInspections().length===n+1&&getInspections()[n].clientId===myId(),before),'owner: saves to own car without picking a client');
+ok(!p.errors.length,'owner: no page errors '+p.errors.join('|'));
+await p.close();
+console.log('2) owner, one car');
+p=await L.open({pre:PRE});await L.login(p,'olivia@test.com');await L.sleep(700);
+await p.evaluate(()=>{var keep=C.vehicles[0];C.vehicles=[keep];openInspectionModal();});await L.sleep(300);
+ok(await p.evaluate(()=>document.getElementById('insp-vehicle').value===C.vehicles[0].id),'single car preselected');
+await p.close();
+console.log('3) tech');
+p=await L.open({pre:PRE});await L.login(p,'tom@test.com');await L.sleep(800);
+await p.evaluate(()=>{showPage('inspections');openInspectionModal();});await L.sleep(400);
+await common(p,'tech');
+ok(await p.evaluate(()=>document.getElementById('insp-tech').parentNode.querySelector('label').textContent==='Tech'),'tech: field labelled Tech');
+ok(await p.evaluate(()=>document.getElementById('insp-client-group').style.display!=='none'&&document.getElementById('insp-client').offsetParent!==null),'tech: client picker shown');
+await hide(p);await p.screenshot({path:SC+'insp-tech-step1.png'});
+ok(!p.errors.length,'tech: no page errors '+p.errors.join('|'));
+await L.close();
+console.log('inspect: '+pass+' passed, '+fail+' failed');process.exit(fail?1:0);
+})().catch(e=>{console.error(e);process.exit(1);});
