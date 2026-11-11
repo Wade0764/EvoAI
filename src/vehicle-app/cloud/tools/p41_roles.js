@@ -60,7 +60,7 @@ function invAll(box){
       var row=Object.prototype.toString.call(r.data)==='[object Array]'?r.data[0]:r.data;
       if(!row||!row.code)throw new Error('no code returned');
       saveInviteCode(row.invite_id,row.code);
-      showInviteResult({title:'Tech invite code',id:row.invite_id,email:email,code:row.code,expires:row.expires_at,who:all?'Access to all of your vehicles':('Access to '+picked.length+' vehicle'+(picked.length===1?'':'s')),help:'Share this code privately. Coverage is per vehicle and stays with the owner. Advisor access is included. There is no separate technician fee. This app does not set a price.'});
+      showInviteResult({title:'Tech invite code',id:row.invite_id,email:email,code:row.code,expires:row.expires_at,who:all?'Access to all of your vehicles':('Access to '+picked.length+' vehicle'+(picked.length===1?'':'s')),help:'Share this code privately. You choose what they can see after they join.'});
       return loadAll().then(function(){renderAccess();});
     }).catch(function(e){showToast(friendlyError(e),'error');});
   };
@@ -75,8 +75,7 @@ function invAll(box){
     box.id='inv-cars';box.className='inv-cars';
     box.innerHTML='<div class="lab">Vehicles this person may open</div>'
       +'<label class="tgl"><input type="checkbox" id="inv-all" onchange="invAll(this)"><span class="tgl-ui"></span><span class="tgl-t">All vehicles</span></label>'
-      +cars.map(function(v){return '<label class="tgl"><input type="checkbox" class="inv-car" value="'+esc(v.id)+'"><span class="tgl-ui"></span><span class="tgl-t">'+esc(vFull(v))+'</span></label>';}).join('')
-      +'<p class="cov-note" id="cov-note">Coverage is paid per vehicle by the owner, including an advisor you authorize. There is no separate technician fee. EvoAI does not set a price, tax, or reseller split on this screen.</p>';
+      +cars.map(function(v){return '<label class="tgl"><input type="checkbox" class="inv-car" value="'+esc(v.id)+'"><span class="tgl-ui"></span><span class="tgl-t">'+esc(vFull(v))+'</span></label>';}).join('');
     sel.parentNode.insertAdjacentElement('afterend', box);
   };
 })();
@@ -86,7 +85,7 @@ function invAll(box){
     var h=prevHTML();
     if(!h)return h;
     h=h.replace('Co-owners have their own login and the same owner rights over every vehicle in this collection: photos, documents, values, reminders, team and transfers.',
-      'Full management can run the collection with you. Only you, the original owner, can invite another co-owner. Limited management can look, comment, and ask a question on an estimate. It cannot change vehicles, permissions, or invites.');
+      'Full management can run the collection with you. Only you, the original owner, can invite another co-owner. Limited management can look, comment, and ask a question on an estimate. It cannot see title documents unless you turn that on, and it cannot change vehicles, permissions, or invites.');
     if(coRank()==='primary'){
       h=h.replace('onclick="coInvite()">Invite co-owner</button>',
         'onclick="coInvite(\'full\')">Invite with full management</button><button class="btn" type="button" id="co-invite-lim" onclick="coInvite(\'limited\')">Invite with limited management</button>');
@@ -304,6 +303,9 @@ async function hxLoad(){
     prev(owner,vehicles);
     hxLoad();
     tdRender();
+    odRender();
+    covLoad();
+    if(sb&&session&&!window.__NT_CLEAR){window.__NT_CLEAR=1;sb.rpc('clear_expired_notices').then(function(){},function(){});}
   };
 })();
 function vxRender(vid){
@@ -334,3 +336,71 @@ async function vxSend(vid){
   var prev=openVehicleDetail;
   openVehicleDetail=function(id){var r=prev(id);vxRender(id);return r;};
 })();
+function odRender(){
+  if(!session||!isOwner())return;
+  var cm=document.getElementById('cp-cm-sec');if(!cm)return;
+  var host=document.getElementById('cp-decide');
+  if(!host){host=document.createElement('section');host.id='cp-decide';host.className='sec od-band';cm.parentNode.insertBefore(host,cm);}
+  var cid=ownerClientId();
+  var rows=(typeof RQ!=='undefined'?RQ.rows:[]).filter(function(r){
+    return r.owner_id===cid&&r.request_kind==='estimate'&&r.status!=='done'&&r.decision!=='approved'&&r.decision!=='denied';
+  });
+  var h='<p class="od-eye">Needs your decision</p><h2>Pending decisions</h2>';
+  if(!rows.length)h+='<p class="od-lead">Nothing is waiting. Estimates from your advisor appear here, between the collection tabs and comments.</p>';
+  else h+=rows.map(rqEstimateCard).join('');
+  host.innerHTML=h;
+}
+function covPaint(rows){
+  if(!session||!isOwner())return;
+  var cm=document.getElementById('cp-cm-sec');if(!cm)return;
+  var host=document.getElementById('cp-cov');
+  if(!host){
+    host=document.createElement('section');host.id='cp-cov';host.className='sec od-band';
+    var band=document.getElementById('cp-decide');
+    (band||cm).parentNode.insertBefore(host, band||cm);
+  }
+  rows=rows||[];
+  if(!rows.length){host.hidden=true;host.innerHTML='';return;}
+  host.hidden=false;
+  host.innerHTML='<p class="od-eye">Notice</p><h2>Already covered</h2>'+rows.map(function(n){return '<p class="od-lead">'+esc(n.body||n.title||'This vehicle is already covered, so a second coverage was not started.')+'</p>';}).join('');
+}
+async function covLoad(){
+  if(!sb||!session||!isOwner())return;
+  try{
+    var r=await sb.from('notifications').select('*').eq('kind','coverage_blocked').order('created_at',{ascending:false}).limit(5);
+    if(!r.error)covPaint(r.data||[]);
+  }catch(e){}
+}
+(function(){
+  if(typeof p40Refresh==='function'){var prev=p40Refresh;p40Refresh=function(){prev();odRender();};}
+  var prevSave=saveVehicle;
+  saveVehicle=function(){
+    var vin=String(val('v-vin')||'').replace(/\s+/g,'').toUpperCase();
+    prevSave();
+    if(!vin||!sb||!sb.rpc)return;
+    sb.rpc('claim_vehicle_coverage',{p_vin:vin,p_vehicle_id:null}).then(function(r){
+      if(r.error||!r.data||r.data.ok!==false)return;
+      covPaint([r.data]);
+      showToast(r.data.body||'This vehicle is already covered, so a second coverage was not started.','error');
+      if(typeof reloadAll==='function')reloadAll(true);
+    },function(){});
+  };
+  var prevCo=coRender;
+  coRender=function(){
+    prevCo();
+    if(coRank()!=='primary')return;
+    (CO.rows||[]).forEach(function(m){
+      if((m.management||'full')!=='limited')return;
+      var row=document.querySelector('.co-row[data-co="'+m.user_id+'"]');
+      if(!row||row.querySelector('.co-title'))return;
+      var on=!!m.see_title_documents;
+      row.insertAdjacentHTML('beforeend','<label class="tgl co-title"><input type="checkbox" '+(on?'checked':'')+' onchange="coTitleToggle(\''+jsId(m.user_id)+'\',this)"><span class="tgl-ui"></span><span class="tgl-t">Title documents</span></label>');
+    });
+  };
+})();
+async function coTitleToggle(uid,box){
+  var r=await sb.rpc('set_co_owner_title_access',{p_user_id:uid,p_allow:!!box.checked});
+  if(r.error){box.checked=!box.checked;showToast(typeof rpcMissing==='function'&&rpcMissing(r.error)?'Title access needs one backend update':friendlyError(r.error),'error');return;}
+  (CO.rows||[]).forEach(function(m){if(m.user_id===uid)m.see_title_documents=!!box.checked;});
+  showToast(box.checked?'Title documents are visible to this co-owner':'Title documents are hidden from this co-owner');
+}

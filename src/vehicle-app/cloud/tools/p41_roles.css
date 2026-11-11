@@ -15,4 +15,9 @@
 .rq-kicker{margin-bottom:6px}
 .vx-sec{margin-top:18px}
 .vx-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(201,170,107,.35);font-size:16px;color:#fff}
+.od-band{margin:8px 0 18px;padding:14px 0 4px;border-top:1px solid rgba(201,170,107,.55)}
+.od-eye{font-family:"Cormorant Garamond",Georgia,serif;letter-spacing:.18em;text-transform:uppercase;color:#C9AA6B;font-size:15px;margin:0 0 6px}
+.od-band h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:28px;color:#fff;margin:0 0 10px}
+.od-lead{color:#F7F4EE;font-size:16px;line-height:1.45;margin:0 0 12px}
+.co-title{margin-top:8px}
 .rq-in,.rq-f input,.rq-f select,#rq-form input,#rq-form select,#rq-form textarea{font-size:16px;color:#fff}

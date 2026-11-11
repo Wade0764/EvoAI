@@ -134,6 +134,18 @@ drop function if exists private.can_manage_collection(uuid);
 drop function if exists private.can_write_vehicle_as_owner(uuid);
 drop function if exists private.grant_covers_vehicle(uuid, uuid);
 drop function if exists private.perm_allowed(text);
+drop policy if exists documents_select on public.documents;
+create policy documents_select on public.documents for select to authenticated
+  using (private.is_owner_or_admin(vehicle_id) or (not owner_only and private.tech_can(vehicle_id, 'view_documents')));
+drop trigger if exists vehicles_coverage_guard on public.vehicles;
+drop function if exists public.set_co_owner_title_access(uuid, boolean);
+drop function if exists public.claim_vehicle_coverage(text, uuid);
+drop function if exists public.clear_expired_notices();
+drop function if exists private.can_see_title_docs(uuid);
+drop function if exists private.norm_vin(text);
+drop function if exists private.vehicles_coverage_guard();
+drop table if exists public.vehicle_coverage;
+alter table public.collection_members drop column if exists see_title_documents;
 
 drop table if exists public.notifications;
 drop table if exists public.vehicle_history;

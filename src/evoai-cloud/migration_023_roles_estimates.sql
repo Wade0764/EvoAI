@@ -9,7 +9,12 @@
 --   * formal estimate rows on service_requests (request_kind = 'estimate') and official notifications.
 --   * vehicle_history for completion, decisions, reminder and field changes. No free-text PII, no VIN, no notes.
 --   * server-side isolation: revoked and out-of-scope callers fail on data routes, not only in the UI.
--- Does not set a price, tax, reseller split, or billing responsibility.
+-- Does not set a price, tax, reseller split, or collect a payment.
+-- Coverage is one row per VIN: the first account to claim it owns it. A later claim is refused and
+-- the later person gets an in-app notice. Completed jobs are kept with the vehicle. Access-ended
+-- notices are hidden after 90 days and removed by public.clear_expired_notices() (the app calls it;
+-- no scheduler is required). Limited co-owners do not see title documents unless the original owner
+-- sets collection_members.see_title_documents.
 begin;
 
 do $$ begin
@@ -64,6 +69,7 @@ on conflict (name) do nothing;
 alter table public.collection_members add column if not exists management text not null default 'full';
 alter table public.collection_members drop constraint if exists collection_members_management_chk;
 alter table public.collection_members add constraint collection_members_management_chk check (management in ('full','limited'));
+alter table public.collection_members add column if not exists see_title_documents boolean not null default false;
 
 create table if not exists public.tech_grant_vehicles (
   access_id  uuid not null references public.tech_access(id) on delete cascade,
@@ -554,7 +560,7 @@ create table if not exists public.notifications (
   owner_id uuid not null references public.profiles(id) on delete cascade,
   vehicle_id uuid references public.vehicles(id) on delete cascade,
   request_id uuid references public.service_requests(id) on delete cascade,
-  kind text not null check (kind in ('estimate_sent','estimate_decided','job_completed','access_ended','reminder_due')),
+  kind text not null check (kind in ('estimate_sent','estimate_decided','job_completed','access_ended','coverage_blocked','reminder_due')),
   title text not null check (char_length(title) between 1 and 140),
   body text check (body is null or char_length(body) <= 400),
   created_at timestamptz not null default now(),
@@ -764,11 +770,17 @@ alter table public.notifications force row level security;
 revoke all on public.notifications from anon;
 grant select, update on public.notifications to authenticated;
 drop policy if exists notifications_select on public.notifications;
+-- Access-ended notices stop being readable after 90 days. clear_expired_notices() deletes them.
+-- Completed job rows are not in this table's expiry path and are not deleted here.
+alter table public.notifications drop constraint if exists notifications_kind_check;
+alter table public.notifications add constraint notifications_kind_check
+  check (kind in ('estimate_sent','estimate_decided','job_completed','access_ended','coverage_blocked','reminder_due'));
 create policy notifications_select on public.notifications for select to authenticated
   using (
     recipient_id = (select auth.uid())
+    and (kind is distinct from 'access_ended' or created_at > now() - interval '90 days')
     and (
-      kind = 'access_ended'
+      kind in ('access_ended','coverage_blocked')
       or private.is_collection_owner(owner_id)
       or (vehicle_id is not null and private.has_active_tech_access(vehicle_id))
       or private.is_client_tech(owner_id)
@@ -984,6 +996,158 @@ create policy audit_log_select on public.audit_log for select to authenticated
        ))
   );
 
+-- Title documents: primary and full co-owners see them. A limited co-owner does not, unless the
+-- original owner has set see_title_documents for that person.
+create or replace function private.can_see_title_docs(p_vehicle uuid) returns boolean
+language sql stable security definer set search_path = '' as $$
+  select private.is_admin()
+      or exists (
+        select 1 from public.vehicles v
+         where v.id = p_vehicle
+           and (
+             private.owner_rank(v.owner_id) in ('primary','full')
+             or private.is_managing_tech(v.owner_id)
+             or exists (
+               select 1 from public.collection_members m
+                where m.collection_owner_id = v.owner_id
+                  and m.user_id = auth.uid()
+                  and m.management = 'limited'
+                  and m.see_title_documents
+             )
+           )
+      );
+$$;
+revoke all on function private.can_see_title_docs(uuid) from public, anon;
+grant execute on function private.can_see_title_docs(uuid) to authenticated, service_role;
+
+create or replace function public.set_co_owner_title_access(p_user_id uuid, p_allow boolean) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare m public.collection_members%rowtype;
+begin
+  if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if p_allow is null then raise exception 'value_required' using errcode = '22004'; end if;
+  select * into m from public.collection_members where user_id = p_user_id for update;
+  if not found then raise exception 'not_found' using errcode = 'P0002'; end if;
+  if private.owner_rank(m.collection_owner_id) is distinct from 'primary' then
+    raise exception 'only the original owner can change title access' using errcode = '42501'; end if;
+  if m.management is distinct from 'limited' then
+    raise exception 'title_toggle_is_for_limited' using errcode = '22023'; end if;
+  update public.collection_members set see_title_documents = p_allow where user_id = p_user_id;
+  return jsonb_build_object('user_id', p_user_id, 'see_title_documents', p_allow);
+end $$;
+revoke all on function public.set_co_owner_title_access(uuid, boolean) from public, anon;
+grant execute on function public.set_co_owner_title_access(uuid, boolean) to authenticated;
+
+drop policy if exists documents_select on public.documents;
+create policy documents_select on public.documents for select to authenticated
+  using (
+    (
+      private.is_owner_or_admin(vehicle_id)
+      and (kind is distinct from 'title' or private.can_see_title_docs(vehicle_id))
+    )
+    or (
+      not owner_only
+      and not private.is_vehicle_owner(vehicle_id)
+      and private.tech_can(vehicle_id, 'view_documents')
+    )
+  );
+
+-- One coverage owner per VIN. No amount, currency, or payment is stored.
+create table if not exists public.vehicle_coverage (
+  vin_key     text primary key check (vin_key ~ '^[A-Z0-9]{5,25}$'),
+  covered_by  uuid not null references public.profiles(id) on delete cascade,
+  vehicle_id  uuid references public.vehicles(id) on delete set null,
+  created_at  timestamptz not null default now()
+);
+alter table public.vehicle_coverage enable row level security;
+alter table public.vehicle_coverage force row level security;
+revoke all on public.vehicle_coverage from anon, authenticated;
+grant select on public.vehicle_coverage to authenticated;
+drop policy if exists vehicle_coverage_select on public.vehicle_coverage;
+create policy vehicle_coverage_select on public.vehicle_coverage for select to authenticated
+  using (covered_by = (select auth.uid()) or (select private.is_admin()));
+
+create or replace function private.norm_vin(p_vin text) returns text
+language sql immutable set search_path = '' as $$
+  select nullif(upper(regexp_replace(coalesce(p_vin, ''), '[^A-Za-z0-9]', '', 'g')), '')
+$$;
+
+create or replace function public.claim_vehicle_coverage(p_vin text, p_vehicle_id uuid default null) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_uid uuid := auth.uid();
+  v_key text := private.norm_vin(p_vin);
+  c public.vehicle_coverage%rowtype;
+begin
+  if v_uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if v_key is null then return jsonb_build_object('ok', true, 'skipped', true); end if;
+  if v_key !~ '^[A-Z0-9]{5,25}$' then raise exception 'invalid_vin' using errcode = '22023'; end if;
+  if p_vehicle_id is not null and not exists (select 1 from public.vehicles v where v.id = p_vehicle_id) then
+    p_vehicle_id := null;
+  end if;
+  select * into c from public.vehicle_coverage where vin_key = v_key for update;
+  if not found then
+    insert into public.vehicle_coverage (vin_key, covered_by, vehicle_id)
+    values (v_key, v_uid, p_vehicle_id);
+    return jsonb_build_object('ok', true, 'covered_by', v_uid);
+  end if;
+  if c.covered_by = v_uid then
+    if p_vehicle_id is not null and c.vehicle_id is null then
+      update public.vehicle_coverage set vehicle_id = p_vehicle_id where vin_key = v_key;
+    end if;
+    return jsonb_build_object('ok', true, 'covered_by', v_uid);
+  end if;
+  insert into public.notifications (recipient_id, owner_id, kind, title, body)
+  values (v_uid, v_uid, 'coverage_blocked', 'Vehicle already covered',
+          'This vehicle is already covered, so a second coverage was not started.');
+  return jsonb_build_object('ok', false, 'error', 'already_covered',
+    'title', 'Vehicle already covered',
+    'body', 'This vehicle is already covered, so a second coverage was not started.');
+end $$;
+
+-- Runs after the vehicle row exists so the coverage row can point at it. A second account's
+-- insert of the same VIN is rolled back. The in-app notice is written by claim_vehicle_coverage,
+-- which returns instead of raising so the notice commits.
+create or replace function private.vehicles_coverage_guard() returns trigger
+language plpgsql security definer set search_path = '' as $$
+declare
+  v_key text := private.norm_vin(new.vin);
+  v_who uuid := coalesce(auth.uid(), new.owner_id);
+  v_owner uuid;
+begin
+  if v_key is null or v_key !~ '^[A-Z0-9]{5,25}$' then return new; end if;
+  insert into public.vehicle_coverage (vin_key, covered_by, vehicle_id)
+  values (v_key, v_who, new.id)
+  on conflict (vin_key) do update
+     set vehicle_id = coalesce(public.vehicle_coverage.vehicle_id, excluded.vehicle_id)
+   where public.vehicle_coverage.covered_by = excluded.covered_by;
+  select covered_by into v_owner from public.vehicle_coverage where vin_key = v_key;
+  if v_owner is distinct from v_who then
+    raise exception 'vehicle_already_covered' using errcode = '42501';
+  end if;
+  return new;
+end $$;
+drop trigger if exists vehicles_coverage_guard on public.vehicles;
+create trigger vehicles_coverage_guard after insert or update of vin on public.vehicles
+  for each row execute function private.vehicles_coverage_guard();
+
+-- Deletes only access-ended notices older than 90 days. Job records are not touched.
+-- The app calls this after sign-in. No external scheduler is required.
+create or replace function public.clear_expired_notices() returns integer
+language plpgsql security definer set search_path = '' as $$
+declare n integer;
+begin
+  if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  delete from public.notifications
+   where kind = 'access_ended' and created_at < now() - interval '90 days';
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+revoke all on function private.norm_vin(text), private.vehicles_coverage_guard() from public, anon, authenticated;
+revoke all on function public.claim_vehicle_coverage(text, uuid), public.clear_expired_notices() from public, anon;
+grant execute on function public.claim_vehicle_coverage(text, uuid), public.clear_expired_notices() to authenticated;
+
 create or replace function private.can_read_object(p_bucket text, p_name text) returns boolean
 language sql stable security definer set search_path = '' as $$
   select p_bucket in ('vehicle-photos','vehicle-documents')
@@ -992,7 +1156,15 @@ language sql stable security definer set search_path = '' as $$
               and (storage.foldername(p_name))[3] = 'portfolio'))
      and private.object_vehicle(p_name) is not null
      and (
-       private.is_owner_or_admin(private.object_vehicle(p_name))
+       (
+         private.is_owner_or_admin(private.object_vehicle(p_name))
+         and not exists (
+           select 1 from public.documents d
+            where (d.storage_path = p_name or d.thumb_path = p_name)
+              and d.kind = 'title'
+              and not private.can_see_title_docs(private.object_vehicle(p_name))
+         )
+       )
        or (private.has_active_tech_access(private.object_vehicle(p_name))
            and case p_bucket
                  when 'vehicle-photos' then private.tech_can(private.object_vehicle(p_name), 'view_photos')

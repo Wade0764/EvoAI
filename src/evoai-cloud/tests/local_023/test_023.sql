@@ -248,7 +248,9 @@ begin
   select count(*) into n from public.vehicles where owner_id=b;
   if n <> 0 then bad := bad || 'limited saw B; '; end if;
   select count(*) into n from public.documents where id=doc_priv;
-  if n <> 1 then bad := bad || 'limited should see title; '; end if;
+  if n <> 0 then bad := bad || 'limited saw title by default; '; end if;
+  select count(*) into n from public.documents where id=doc1;
+  if n <> 1 then bad := bad || 'limited lost a non-title document; '; end if;
   execute 'reset role';
   begin
     execute 'set local role authenticated';
@@ -416,6 +418,99 @@ begin
   select count(*) into n from public.vehicle_history where owner_id=a;
   if n <> 0 then bad := bad || 'B saw A history; '; end if;
   execute 'reset role';
+
+  -- title toggle: only the original owner can grant it, and it is per limited co-owner
+  perform set_config('request.jwt.claim.sub', dl::text, true);
+  begin
+    execute 'set local role authenticated';
+    perform public.set_co_owner_title_access(dl, true);
+    bad := bad || 'limited granted themself title access; ';
+  exception when others then null; end;
+  execute 'reset role';
+  perform set_config('request.jwt.claim.sub', cf::text, true);
+  begin
+    execute 'set local role authenticated';
+    perform public.set_co_owner_title_access(dl, true);
+    bad := bad || 'full co-owner granted title access; ';
+  exception when others then null; end;
+  execute 'reset role';
+  perform set_config('request.jwt.claim.sub', a::text, true);
+  execute 'set local role authenticated';
+  j := public.set_co_owner_title_access(dl, true);
+  if coalesce(j->>'see_title_documents','') <> 'true' then bad := bad || 'primary title toggle; '; end if;
+  execute 'reset role';
+  perform set_config('request.jwt.claim.sub', dl::text, true);
+  execute 'set local role authenticated';
+  select count(*) into n from public.documents where id=doc_priv;
+  if n <> 1 then bad := bad || 'limited still hidden after toggle; '; end if;
+  execute 'reset role';
+  insert into storage.objects(bucket_id, name, owner_id)
+  values ('vehicle-documents', a::text||'/'||v1::text||'/title.txt', a::text);
+  perform set_config('request.jwt.claim.sub', a::text, true);
+  execute 'set local role authenticated';
+  j := public.set_co_owner_title_access(dl, false);
+  execute 'reset role';
+  perform set_config('request.jwt.claim.sub', dl::text, true);
+  execute 'set local role authenticated';
+  select count(*) into n from public.documents where id=doc_priv;
+  if n <> 0 then bad := bad || 'title visible after toggle off; '; end if;
+  select count(*) into n from storage.objects where name like '%/title.txt';
+  if n <> 0 then bad := bad || 'limited read the title file; '; end if;
+  execute 'reset role';
+  perform set_config('request.jwt.claim.sub', cf::text, true);
+  execute 'set local role authenticated';
+  select count(*) into n from public.documents where id=doc_priv;
+  if n <> 1 then bad := bad || 'full co-owner lost title; '; end if;
+  execute 'reset role';
+
+  -- duplicate coverage: first claim owns it; the second person is blocked and notified. No price is stored.
+  perform set_config('request.jwt.claim.sub', a::text, true);
+  execute 'set local role authenticated';
+  j := public.claim_vehicle_coverage('test-vin-123456789', null);
+  if coalesce(j->>'ok','') <> 'true' then bad := bad || 'first coverage; '; end if;
+  execute 'reset role';
+  perform set_config('request.jwt.claim.sub', b::text, true);
+  execute 'set local role authenticated';
+  j := public.claim_vehicle_coverage('TESTVIN123456789', null);
+  if coalesce(j->>'error','') <> 'already_covered' then bad := bad || 'second coverage not blocked; '; end if;
+  select count(*) into n from public.notifications where recipient_id=b and kind='coverage_blocked';
+  if n <> 1 then bad := bad || 'coverage notice='||n||'; '; end if;
+  select count(*) into n from public.vehicle_coverage;
+  if n <> 0 then bad := bad || 'second person can read the coverage row; '; end if;
+  execute 'reset role';
+  select count(*) into n from public.vehicle_coverage where vin_key='TESTVIN123456789' and covered_by=a;
+  if n <> 1 then bad := bad || 'coverage rows='||n||'; '; end if;
+  begin
+    execute 'set local role authenticated';
+    insert into public.vehicles(owner_id, year, make, model, vin)
+    values (b, 2020, 'Porsche', '911', 'TESTVIN123456789');
+    bad := bad || 'second vehicle with a covered VIN was saved; ';
+  exception when others then
+    if sqlerrm not like '%vehicle_already_covered%' then bad := bad || 'vin block '||sqlerrm||'; '; end if;
+  end;
+  execute 'reset role';
+
+  -- retention: jobs stay; access-ended notices older than 90 days are hidden and then deleted
+  insert into public.notifications(recipient_id, owner_id, kind, title, created_at)
+  values (a, a, 'access_ended', 'Old ended', now() - interval '100 days'),
+         (a, a, 'access_ended', 'Recent ended', now() - interval '10 days');
+  insert into public.service_requests(owner_id, vehicle_id, created_by, service, status, completed_at, completion_note)
+  values (a, v1, a, 'maintenance', 'done', now() - interval '400 days', 'Kept with the car');
+  perform set_config('request.jwt.claim.sub', a::text, true);
+  execute 'set local role authenticated';
+  select count(*) into n from public.notifications where title='Old ended';
+  if n <> 0 then bad := bad || 'old access notice still visible; '; end if;
+  select count(*) into n from public.notifications where title='Recent ended';
+  if n <> 1 then bad := bad || 'recent access notice hidden; '; end if;
+  n := public.clear_expired_notices();
+  if n < 1 then bad := bad || 'cleanup deleted '||n||'; '; end if;
+  select count(*) into n from public.service_requests where completion_note='Kept with the car';
+  if n <> 1 then bad := bad || 'completed job was removed; '; end if;
+  execute 'reset role';
+  select count(*) into n from public.notifications where title='Old ended';
+  if n <> 0 then bad := bad || 'old notice survived cleanup; '; end if;
+  select count(*) into n from public.notifications where title='Recent ended';
+  if n <> 1 then bad := bad || 'recent notice was deleted; '; end if;
 
   if bad <> '' then raise exception '023 failures: %', bad; end if;
   return 'ok';
