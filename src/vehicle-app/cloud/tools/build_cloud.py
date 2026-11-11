@@ -16,7 +16,7 @@ def _publish(html):
         sw=os.path.join(ROOT,'cloud','sw.js')
         if os.path.exists(sw):
             s=open(sw,encoding='utf-8').read()
-            s=re.sub(r"var CACHE='[^']*'","var CACHE='evoai-shell-v38b-roles'",s,count=1)
+            s=re.sub(r"var CACHE='[^']*'","var CACHE='evoai-shell-v38c-roles'",s,count=1)
             open(sw,'w',encoding='utf-8').write(s)
     print('built',len(html))
 if not os.path.exists(SRC):

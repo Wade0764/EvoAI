@@ -2,6 +2,7 @@
 # Rebuild the single HTML, syntax/ASCII check, then run the mocked e2e suite. Optional: python3 live_probe.py (read-only, anon key).
 set -e
 cd "$(dirname "$0")/.."
+mkdir -p screens /tmp/logoshot /opt/cursor/artifacts/roles
 python3 tools/build_cloud.py
 python3 - <<'PY'
 import re
@@ -45,6 +46,7 @@ else
   echo "skip wade_import (private fixture is not in the repo)"
 fi
 node tests/roles41.js
+node tests/roles_logic.js
 node tests/presshold.js
 node tests/values25b.js
 node tests/signup.js

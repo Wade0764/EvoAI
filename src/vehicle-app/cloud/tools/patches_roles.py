@@ -25,4 +25,14 @@ sub(
   "async function ssRun(){\n  var my=++SS.tok;",
   "async function ssRun(){\n  var my=++SS.tok;\n  try{var _sv=byId(getVehicles(),val('svc-vehicle'));if(_sv&&!canReviewScan(_sv)){ssShow('entry','Reviewed scanning is not enabled for you on this vehicle. Enter the details below.');return;}}catch(_e){}\n"
 )
+sub('.co-desc{font-size:17px;line-height:1.5;color:#C9CCD1;margin:0 0 14px}.co-muted{color:#B3B7BE}',
+    '.co-desc{font-size:17px;line-height:1.5;color:#F7F4EE;margin:0 0 14px}.co-muted{color:#C9AA6B}', 'html')
+sub('.co-n{font-size:19px;color:#F2F0EB}.co-m{font-size:15px;color:#B3B7BE;margin-top:3px;line-height:1.4}',
+    '.co-n{font-size:19px;color:#F7F4EE}.co-m{font-size:15px;color:#F7F4EE;margin-top:3px;line-height:1.4}', 'html')
+sub('.co-link{font-size:15px;color:#C9CCD1;margin-top:6px;word-break:break-all;user-select:all;-webkit-user-select:all}',
+    '.co-link{font-size:15px;color:#C9AA6B;margin-top:6px;word-break:break-all;user-select:all;-webkit-user-select:all}', 'html')
+sub('<p class="ph-note">Delete permanently is only for the owner or admin. Technicians can only delete cars they added. This cannot be undone after 10 seconds.</p>',
+    '<p class="ph-note">Archive keeps completed jobs with the car. Delete permanently is refused when a completed job is on file. It is only for a car with no completed work, and it frees that VIN.</p>')
+sub("showToast(r.error.code==='42501'?'You can only delete cars you added. '+name+' was not deleted.':'Could not delete '+name+'. It is still here.')",
+    "showToast(/Archive/.test(String(r.error&&r.error.message||''))?r.error.message:(r.error.code==='42501'?'You can only delete cars you added. '+name+' was not deleted.':'Could not delete '+name+'. It is still here.'))")
 js = js.rstrip()+'\n'+open(T+'p41_roles.js').read()+'\n'

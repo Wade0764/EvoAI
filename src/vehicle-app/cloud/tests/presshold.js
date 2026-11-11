@@ -92,7 +92,7 @@ let order1=await p.evaluate(()=>[].slice.call(document.querySelectorAll('.whl-ca
 ok(JSON.stringify(order1)===JSON.stringify(ids2),'order is kept after reloading from the database');
 // archive + undo (ph-04, ph-05)
 await p.evaluate(id=>phSheet(id),V2);await btn(p,'Remove from portfolio');await L.sleep(150);s=await sheet(p);
-ok(/Remove 1967 Chevrolet Corvette Sting Ray\?/.test(s)&&/Archive keeps its history, photos and documents\. You can bring it back any time from Archived cars\./.test(s)&&/Delete permanently is only for the owner or admin\. Technicians can only delete cars they added\. This cannot be undone after 10 seconds\./.test(s),'remove sheet texts (ph-04)');
+ok(/Remove 1967 Chevrolet Corvette Sting Ray\?/.test(s)&&/Archive keeps its history, photos and documents\. You can bring it back any time from Archived cars\./.test(s)&&/Archive keeps completed jobs with the car\. Delete permanently is refused when a completed job is on file\./.test(s),'remove sheet texts (ph-04)');
 ok(await p.evaluate(()=>[].slice.call(document.querySelectorAll('#ph-root button')).map(b=>b.innerText.trim()).join('|'))==='Archive|Delete permanently|Cancel','owner gets Archive, Delete permanently, Cancel');
 ok((await style(p)).length===0,'remove sheet text >= 15px, no grey');
 await btn(p,'Archive');await L.sleep(900);

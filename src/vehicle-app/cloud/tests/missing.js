@@ -58,10 +58,12 @@ k=await key(p);ok(k.chip==='8 of 8 complete'&&k.miss.length===0,'after save: 8 o
 await p.evaluate(()=>{setVal('v-plate','');});
 await p.evaluate(()=>msSetCount(false));k=await key(p);ok(k.chip==='','count hidden when turned off');
 await p.evaluate(()=>msSetCount(true));k=await key(p);ok(k.chip!=='','count back on');
-// ---------- D. co-owner view: never Missing
-await p.evaluate(()=>{var v=byId(getVehicles(),currentVehicleId);v.insurer='';CO.of='someone-else';msRender(v);});
-k=await key(p);ok(k.miss.length===0&&k.chip===''&&/Not on file/.test(k.txt),'co-owner view: no Missing, no count');
-await p.evaluate(()=>{CO.of=null;});
+// ---------- D. full co-owner sees Missing; limited does not
+await p.evaluate(()=>{var v=byId(getVehicles(),currentVehicleId);v.insurer='';CO.on=true;CO.of='someone-else';CO.rows=[{user_id:myId(),management:'full',collection_owner_id:'someone-else'}];msRender(v);});
+k=await key(p);ok(k.miss.length>0,'full co-owner sees Missing');
+await p.evaluate(()=>{CO.rows=[{user_id:myId(),management:'limited',collection_owner_id:'someone-else'}];var v=byId(getVehicles(),currentVehicleId);msRender(v);});
+k=await key(p);ok(k.miss.length===0&&k.chip===''&&/Not on file/.test(k.txt),'limited co-owner: no Missing, no count');
+await p.evaluate(()=>{CO.of=null;CO.rows=[];});
 // ---------- E. archived / export never carry Missing
 ok(await p.evaluate(()=>!/Missing/.test(JSON.stringify(getVehicles()))),'exported data has no "Missing"');
 ok(await p.evaluate(()=>{var v=byId(getVehicles(),currentVehicleId);var a=Object.assign({},v,{archived:true});return !msCanSeeMissing(a);}),'archived car: no Missing');

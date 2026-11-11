@@ -49,7 +49,11 @@ select p.oid::regprocedure::text, pg_get_functiondef(p.oid)
         ('private','tech_can'),
         ('public','set_tech_permission'),
         ('public','revoke_tech_access'),
-        ('public','reset_tech_permission_override'))
+        ('public','reset_tech_permission_override'),
+        ('public','initiate_transfer'),
+        ('public','delete_vehicle_permanently'),
+        ('private','complete_transfer'),
+        ('private','comments_guard'))
 on conflict (fn) do nothing;
 
 create table if not exists private.backup_023_views (
@@ -512,6 +516,12 @@ begin
   end if;
   if ta.status <> 'revoked' then
     update public.tech_access set status = 'revoked', revoked_at = now(), revoked_by = auth.uid() where id = ta.id;
+    perform set_config('evoai.estimate_rpc', '1', true);
+    update public.service_requests
+       set decision = 'advisor_removed'
+     where request_kind = 'estimate' and created_by = ta.tech_id
+       and decision = 'pending' and status not in ('done','declined');
+    perform set_config('evoai.estimate_rpc', '0', true);
     update public.invites set revoked_at = now()
      where created_by in (ta.owner_id, auth.uid()) and redeemed_at is null and revoked_at is null
        and kind in ('tech_owner','tech_vehicle') and email = (select lower(email) from public.profiles where id = ta.tech_id);
@@ -548,11 +558,11 @@ alter table public.service_requests add constraint service_requests_estimate_sha
       and proposed_start is not null
       and proposed_tz ~ '^[A-Za-z0-9_+\-/]{1,64}$'
       and duration_minutes between 15 and 20160
-      and decision in ('pending','approved','denied','question'))
+      and decision in ('pending','approved','denied','question','advisor_removed'))
 );
 alter table public.service_requests drop constraint if exists service_requests_decision_chk;
 alter table public.service_requests add constraint service_requests_decision_chk
-  check (decision is null or decision in ('pending','approved','denied','question'));
+  check (decision is null or decision in ('pending','approved','denied','question','advisor_removed'));
 
 create table if not exists public.notifications (
   id uuid primary key default gen_random_uuid(),
@@ -608,6 +618,7 @@ revoke all on function private.history_add(uuid,uuid,text,uuid,text,text) from p
 create or replace function private.service_requests_guard() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
+  if coalesce(current_setting('evoai.transfer', true), '') = '1' then return new; end if;
   if tg_op = 'INSERT' then
     if not exists (select 1 from public.vehicles v where v.id = new.vehicle_id and v.owner_id = new.owner_id) then
       raise exception 'vehicle_not_in_collection' using errcode = '42501'; end if;
@@ -650,7 +661,6 @@ create policy service_requests_insert on public.service_requests for insert to a
       and status = 'new' and decision = 'pending'
       and private.has_active_tech_access(vehicle_id)
       and private.tech_can(vehicle_id, 'can_send_estimates')
-      and private.tech_can(vehicle_id, 'can_add_service')
       and not private.is_collection_owner(owner_id))
   );
 drop policy if exists service_requests_update on public.service_requests;
@@ -687,7 +697,7 @@ begin
   v_rank := private.owner_rank(r.owner_id);
   if v_rank = 'limited' and p_decision <> 'question' then
     raise exception 'limited_can_only_ask' using errcode = '42501'; end if;
-  if r.decision = 'approved' or r.decision = 'denied' or r.status = 'done' then
+  if r.decision in ('approved','denied','advisor_removed') or r.status in ('done','declined') then
     raise exception 'estimate_already_decided' using errcode = 'P0001'; end if;
   perform set_config('evoai.estimate_rpc', '1', true);
   if p_decision = 'question' then
@@ -719,6 +729,8 @@ begin
   if not private.has_active_tech_access(r.vehicle_id) or not private.tech_can(r.vehicle_id, 'can_add_service') then
     raise exception 'not_allowed' using errcode = '42501'; end if;
   if r.status = 'done' then raise exception 'already_complete' using errcode = 'P0001'; end if;
+  if r.decision = 'advisor_removed' or r.status = 'declined' then
+    raise exception 'advisor_removed' using errcode = 'P0001'; end if;
   if r.request_kind = 'estimate' and r.decision is distinct from 'approved' then
     raise exception 'estimate_not_approved' using errcode = 'P0001'; end if;
   if r.request_kind = 'client' and r.status not in ('accepted','scheduled') then
@@ -793,7 +805,8 @@ create policy notifications_read on public.notifications for update to authentic
 create or replace function private.notifications_guard() returns trigger
 language plpgsql set search_path = '' as $$
 begin
-  if coalesce(current_setting('evoai.estimate_rpc', true), '') = '1' then return new; end if;
+  if coalesce(current_setting('evoai.estimate_rpc', true), '') = '1'
+     or coalesce(current_setting('evoai.transfer', true), '') = '1' then return new; end if;
   if new.recipient_id is distinct from old.recipient_id or new.owner_id is distinct from old.owner_id
      or new.vehicle_id is distinct from old.vehicle_id or new.request_id is distinct from old.request_id
      or new.kind is distinct from old.kind or new.title is distinct from old.title
@@ -953,8 +966,14 @@ create policy reminders_insert on public.reminders for insert to authenticated
                   and private.has_active_tech_access(vehicle_id) and private.tech_can(vehicle_id, 'can_add_reminders')));
 drop policy if exists reminders_update on public.reminders;
 create policy reminders_update on public.reminders for update to authenticated
-  using (private.can_write_vehicle_as_owner(vehicle_id))
-  with check (private.can_write_vehicle_as_owner(vehicle_id));
+  using (private.can_write_vehicle_as_owner(vehicle_id)
+         or (private.has_active_tech_access(vehicle_id)
+             and private.tech_can(vehicle_id, 'can_add_reminders')
+             and not private.is_vehicle_owner(vehicle_id)))
+  with check (private.can_write_vehicle_as_owner(vehicle_id)
+         or (private.has_active_tech_access(vehicle_id)
+             and private.tech_can(vehicle_id, 'can_add_reminders')
+             and not private.is_vehicle_owner(vehicle_id)));
 drop policy if exists reminders_delete on public.reminders;
 create policy reminders_delete on public.reminders for delete to authenticated
   using (private.can_write_vehicle_as_owner(vehicle_id));
@@ -1115,15 +1134,27 @@ declare
   v_who uuid := coalesce(auth.uid(), new.owner_id);
   v_owner uuid;
 begin
+  if coalesce(current_setting('evoai.transfer', true), '') = '1' then return new; end if;
   if v_key is null or v_key !~ '^[A-Z0-9]{5,25}$' then return new; end if;
+  -- Ordinary save always writes vin. If this car already holds the coverage, keep it
+  -- with the car's current owner instead of treating the write as a second claim.
+  if exists (select 1 from public.vehicle_coverage c where c.vin_key = v_key and c.vehicle_id = new.id)
+     and (auth.uid() is null or private.is_collection_owner(new.owner_id) or private.is_managing_tech(new.owner_id)) then
+    update public.vehicle_coverage set covered_by = new.owner_id
+     where vin_key = v_key and vehicle_id = new.id;
+    return new;
+  end if;
   insert into public.vehicle_coverage (vin_key, covered_by, vehicle_id)
   values (v_key, v_who, new.id)
   on conflict (vin_key) do update
      set vehicle_id = coalesce(public.vehicle_coverage.vehicle_id, excluded.vehicle_id)
    where public.vehicle_coverage.covered_by = excluded.covered_by;
   select covered_by into v_owner from public.vehicle_coverage where vin_key = v_key;
-  if v_owner is distinct from v_who then
+  if v_owner is distinct from v_who and v_owner is distinct from new.owner_id then
     raise exception 'vehicle_already_covered' using errcode = '42501';
+  end if;
+  if v_owner is distinct from new.owner_id and private.is_collection_owner(new.owner_id) then
+    update public.vehicle_coverage set covered_by = new.owner_id, vehicle_id = new.id where vin_key = v_key;
   end if;
   return new;
 end $$;
@@ -1236,5 +1267,196 @@ where e.tech_id = auth.uid()
 group by e.vehicle_id, e.owner_id, v.year, v.make, v.model;
 
 grant select on public.tech_effective_permissions, public.my_tech_visibility to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Transfer, coverage move, co-owner management, delete vs permanent jobs
+-- ---------------------------------------------------------------------------
+create or replace function private.comments_guard() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  if coalesce(current_setting('evoai.transfer', true), '') = '1' then return new; end if;
+  if tg_op = 'INSERT' then
+    if new.vehicle_id is not null and not exists (select 1 from public.vehicles v where v.id = new.vehicle_id and v.owner_id = new.owner_id) then
+      raise exception 'vehicle_not_in_collection' using errcode = '42501'; end if;
+    if new.request_id is not null and not exists (select 1 from public.service_requests r where r.id = new.request_id and r.owner_id = new.owner_id) then
+      raise exception 'request_not_in_collection' using errcode = '42501'; end if;
+  else
+    if new.owner_id is distinct from old.owner_id or new.vehicle_id is distinct from old.vehicle_id or new.request_id is distinct from old.request_id
+       or new.author_id is distinct from old.author_id or new.created_at is distinct from old.created_at then
+      raise exception 'comment_fields_locked' using errcode = '42501'; end if;
+    if new.body is distinct from old.body then new.edited_at := now(); end if;
+  end if;
+  return new;
+end $$;
+
+create or replace function public.initiate_transfer(p_vehicle_id uuid, p_buyer_email text default null)
+returns table (transfer_id uuid, code text, expires_at timestamptz)
+language plpgsql security definer set search_path = '' as $$
+#variable_conflict use_column
+declare v_uid uuid := auth.uid(); v_owner uuid; v_code text; v_tid uuid; v_exp timestamptz;
+begin
+  if v_uid is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  select owner_id into v_owner from public.vehicles where id = p_vehicle_id;
+  if v_owner is null or not private.can_manage_collection(v_owner) then
+    raise exception 'not_vehicle_owner' using errcode = '42501';
+  end if;
+  update public.transfers set status = 'expired' where vehicle_id = p_vehicle_id and status = 'pending' and expires_at <= now();
+  if exists (select 1 from public.transfers where vehicle_id = p_vehicle_id and status = 'pending') then
+    raise exception 'transfer_already_pending' using errcode = '23505';
+  end if;
+  insert into public.transfers (vehicle_id, seller_id, buyer_email)
+  values (p_vehicle_id, v_owner, nullif(lower(btrim(p_buyer_email)), ''))
+  returning id, transfers.expires_at into v_tid, v_exp;
+  v_code := substr(replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', ''), 1, 32);
+  insert into public.invites (code_hash, kind, created_by, owner_id, vehicle_id, transfer_id, email, expires_at)
+  values (encode(sha256(convert_to(v_code, 'UTF8')), 'hex'), 'transfer', v_uid, v_owner, p_vehicle_id, v_tid,
+          nullif(lower(btrim(p_buyer_email)), ''), v_exp);
+  return query select v_tid, v_code, v_exp;
+end $$;
+
+create or replace function private.complete_transfer(p_transfer uuid, p_buyer uuid) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare
+  t public.transfers%rowtype;
+  v public.vehicles%rowtype;
+  v_snapshot jsonb;
+  v_archive uuid;
+  r record;
+begin
+  select * into t from public.transfers where id = p_transfer for update;
+  if not found or t.status <> 'pending' or t.expires_at <= now() then
+    raise exception 'invalid_or_expired_invite' using errcode = 'P0001';
+  end if;
+  if p_buyer = t.seller_id then raise exception 'cannot_transfer_to_self' using errcode = '42501'; end if;
+  select * into v from public.vehicles where id = t.vehicle_id for update;
+  if not found or v.owner_id <> t.seller_id then
+    raise exception 'invalid_or_expired_invite' using errcode = 'P0001';
+  end if;
+
+  v_snapshot := jsonb_build_object(
+    'taken_at', now(),
+    'vehicle', to_jsonb(v) - 'notes',
+    'service_records', coalesce((select jsonb_agg(jsonb_build_object('id', s.id, 'title', s.title, 'performed_on', s.performed_on)) from public.service_records s where s.vehicle_id = v.id), '[]'::jsonb),
+    'estimates', coalesce((select jsonb_agg(jsonb_build_object('id', q.id, 'decision', q.decision, 'status', q.status)) from public.service_requests q where q.vehicle_id = v.id), '[]'::jsonb),
+    'history', coalesce((select jsonb_agg(jsonb_build_object('id', h.id, 'kind', h.kind, 'summary', h.summary)) from public.vehicle_history h where h.vehicle_id = v.id), '[]'::jsonb)
+  );
+  insert into public.vehicle_archives (owner_id, source_vehicle_id, transfer_id, label, snapshot)
+  values (t.seller_id, v.id, t.id,
+          btrim(concat_ws(' ', v.year::text, v.make, v.model)),
+          v_snapshot)
+  returning id into v_archive;
+
+  for r in
+    select ta.id, ta.tech_id, ta.vehicle_id
+      from public.tech_access ta
+     where ta.owner_id = v.owner_id and ta.status = 'active'
+       and (ta.vehicle_id = v.id
+            or exists (select 1 from public.tech_grant_vehicles g where g.access_id = ta.id and g.vehicle_id = v.id))
+  loop
+    insert into public.notifications (recipient_id, owner_id, vehicle_id, kind, title, body)
+    values (r.tech_id, v.owner_id, v.id, 'access_ended', 'Access ended',
+            'This vehicle was transferred. Your access to it has ended.');
+    if r.vehicle_id = v.id then
+      update public.tech_access set status = 'revoked', revoked_at = now(), revoked_by = t.seller_id where id = r.id;
+    else
+      delete from public.tech_grant_vehicles where access_id = r.id and vehicle_id = v.id;
+      if not exists (select 1 from public.tech_grant_vehicles g where g.access_id = r.id) then
+        update public.tech_access set status = 'revoked', revoked_at = now(), revoked_by = t.seller_id where id = r.id;
+      end if;
+    end if;
+  end loop;
+
+  delete from public.expenses where vehicle_id = v.id;
+  delete from public.reminders where vehicle_id = v.id;
+  delete from public.vehicle_financials where vehicle_id = v.id;
+  update public.advisories set status = 'declined', owner_response = 'Vehicle transferred', responded_at = now()
+   where vehicle_id = v.id and status = 'pending';
+  update public.invites set revoked_at = now()
+   where vehicle_id = v.id and redeemed_at is null and revoked_at is null and kind <> 'transfer';
+
+  perform set_config('evoai.transfer', '1', true);
+  update public.service_requests set owner_id = p_buyer where vehicle_id = v.id;
+  update public.comments set owner_id = p_buyer where vehicle_id = v.id;
+  update public.vehicle_history set owner_id = p_buyer where vehicle_id = v.id;
+  update public.notifications set owner_id = p_buyer
+   where vehicle_id = v.id and kind is distinct from 'access_ended';
+  update public.vehicle_coverage set covered_by = p_buyer, vehicle_id = v.id
+   where vehicle_id = v.id
+      or (vin_key = private.norm_vin(v.vin) and covered_by = v.owner_id);
+  update public.vehicles set owner_id = p_buyer, archived = false where id = v.id;
+  perform set_config('evoai.transfer', '0', true);
+
+  update public.transfers set status = 'completed', buyer_id = p_buyer, completed_at = now() where id = t.id;
+  insert into public.audit_log (actor_id, action, entity_table, entity_id, vehicle_id, owner_id, details)
+  values (p_buyer, 'transfer_completed', 'transfers', t.id, v.id, p_buyer,
+          jsonb_build_object('buyer', p_buyer, 'archive_id', v_archive));
+  return jsonb_build_object('kind','transfer','vehicle_id', v.id, 'archive_id', v_archive, 'owner_id', p_buyer);
+end $$;
+
+create or replace function public.set_co_owner_management(p_user_id uuid, p_management text) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare m public.collection_members%rowtype;
+begin
+  if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if p_management not in ('full','limited') then raise exception 'invalid_management' using errcode = '22023'; end if;
+  select * into m from public.collection_members where user_id = p_user_id for update;
+  if not found then raise exception 'not_found' using errcode = 'P0002'; end if;
+  if private.owner_rank(m.collection_owner_id) is distinct from 'primary' then
+    raise exception 'only the original owner can change management' using errcode = '42501'; end if;
+  update public.collection_members set management = p_management where user_id = p_user_id;
+  if p_management = 'full' then
+    update public.collection_members set see_title_documents = false where user_id = p_user_id;
+  end if;
+  return jsonb_build_object('user_id', p_user_id, 'management', p_management);
+end $$;
+
+create or replace function public.dismiss_removed_estimate(p_id uuid) returns jsonb
+language plpgsql security definer set search_path = '' as $$
+declare r public.service_requests%rowtype;
+begin
+  if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  select * into r from public.service_requests where id = p_id for update;
+  if not found or r.decision is distinct from 'advisor_removed' then
+    raise exception 'estimate_not_found' using errcode = '42501'; end if;
+  if not private.is_collection_owner(r.owner_id) then raise exception 'not_allowed' using errcode = '42501'; end if;
+  perform set_config('evoai.estimate_rpc', '1', true);
+  update public.service_requests set status = 'declined' where id = r.id;
+  return jsonb_build_object('id', r.id, 'dismissed', true);
+end $$;
+
+create or replace function public.delete_vehicle_permanently(p_id uuid) returns boolean
+language plpgsql security definer set search_path = '' as $$
+declare v_vin text;
+begin
+  if not private.can_delete_vehicle(p_id) then raise exception 'not_allowed' using errcode = '42501'; end if;
+  if exists (select 1 from public.vehicle_history h where h.vehicle_id = p_id and h.kind = 'job_complete')
+     or exists (select 1 from public.service_requests q where q.vehicle_id = p_id and q.status = 'done')
+     or exists (select 1 from public.service_records s where s.vehicle_id = p_id) then
+    raise exception 'Completed jobs stay with this vehicle. Archive it instead of deleting it.'
+      using errcode = 'P0001';
+  end if;
+  select private.norm_vin(vin) into v_vin from public.vehicles where id = p_id;
+  delete from public.vehicle_coverage where vehicle_id = p_id or (v_vin is not null and vin_key = v_vin);
+  delete from public.vehicles where id = p_id;
+  return found;
+end $$;
+
+create or replace function private.documents_title_class() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  if new.kind = 'title'
+     or coalesce(new.title, '') ~* '(^|[^a-z])title([^a-z]|$)'
+     or coalesce(new.doc_category, '') ~* 'title' then
+    new.kind := 'title';
+  end if;
+  return new;
+end $$;
+drop trigger if exists documents_title_class on public.documents;
+create trigger documents_title_class before insert or update of kind, title, doc_category on public.documents
+  for each row execute function private.documents_title_class();
+
+revoke all on function public.set_co_owner_management(uuid, text), public.dismiss_removed_estimate(uuid) from public, anon;
+grant execute on function public.set_co_owner_management(uuid, text), public.dismiss_removed_estimate(uuid),
+  public.initiate_transfer(uuid, text), public.delete_vehicle_permanently(uuid) to authenticated;
 
 commit;

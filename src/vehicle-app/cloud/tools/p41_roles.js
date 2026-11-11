@@ -18,7 +18,8 @@ function canReviewScan(v){
 }
 function coRank(){
   if(!session||!isOwner())return '';
-  if(!(typeof CO!=='undefined'&&CO.of))return 'primary';
+  if(typeof CO==='undefined'||CO.on==null)return '';
+  if(!CO.of)return 'primary';
   var me0=myId(),m=(CO.rows||[]).filter(function(x){return x.user_id===me0;})[0];
   return (m&&m.management)||'full';
 }
@@ -120,7 +121,7 @@ function invAll(box){
     prev();
     var sel=document.getElementById('im-np-country');
     if(!sel||document.getElementById('pf-world-note'))return;
-    sel.insertAdjacentHTML('afterend','<p class="pf-world" id="pf-world-note">A portfolio can sit in any country. Adding one does not move service dates or mileage reminders, and it does not change who can see a car. Saving a named portfolio needs the portfolios update, which is not on the live database yet.</p>');
+    sel.insertAdjacentHTML('afterend','<p class="pf-world" id="pf-world-note">A portfolio can sit in any country. Adding one does not move service dates or mileage reminders, and it does not change who can see a car.</p>');
   };
 })();
 function rqMoney(r){
@@ -132,7 +133,11 @@ function rqEstimateCard(r){
   var staff=rqCanStaff(),v=byId(getVehicles(),r.vehicle_id),id=jsId(r.id),dec=r.decision||'pending',done=r.status==='done';
   var when=r.proposed_start?fmtDateTime(r.proposed_start):'Time not set';
   var acts='';
-  if(!staff&&!done&&dec!=='approved'&&dec!=='denied'){
+  if(dec==='advisor_removed'&&!done&&r.status!=='declined'){
+    acts='<p class="od-lead">Advisor removed. This estimate is no longer a live decision.</p>'+(staff?'':'<div class="rq-acts"><button type="button" class="btn" onclick="rqDismissRemoved(this)">Dismiss</button></div>');
+  } else if(!staff&&coRank()==='limited'&&!done&&dec!=='approved'&&dec!=='denied'){
+    acts='<div class="rq-acts"><button type="button" class="btn" onclick="rqAsk(this)">Ask a question</button></div>';
+  } else if(!staff&&!done&&dec!=='approved'&&dec!=='denied'&&dec!=='advisor_removed'){
     acts='<div class="rq-acts"><button type="button" class="btn btn-primary" onclick="rqDecide(this,\'approved\')">Approve</button><button type="button" class="btn" onclick="rqDecide(this,\'denied\')">Deny</button><button type="button" class="btn" onclick="rqAsk(this)">Ask a question</button></div>';
   } else if(staff&&dec==='approved'&&!done){
     acts='<div class="rq-acts"><button type="button" class="btn btn-primary" onclick="rqCompleteOpen(this)">Mark job complete</button></div>';
@@ -144,7 +149,7 @@ function rqEstimateCard(r){
     acts='<div class="rq-inline"><label class="rq-lab" for="rq-note-'+id+'">What was done</label><textarea id="rq-note-'+id+'" rows="3" placeholder="Work completed, no customer personal details"></textarea><label class="rq-lab" for="rq-mi-'+id+'">Mileage now</label><input id="rq-mi-'+id+'" inputmode="numeric" placeholder="Optional"><div class="rq-acts"><button type="button" class="btn" onclick="rqAct(this,\'close\')">Cancel</button><button type="button" class="btn btn-primary" onclick="rqComplete(this)">Archive into the vehicle history</button></div></div>';
   }
   return '<article class="rq-card rq-est" data-id="'+id+'" data-kind="estimate"><div class="rq-kicker">Estimate</div>'
-    +'<div class="rq-top"><div class="rq-who">'+(staff?'<div class="rq-cl">'+esc(rqClientName(r.owner_id))+'</div>':'')+'<div class="rq-veh">'+esc(v?(v.nickname||vFull(v)):'Vehicle')+'</div></div><span class="rq-pill">'+esc(done?'Complete':(dec==='approved'?'Approved':dec==='denied'?'Denied':dec==='question'?'Question':'Pending'))+'</span></div>'
+    +'<div class="rq-top"><div class="rq-who">'+(staff?'<div class="rq-cl">'+esc(rqClientName(r.owner_id))+'</div>':'')+'<div class="rq-veh">'+esc(v?(v.nickname||vFull(v)):'Vehicle')+'</div></div><span class="rq-pill">'+esc(done?'Complete':(dec==='advisor_removed'?'Advisor removed':dec==='approved'?'Approved':dec==='denied'?'Denied':dec==='question'?'Question':'Pending'))+'</span></div>'
     +'<dl class="rq-dl"><div><dt>Work</dt><dd>'+esc(r.work_summary||'')+'</dd></div>'
     +'<div><dt>Price</dt><dd>'+esc(rqMoney(r))+'</dd></div>'
     +'<div><dt>Proposed</dt><dd>'+esc(when)+(r.proposed_tz?' '+esc(r.proposed_tz):'')+'</dd></div>'
@@ -159,7 +164,7 @@ function rqEstimateCard(r){
   renderRequests=function(){
     prev();
     var act=document.getElementById('rq-actions');
-    if(act&&rqCanStaff()&&!document.getElementById('rq-est-btn')){
+    if(act&&rqCanStaff()&&canAny('can_send_estimates')&&!document.getElementById('rq-est-btn')){
       act.insertAdjacentHTML('afterbegin','<button class="btn btn-primary" id="rq-est-btn" type="button" onclick="rqOpenEstimate()">Send an estimate</button>');
     }
   };
@@ -261,7 +266,8 @@ function tdRender(){
   else h+='<div class="td-grid">'+clients.map(function(c){
     var vs=getVehicles().filter(function(v){return v.clientId===c.id&&!isArchivedVehicle(v);});
     var n=openE.filter(function(r){return r.owner_id===c.id;}).length;
-    return '<button type="button" class="td-card" onclick="openClientDetail(\''+jsId(c.id)+'\')"><span class="td-name">'+esc(c.name||'Client')+'</span><span class="td-meta">'+vs.length+' vehicle'+(vs.length===1?'':'s')+(n?' / '+n+' open estimate'+(n===1?'':'s'):'')+'</span></button>';
+    var on=window.TDASH&&window.TDASH.client===c.id;
+    return '<button type="button" class="td-card'+(on?' td-on':'')+'" onclick="tdPickClient(\''+jsId(c.id)+'\')"><span class="td-name">'+esc(c.name||'Client')+'</span><span class="td-meta">'+vs.length+' vehicle'+(vs.length===1?'':'s')+(n?' / '+n+' open estimate'+(n===1?'':'s'):'')+'</span></button>';
   }).join('')+'</div>';
   host.innerHTML=h;
 }
@@ -343,7 +349,7 @@ function odRender(){
   if(!host){host=document.createElement('section');host.id='cp-decide';host.className='sec od-band';cm.parentNode.insertBefore(host,cm);}
   var cid=ownerClientId();
   var rows=(typeof RQ!=='undefined'?RQ.rows:[]).filter(function(r){
-    return r.owner_id===cid&&r.request_kind==='estimate'&&r.status!=='done'&&r.decision!=='approved'&&r.decision!=='denied';
+    return r.owner_id===cid&&r.request_kind==='estimate'&&r.status!=='done'&&r.status!=='declined'&&r.decision!=='approved'&&r.decision!=='denied';
   });
   var h='<p class="od-eye">Needs your decision</p><h2>Pending decisions</h2>';
   if(!rows.length)h+='<p class="od-lead">Nothing is waiting. Estimates from your advisor appear here, between the collection tabs and comments.</p>';
@@ -390,14 +396,79 @@ async function covLoad(){
     prevCo();
     if(coRank()!=='primary')return;
     (CO.rows||[]).forEach(function(m){
-      if((m.management||'full')!=='limited')return;
       var row=document.querySelector('.co-row[data-co="'+m.user_id+'"]');
-      if(!row||row.querySelector('.co-title'))return;
+      if(!row||row.querySelector('.co-mgmt'))return;
       var on=!!m.see_title_documents;
-      row.insertAdjacentHTML('beforeend','<label class="tgl co-title"><input type="checkbox" '+(on?'checked':'')+' onchange="coTitleToggle(\''+jsId(m.user_id)+'\',this)"><span class="tgl-ui"></span><span class="tgl-t">Title documents</span></label>');
+      var mgmt=m.management||'full';
+      row.insertAdjacentHTML('beforeend',
+        '<div class="co-tools"><label class="co-mgmt">Management <select aria-label="Management" onchange="coMgmt(this,\''+jsId(m.user_id)+'\')"><option value="full"'+(mgmt==='full'?' selected':'')+'>Full</option><option value="limited"'+(mgmt==='limited'?' selected':'')+'>Limited</option></select></label>'
+        +(mgmt==='limited'?'<label class="tgl co-title"><input type="checkbox" '+(on?'checked':'')+' onchange="coTitleToggle(\''+jsId(m.user_id)+'\',this)"><span class="tgl-ui"></span><span class="tgl-t">Title documents</span></label>':'')+'</div>');
     });
   };
 })();
+async function rqDismissRemoved(btn){
+  var card=btn.closest('.rq-card');if(!card)return;
+  var id=card.dataset.id;
+  var r=await sb.rpc('dismiss_removed_estimate',{p_id:id});
+  if(r.error){showToast(friendlyError(r.error),'error');return;}
+  var row=byId(RQ.rows,id);if(row)row.status='declined';
+  showToast('Estimate dismissed');
+  if(typeof odRender==='function')odRender();
+  if(typeof renderRequests==='function')renderRequests();
+}
+canManageReminders=function(v){return canEditVehicle(v)||(!!v&&can(v,'can_add_reminders'));};
+(function(){
+  var prev=reminderItems;
+  reminderItems=function(vehicles){
+    var list=(vehicles||[]).filter(function(v){
+      if(!v)return false;
+      var rank=coRank();
+      if(rank==='primary'||rank==='full'||rank==='limited')return true;
+      return can(v,'view_reminders');
+    });
+    return prev(list);
+  };
+  var prevMs=msCanSeeMissing;
+  msCanSeeMissing=function(v){
+    if(!v||(typeof isArchivedVehicle==='function'&&isArchivedVehicle(v)))return false;
+    var rank=coRank();
+    if(rank==='limited')return false;
+    if(rank==='full')return true;
+    return prevMs(v);
+  };
+  var TDASH={on:0,client:null};
+  window.TDASH=TDASH;
+  var prevAV=activeVehicles;
+  activeVehicles=function(){
+    var r=prevAV.apply(this,arguments);
+    if(TDASH.on&&TDASH.client&&Array.isArray(r))return r.filter(function(v){return v.clientId===TDASH.client;});
+    return r;
+  };
+  var prevArc=visibleArchives;
+  visibleArchives=function(){
+    var r=prevArc.apply(this,arguments);
+    if(TDASH.on&&TDASH.client&&Array.isArray(r))return r.filter(function(v){return v.clientId===TDASH.client;});
+    return r;
+  };
+  var prevDash=renderDashboard;
+  renderDashboard=function(){
+    var scope=typeof isAdvisor==='function'&&isAdvisor()&&!(typeof realAdmin==='function'&&realAdmin());
+    var clients=(typeof getClients==='function'?getClients():[]).filter(function(c){return c&&c.id;});
+    if(scope&&(!TDASH.client||!clients.some(function(c){return c.id===TDASH.client;})))TDASH.client=clients[0]?clients[0].id:null;
+    TDASH.on=scope?1:0;
+    try{prevDash();}finally{TDASH.on=0;}
+    tdRender();
+  };
+})();
+function tdPickClient(id){if(window.TDASH)window.TDASH.client=id;if(typeof renderDashboard==='function')renderDashboard();}
+async function coMgmt(sel,uid){
+  var v=sel.value;
+  var r=await sb.rpc('set_co_owner_management',{p_user_id:uid,p_management:v});
+  if(r.error){showToast(friendlyError(r.error),'error');coRender();return;}
+  (CO.rows||[]).forEach(function(m){if(m.user_id===uid)m.management=v;});
+  coRender();
+  showToast(v==='full'?'Co-owner set to full management':'Co-owner set to limited management');
+}
 async function coTitleToggle(uid,box){
   var r=await sb.rpc('set_co_owner_title_access',{p_user_id:uid,p_allow:!!box.checked});
   if(r.error){box.checked=!box.checked;showToast(typeof rpcMissing==='function'&&rpcMissing(r.error)?'Title access needs one backend update':friendlyError(r.error),'error');return;}

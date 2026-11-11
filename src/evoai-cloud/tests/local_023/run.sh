@@ -17,6 +17,8 @@ done
 sudo -u postgres psql -d "$DB" -v ON_ERROR_STOP=1 -f backup_023.sql
 sudo -u postgres psql -d "$DB" -v ON_ERROR_STOP=1 -f migration_023_roles_estimates.sql
 sudo -u postgres psql -d "$DB" -v ON_ERROR_STOP=1 -f tests/local_023/test_023.sql
+sudo -u postgres psql -d "$DB" -v ON_ERROR_STOP=1 -f tests/local_023/test_023_journeys.sql
 sudo -u postgres psql -d "$DB" -v ON_ERROR_STOP=1 -f rollback_023.sql
 sudo -u postgres psql -d "$DB" -v ON_ERROR_STOP=1 -c "select to_regclass('public.notifications') is null and to_regclass('public.vehicle_history') is null and to_regclass('evo_backup.vehicles_20261110') is not null;"
+sudo -u postgres psql -d "$DB" -v ON_ERROR_STOP=1 -f migration_023_roles_estimates.sql >/tmp/evo_reapply.out
 echo "local 023 chain ok"
