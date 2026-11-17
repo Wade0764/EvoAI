@@ -206,6 +206,14 @@ S.est={mode:'ok',delay:80};
 function FE(name,status,body){return {name:name,message:name,context:status?{status:status,json:body?function(){return Promise.resolve(body);}:undefined}:undefined};}
 var functions={invoke:function(name,opts){return new Promise(function(res){
   S.fn.calls.push({name:name,body:opts&&opts.body});
+  if(name==='draft-price-list'){
+    var draftFn=S.fn&&S.fn.draft;
+    setTimeout(function(){
+      if(typeof draftFn==='function')res(draftFn(opts&&opts.body));
+      else res({data:null,error:FE('FunctionsHttpError',404)});
+    },5);
+    return;
+  }
   if(name==='estimate-value'){
     var eb=(opts&&opts.body)||{},em=S.est.mode;
     setTimeout(function(){
