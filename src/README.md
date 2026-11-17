@@ -9,4 +9,6 @@ This folder is the build source that was not previously in the git repo. `cloud/
 
 `migration_023` is not applied to the live Supabase project. Prove it locally with `src/evoai-cloud/tests/local_023/run.sh` (needs local Postgres, the `pg_cron` package, and the throwaway `pg_net` stub described in that script's header comments only if you start from an empty cluster).
 
+`migration_024` (tech price lists and client service requests) is also not applied, and the `draft-price-list` function is not deployed. Prove it with `src/evoai-cloud/tests/local_024/run.sh`. That script installs throwaway `pg_cron` and `pg_net` stubs when the real extensions are not on the machine.
+
 Do not add `wade_asset_list.pdf`, `Vehicle_Asset_List.pdf`, or the Wade import scripts. They were left out of this tree on purpose.

@@ -60,3 +60,5 @@ node tests/portfolio_pick.js
 node tests/binder.js
 node tests/todo.js
 node tests/logo_bar.js
+node tests/pricelist_logic.js
+node tests/pricelist_parse.mjs

@@ -1,0 +1,3 @@
+comment = 'local test stub, not for production'
+default_version = '1.0'
+relocatable = false

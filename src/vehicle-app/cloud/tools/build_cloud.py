@@ -16,7 +16,7 @@ def _publish(html):
         sw=os.path.join(ROOT,'cloud','sw.js')
         if os.path.exists(sw):
             s=open(sw,encoding='utf-8').read()
-            s=re.sub(r"var CACHE='[^']*'","var CACHE='evoai-shell-v38c-roles'",s,count=1)
+            s=re.sub(r"var CACHE='[^']*'","var CACHE='evoai-shell-v39-pricelist'",s,count=1)
             open(sw,'w',encoding='utf-8').write(s)
     print('built',len(html))
 if not os.path.exists(SRC):
@@ -44,6 +44,7 @@ if not os.path.exists(SRC):
         if count and n!=count:errs.append('JS count %d!=%d: %s'%(n,count,old[:70]));return
         js=js.replace(old,new)
     exec(open(T+'patches_roles.py',encoding='utf-8').read())
+    exec(open(T+'patches_pricelist.py',encoding='utf-8').read())
     if errs:
         print('\n'.join(errs));sys.exit(1)
     _publish(html_head+js+html_tail)
@@ -192,6 +193,7 @@ exec(open(T+'patches_logo.py').read())  # v34 binder vault (p34)
 exec(open(T+'patches_splash.py').read())  # v36b splash (p39b) — was only in build_preview_requests.py
 exec(open(T+'patches_requests.py').read())  # v37 / v40 requests (p40)
 exec(open(T+'patches_roles.py').read())  # v38 roles, estimates, history (p41)
+exec(open(T+'patches_pricelist.py').read())  # v39 price list (p42)
 if errs:
     print('\n'.join(errs));sys.exit(1)
 vendor=open('/workspace/vehicle-app/cloud/vendor/supabase.js').read()
