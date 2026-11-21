@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
-"""Procedural seamless 2x2 twill carbon-fiber tile, Royal Jewel greens.
+"""Procedural seamless 2x2 twill, baked for phone-size carbon trim.
 
-No stock art. Warp tows run vertically and weft tows run horizontally.
-A 2/2 twill puts two tows over and two under, stepping one tow each row,
-so the cloth reads as a broken diagonal. Each tow is a bundle of fine
-parallel strands. The tile period divides the image, so it repeats cleanly.
+No stock art. The repeat is 96px and is shown at 32 CSS px, so each tow is
+about 2.7 CSS px (3x density). Tows meet edge to edge: there is no groove.
+One direction is a little lighter and glossier, the other a little darker
+and flatter. Filaments are only a whisper, so they disappear at arm's length.
+Every texel stays at or below #0A5A42, which is 7.2:1 against ivory.
 """
 import os
+from io import BytesIO
 import numpy as np
 from PIL import Image
 
-SIZE = 128
-TOW = 16          # 128 / 16 = 8 tows; the 2x2 repeat is 4 tows = 64px
-STRANDS = 10      # filaments across one tow
-SHADOW = np.array([3, 34, 24], dtype=np.float64)     # #032218
-MID = np.array([10, 90, 66], dtype=np.float64)       # #0A5A42, 7.2:1 on ivory
+SIZE = 96
+TOW = 8                 # 96 / 8 = 12 tows; 2x2 period is 32px, three repeats
+SHADOW = np.array([3, 34, 24], dtype=np.float64)    # #032218
+MID = np.array([10, 90, 66], dtype=np.float64)      # #0A5A42
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CLOUD = os.path.dirname(HERE)
@@ -44,53 +45,46 @@ def _contrast(rgb, ink=(242, 240, 235)):
 
 
 def build():
-    y, x = np.mgrid[0:SIZE, 0:SIZE]
-    ix = x // TOW
-    iy = y // TOW
-    # 2/2 twill, stepped by one tow each weft row. Seamless because SIZE % (4*TOW) == 0.
-    warp_top = ((ix - iy) % 4) < 2
-    lx = (x % TOW).astype(np.float64)
-    ly = (y % TOW).astype(np.float64)
+    # Draw at 2x and box-filter down so the tow edges stay soft but seamless.
+    n = SIZE * 2
+    tow = TOW * 2
+    y, x = np.mgrid[0:n, 0:n]
+    ix = x // tow
+    iy = y // tow
+    # 2/2 twill, one-tow step each row. n is a multiple of 4*tow.
+    glossy = ((ix - iy) % 4) < 2
+    lx = (x % tow).astype(np.float64) / tow
+    ly = (y % tow).astype(np.float64) / tow
 
-    def strands(local):
-        phase = (local / TOW) * STRANDS
-        ridge = np.cos(2 * np.pi * phase) ** 2
-        return 0.62 + 0.38 * ridge
+    # A broad sheen along each tow, not a dark outline. Center is only a little brighter.
+    def sheen(local):
+        return 0.94 + 0.06 * np.cos(2 * np.pi * (local - 0.5)) ** 2
 
-    def groove(local):
-        d = np.minimum(local, TOW - local)
-        return np.clip(d / 2.4, 0.0, 1.0) ** 0.85
+    # A hint of filament, too small to read at 1x.
+    def filament(local):
+        return 1.0 + 0.018 * np.cos(2 * np.pi * local * 7)
 
-    # Anisotropic: horizontal (weft) tows face an overhead light and read lighter.
-    warp = strands(lx) * (0.55 + 0.45 * groove(lx)) * 0.78
-    weft = strands(ly) * (0.55 + 0.45 * groove(ly)) * 1.0
-    lum = np.where(warp_top, warp, weft)
-
-    # A dark line where a tow dives under its neighbour.
-    edge = (warp_top != np.roll(warp_top, 1, axis=1)) | (warp_top != np.roll(warp_top, 1, axis=0))
-    lum = np.where(edge, lum * 0.42, lum)
-
-    # Slow, integer-frequency variation so the tile still meets itself at the edges.
-    lum = lum + 0.035 * np.sin(2 * np.pi * x / SIZE * 2 + 0.6)
-    lum = lum + 0.028 * np.cos(2 * np.pi * y / SIZE * 3)
+    # Glossy tows (the ones facing the light) sit near the mid green.
+    # Matte tows sit lower, toward the shadow, with almost no internal flash.
+    light = sheen(ly) * filament(ly) * (0.86 + 0.06 * np.sin(2 * np.pi * x / n * 2))
+    matte = sheen(lx) * filament(lx) * 0.46
+    lum = np.where(glossy, light, matte)
     lum = np.clip(lum, 0.0, 1.0)
 
-    # Bright strands stop at the mid green so ivory type stays at 7.2:1 or better.
-    t = lum[..., None]
-    rgb = SHADOW + (MID - SHADOW) * t
-
-    ink_contrast = _contrast(rgb)
-    return rgb, float(ink_contrast.min())
+    rgb = SHADOW + (MID - SHADOW) * lum[..., None]
+    # Average 2x2 blocks. The period survives because 2 divides the repeat.
+    rgb = rgb.reshape(SIZE, 2, SIZE, 2, 3).mean(axis=(1, 3))
+    return rgb, float(_contrast(rgb).min())
 
 
 def main():
     rgb, worst = build()
+    if worst < 7.0:
+        raise SystemExit('contrast fell to %.2f' % worst)
     img = Image.fromarray(np.clip(np.round(rgb), 0, 255).astype(np.uint8), 'RGB')
-    # Supersample was not required; the cosine strands are already band-limited.
-    quality = 72
+    quality = 80
     raw = None
-    for q in (72, 64, 56, 48, 42):
-        from io import BytesIO
+    for q in (80, 72, 64, 56, 48):
         buf = BytesIO()
         img.save(buf, 'WEBP', quality=q, method=6)
         raw = buf.getvalue()
@@ -102,7 +96,8 @@ def main():
     for path in OUTS:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         open(path, 'wb').write(raw)
-    print('carbon-twill.webp %d bytes q=%d contrast>=%.2f' % (len(raw), quality, worst))
+    print('carbon-twill.webp %d bytes q=%d contrast>=%.2f tow=%.2fcss' % (
+        len(raw), quality, worst, TOW / SIZE * 32))
 
 
 if __name__ == '__main__':

@@ -1545,8 +1545,7 @@ textarea::placeholder,.rq-f input::placeholder{color:#E2C58E;font-style:italic}
   --em-sh: #032218;
   --em-flat: #0A5A42;
   --em-ink: #F2F0EB;
-  /* 2x2 twill: 6px tows, 12px cell. Shadow #032218, mid #0A5A42, a faint lift on the tow edge.
-     #2B8F68 is only the 1px top gleam. */
+  /* 2x2 twill tile: ~2.7 CSS px tows, shown at 32px. #2B8F68 is only the 1px top gleam. */
   --em-fiber:
     radial-gradient(130% 80% at 50% 0%, rgba(242,240,235,.05), transparent 64%),
     linear-gradient(27deg, #032218 0px, #0A5A42 2px, rgba(242,240,235,.07) 3px, transparent 3px),
@@ -1574,17 +1573,16 @@ textarea::placeholder,.rq-f input::placeholder{color:#E2C58E;font-style:italic}
 .vd-tabs button.on {
   background-color: #0A5A42 !important;
   background-image:
-    radial-gradient(78% 46% at 50% -8%, rgba(242,240,235,.13), rgba(242,240,235,0) 56%),
-    linear-gradient(180deg, transparent 60%, rgba(3,34,24,.4) 100%),
-    linear-gradient(90deg, rgba(3,34,24,.34), transparent 14%, transparent 86%, rgba(3,34,24,.34)),
+    linear-gradient(128deg, rgba(3,34,24,.62) 0%, rgba(3,34,24,.08) 32%, rgba(10,90,66,0) 42%, rgba(10,90,66,.5) 52%, rgba(10,90,66,0) 63%, rgba(3,34,24,.14) 74%, rgba(3,34,24,.68) 100%),
+    linear-gradient(90deg, rgba(3,34,24,.42), transparent 16%, transparent 84%, rgba(3,34,24,.42)),
     url("assets/carbon-twill.webp") !important;
-  background-size: 100% 72%, 100% 100%, 100% 100%, 48px 48px !important;
-  background-position: center top, center, center, 0 0 !important;
-  background-repeat: no-repeat, no-repeat, no-repeat, repeat !important;
+  background-size: 100% 100%, 100% 100%, 32px 32px !important;
+  background-position: center, center, 0 0 !important;
+  background-repeat: no-repeat, no-repeat, repeat !important;
   color: #F2F0EB !important;
   text-shadow: 0 1px 0 rgba(3,34,24,.85);
   border-color: #032218 !important;
-  box-shadow: inset 0 1px 0 #2B8F68, inset 0 -7px 10px rgba(3,34,24,.45) !important;
+  box-shadow: inset 0 1px 0 #2B8F68, inset 0 -9px 14px rgba(3,34,24,.55) !important;
 }
 
 .card-em, .vh-card, .att-card, .whl .whl-card {
@@ -1671,14 +1669,13 @@ input, textarea, select { caret-color: #E2C58E; }
     color: #F2F0EB !important;
     background-color: #032218 !important;
     background-image:
-      radial-gradient(78% 46% at 50% -8%, rgba(242,240,235,.1), rgba(242,240,235,0) 56%),
-      linear-gradient(180deg, transparent 62%, rgba(3,34,24,.45) 100%),
-      linear-gradient(90deg, rgba(3,34,24,.3), transparent 16%, transparent 84%, rgba(3,34,24,.3)),
+      linear-gradient(128deg, rgba(3,34,24,.58) 0%, rgba(3,34,24,.06) 32%, rgba(10,90,66,0) 42%, rgba(10,90,66,.46) 52%, rgba(10,90,66,0) 63%, rgba(3,34,24,.12) 74%, rgba(3,34,24,.64) 100%),
+      linear-gradient(90deg, rgba(3,34,24,.36), transparent 18%, transparent 82%, rgba(3,34,24,.36)),
       url("assets/carbon-twill.webp") !important;
-    background-size: 100% 72%, 100% 100%, 100% 100%, 48px 48px !important;
-    background-position: center top, center, center, 0 0 !important;
-    background-repeat: no-repeat, no-repeat, no-repeat, repeat !important;
-    box-shadow: inset 0 1px 0 #2B8F68, inset 0 -6px 8px rgba(3,34,24,.4) !important;
+    background-size: 100% 100%, 100% 100%, 32px 32px !important;
+    background-position: center, center, 0 0 !important;
+    background-repeat: no-repeat, no-repeat, repeat !important;
+    box-shadow: inset 0 1px 0 #2B8F68, inset 0 -8px 12px rgba(3,34,24,.5) !important;
   }
   .sidebar .nav-item.nav-primary .nav-badge {
     position: absolute;
