@@ -55,6 +55,12 @@ def _materialise(html, directory):
     sizes.append(('vendor.js',os.path.getsize(os.path.join(directory,'vendor.js'))))
     return html,sizes
 def _publish(html):
+    import importlib.util
+    gen = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gen_carbon_twill.py')
+    spec = importlib.util.spec_from_file_location('gen_carbon_twill', gen)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod.main()
     before=len(html.encode('utf-8'))
     targets=[]
     targets.append((CLOUD,'evoai-cloud.html'))
