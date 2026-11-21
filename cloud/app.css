@@ -1545,11 +1545,18 @@ textarea::placeholder,.rq-f input::placeholder{color:#E2C58E;font-style:italic}
   --em-sh: #032218;
   --em-flat: #0A5A42;
   --em-ink: #F2F0EB;
-  /* Twill is only #032218 and #0A5A42. #2B8F68 is the 1px glass gleam, not a fill. */
+  /* 2x2 twill: 6px tows, 12px cell. Shadow #032218, mid #0A5A42, a faint lift on the tow edge.
+     #2B8F68 is only the 1px top gleam. */
   --em-fiber:
-    repeating-linear-gradient(45deg, rgba(3,34,24,.42) 0 1px, rgba(10,90,66,0) 1px 4px),
-    repeating-linear-gradient(45deg, transparent 0 3px, rgba(3,34,24,.28) 3px 4px, transparent 4px 6px),
-    linear-gradient(180deg, #0A5A42 0%, #0A5A42 82%, #032218 100%);
+    radial-gradient(130% 80% at 50% 0%, rgba(242,240,235,.05), transparent 64%),
+    linear-gradient(27deg, #032218 0px, #0A5A42 2px, rgba(242,240,235,.07) 3px, transparent 3px),
+    linear-gradient(207deg, #032218 0px, #0A5A42 2px, rgba(242,240,235,.06) 3px, transparent 3px),
+    linear-gradient(27deg, #063828 0px, #0A5A42 2px, rgba(242,240,235,.05) 3px, transparent 3px),
+    linear-gradient(207deg, #063828 0px, #0A5A42 2px, rgba(242,240,235,.05) 3px, transparent 3px),
+    linear-gradient(90deg, rgba(3,34,24,.16) 6px, transparent 6px),
+    linear-gradient(#0A5A42 0 25%, rgba(3,34,24,.28) 25% 50%, #0A5A42 50% 75%, rgba(3,34,24,.34) 75% 100%);
+  --em-fiber-size: 100% 100%, 12px 12px, 12px 12px, 12px 12px, 12px 12px, 12px 12px, 12px 12px;
+  --em-fiber-pos: 0 0, 0 3px, 6px 0, 0 6px, 6px 3px, 0 0, 0 0;
   --em-edge: var(--em-fiber);
   --em-glow: 0 8px 18px -12px rgba(3,34,24,.8);
   --font-display: 'Cormorant Garamond', Georgia, serif;
@@ -1567,11 +1574,12 @@ textarea::placeholder,.rq-f input::placeholder{color:#E2C58E;font-style:italic}
 .vd-tabs button.on {
   background-color: #0A5A42 !important;
   background-image: var(--em-fiber) !important;
+  background-size: var(--em-fiber-size) !important;
+  background-position: var(--em-fiber-pos) !important;
   background-repeat: repeat !important;
-  background-size: auto !important;
   color: #F2F0EB !important;
   border-color: #032218 !important;
-  box-shadow: inset 0 1px 0 #2B8F68, inset 0 -8px 12px rgba(3,34,24,.45) !important;
+  box-shadow: inset 0 1px 0 #2B8F68, inset 0 -8px 12px rgba(3,34,24,.4) !important;
 }
 
 .card-em, .vh-card, .att-card, .whl .whl-card {
@@ -1658,10 +1666,16 @@ input, textarea, select { caret-color: #E2C58E; }
     color: #F2F0EB !important;
     background-color: transparent !important;
     background-image:
-      repeating-linear-gradient(45deg, rgba(3,34,24,.38) 0 1px, transparent 1px 4px),
-      repeating-linear-gradient(45deg, transparent 0 3px, rgba(3,34,24,.22) 3px 4px, transparent 4px 6px),
-      linear-gradient(180deg, rgba(10,90,66,.42), rgba(10,90,66,.06) 70%, transparent) !important;
-    box-shadow: inset 0 2px 0 #2B8F68 !important;
+      radial-gradient(130% 80% at 50% 0%, rgba(242,240,235,.04), transparent 60%),
+      linear-gradient(27deg, rgba(3,34,24,.7) 0 2px, transparent 3px),
+      linear-gradient(207deg, rgba(3,34,24,.55) 0 2px, transparent 3px),
+      linear-gradient(27deg, rgba(10,90,66,.7) 0 2px, transparent 3px),
+      linear-gradient(207deg, rgba(10,90,66,.5) 0 2px, transparent 3px),
+      linear-gradient(180deg, rgba(10,90,66,.28), transparent 78%) !important;
+    background-size: 100% 100%, 12px 12px, 12px 12px, 12px 12px, 12px 12px, 100% 100% !important;
+    background-position: 0 0, 0 3px, 6px 0, 0 6px, 6px 3px, 0 0 !important;
+    background-repeat: repeat !important;
+    box-shadow: inset 0 1px 0 #2B8F68 !important;
   }
   .sidebar .nav-item.nav-primary .nav-badge {
     position: absolute;
