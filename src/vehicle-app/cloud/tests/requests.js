@@ -78,7 +78,7 @@ let t=await p.evaluate(()=>{var n=document.querySelector('.nav-item[data-page="r
   return {nav:!!n&&n.style.display!=='none',badge:b.style.display==='none'?0:Number(b.textContent),order:vis};});
 ok(t.nav,'tech: Requests tab in the nav');
 ok(t.badge===2,'tech: count badge = 2 new requests ('+t.badge+')');
-ok(t.order.indexOf('requests')===t.order.indexOf('todo')+1,'Requests sits right after To Do ('+t.order.slice(0,4)+')');
+ok(t.order.indexOf('garage')>=0&&t.order.indexOf('requests')===t.order.indexOf('garage')+1&&t.order.indexOf('todo')===t.order.indexOf('requests')+1,'Requests sits between Garage and To do ('+t.order.join(',')+')');
 // overview C (tech)
 let ov=await p.evaluate(()=>{var pg=document.getElementById('page-dashboard'),ids=['dash-hero','dash-ovc','dash-ovc-portfolio','dash-ovc-brief','dash-ovc-stats','dash-cm-sec','dash-act-sec'];
   var pos=ids.map(function(i){var e=document.getElementById(i);return e?e.compareDocumentPosition.bind(e):null;});

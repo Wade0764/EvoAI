@@ -16,6 +16,15 @@ const PRE=`try{if(!sessionStorage.__c){localStorage.clear();sessionStorage.__c=1
   return Promise.resolve(new Response(JSON.stringify({Count:1,Results:[row]}),{status:200,headers:{'Content-Type':'application/json'}}));};
 })();`;
 const w=ms=>L.sleep(ms);
+async function pageSource(p){
+  return p.evaluate(async function(){
+    var parts=[].slice.call(document.scripts).map(function(s){return s.textContent||'';});
+    var urls=[].slice.call(document.scripts).map(function(s){return s.src;}).filter(Boolean);
+    var i;
+    for(i=0;i<urls.length;i++){try{parts.push(await (await fetch(urls[i])).text());}catch(e){}}
+    return parts.join('\n');
+  });
+}
 (async()=>{
 await L.launch();
 console.log('VIN unit');
@@ -78,13 +87,13 @@ s=await p.evaluate(async a=>{var list=getVehicles(),v=list.filter(function(x){re
 ok(s.n>=1&&!s.sheet&&s.eng==='2.3L 4-cyl Gasoline'&&s.body==='Coupe'&&s.at,'pull-to-refresh backfill fills empty fields quietly');
 ok(s.est,'backfill re-runs the estimate when something changed');
 ok(s.again===0,'already-decoded cars are not looked up again');
-ok(await p.evaluate(()=>/vinBackfill\(\)/.test(ptrRun?ptrRun.toString():'')).catch(()=>false)||await p.evaluate(()=>{var t=[].slice.call(document.scripts).map(function(x){return x.textContent;}).join('');return /reloadAll\(true\)\)\.then\(function\(\)\{return vinBackfill\(\)/.test(t);}),'pull-to-refresh calls vinBackfill before estimating');
+ok(/vinBackfill\(\)/.test(await p.evaluate(()=>ptrRun?ptrRun.toString():'').catch(()=>''))||/reloadAll\(true\)\)\.then\(function\(\)\{return vinBackfill\(\)/.test(await pageSource(p)),'pull-to-refresh calls vinBackfill before estimating');
 s=await p.evaluate(async a=>{var t=vinApplyToVehicle(a.id,a.DEF,'ask','The document shows VIN '+a.DEF+': ');await new Promise(r=>setTimeout(r,500));
   var txt=(document.querySelector('#vin-sheet .vin-t')||{}).textContent;document.getElementById('vin-use').click();var r=await t;var u=byId(getVehicles(),a.id);return {txt:txt,r:r,make:u.make,vin:u.vin,model:u.model};},{id:s.id,DEF});
 ok(/^The document shows VIN SALEA7EU5N2100123: 2022 Land Rover Defender 110 X-Dynamic\. Update\?$/.test(s.txt),'document-scan VIN asks with one sheet');
 ok(s.r==='updated'&&s.make==='Land Rover'&&s.model==='Defender 110'&&s.vin===DEF,'Use VIN updates the existing car');
-ok(await p.evaluate(()=>/vinApplyToVehicle\(_dv\.id,s\.vin,'ask'/.test([].slice.call(document.scripts).map(function(x){return x.textContent;}).join(''))),'scan-document result.vin hooked into the doc flow');
-ok(await p.evaluate(()=>/data\.vin[^\n]*vinChanged\(\)/.test([].slice.call(document.scripts).map(function(x){return x.textContent;}).join(''))),'photo identify VIN goes through vinChanged (auto decode)');
+ok(/vinApplyToVehicle\(_dv\.id,s\.vin,'ask'/.test(await pageSource(p)),'scan-document result.vin hooked into the doc flow');
+ok(/data\.vin[^\n]*vinChanged\(\)/.test(await pageSource(p)),'photo identify VIN goes through vinChanged (auto decode)');
 await p.close();
 
 console.log('VIN desktop');

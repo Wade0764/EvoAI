@@ -39,7 +39,7 @@ async function upload(p,id,file){const i=await p.$(id);await i.uploadFile(path.j
   ok(f.tags.every(t=>parseFloat(t.fs)>=15),'tags are 15px+');
   ok(!f.dis,'every field still editable');
   ok(f.call&&f.call.file_base64&&f.call.mime==='image/jpeg'&&f.call.vehicle_id,'reuses scan-document with file_base64 + mime + vehicle_id');
-  const grey=await p.evaluate(()=>{const ok=['rgb(255, 255, 255)','rgb(201, 170, 107)','rgb(7, 8, 10)','rgb(242, 240, 235)'];return [...document.querySelectorAll('#ss-box *,#ss-or,#modal-service label')].filter(e=>e.offsetParent&&[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())&&ok.indexOf(getComputedStyle(e).color)<0).map(e=>e.className+':'+getComputedStyle(e).color);});
+  const grey=await p.evaluate(()=>{const ok=['rgb(255, 255, 255)','rgb(201, 170, 107)','rgb(226, 197, 142)','rgb(7, 8, 10)','rgb(242, 240, 235)'];return [...document.querySelectorAll('#ss-box *,#ss-or,#modal-service label')].filter(e=>e.offsetParent&&[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())&&ok.indexOf(getComputedStyle(e).color)<0).map(e=>e.className+':'+getComputedStyle(e).color);});
   ok(grey.length===0,'scan card and labels: white/gold text only '+grey.join(','));
   if(process.env.SS_SHOTS)await p.screenshot({path:OUT+'ss_3_filled.png'});
   await p.evaluate(()=>{const e=document.getElementById('svc-miles');e.value='2410';e.dispatchEvent(new Event('input',{bubbles:true}));});

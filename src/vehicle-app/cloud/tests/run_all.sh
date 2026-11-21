@@ -7,10 +7,12 @@ python3 tools/build_cloud.py
 python3 - <<'PY'
 import re
 h=open('evoai-cloud.html',encoding='utf-8').read()
-assert all(ord(c)<128 for c in h),'non-ascii'
-s=re.findall(r'<script>(.*?)</script>',h,re.S);open('/tmp/_main.js','w').write(s[1])
-assert 'service_role' not in h.lower()
-print('ascii ok; scripts',len(s))
+app=open('app.js',encoding='utf-8').read()
+assert all(ord(c)<128 for c in h),'non-ascii html'
+assert all(ord(c)<128 for c in app),'non-ascii app.js'
+open('/tmp/_main.js','w').write(app)
+assert 'service_role' not in h.lower() and 'service_role' not in app.lower()
+print('ascii ok; app.js',len(app),'html',len(h))
 PY
 node --check /tmp/_main.js
 # v27: make sure 8765 is free, then keep the test server alive (restart if it dies) for the whole run
@@ -62,3 +64,4 @@ node tests/todo.js
 node tests/logo_bar.js
 node tests/pricelist_logic.js
 node tests/pricelist_parse.mjs
+node tests/cleanup_logic.js

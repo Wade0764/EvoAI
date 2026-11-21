@@ -2,3 +2,10 @@ src/vehicle-app/node_modules/
 src/vehicle-app/cloud/node_modules/
 src/vehicle-app/cloud/screens/
 src/vehicle-app/cloud/evoai-cloud.html
+src/vehicle-app/cloud/app.css
+src/vehicle-app/cloud/app.js
+src/vehicle-app/cloud/vendor.js
+src/vehicle-app/cloud/assets/
+
+evoai-portfolio/
+/vehicle-app
