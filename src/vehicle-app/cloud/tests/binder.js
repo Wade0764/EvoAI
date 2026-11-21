@@ -34,7 +34,7 @@ function PRE(){return `try{localStorage.setItem('pwa_hint_dismissed','1')}catch(
    return Promise.resolve({data:{category:'insurance',confidence:0.98,title:'Insurance policy EVO-TEST-0002',doc_date:pl(9),vendor:'Example Mutual (fake)',mileage:null,amount:null,currency:'USD',services:[],expires_on:pl(374),summary:'Policy no. EVO-TEST-0002, agreed value.',reminders:[],model:'test',remaining:9},error:null});};return c;};
 })();`;}
 const shot=async(p,n)=>{if(!process.env.BND_SHOTS)return;fs.mkdirSync(OUT,{recursive:true});await p.evaluate(()=>{const r=document.getElementById('bnd-root'),m=document.querySelector('.main');if(r&&m&&!document.getElementById('bnd-filed')){const hb=document.querySelector('.offline-bar,.rem-banner');m.scrollTop+=r.getBoundingClientRect().top-190;}});await L.sleep(400);await p.screenshot({path:OUT+n+'.png'});console.log('  shot '+OUT+n+'.png');};
-const grey=p=>p.evaluate(()=>{const okc=['rgb(255, 255, 255)','rgb(201, 170, 107)','rgb(224, 138, 116)','rgb(7, 8, 10)'];
+const grey=p=>p.evaluate(()=>{const okc=['rgb(255, 255, 255)','rgb(242, 240, 235)','rgb(226, 197, 142)','rgb(201, 170, 107)','rgb(224, 138, 116)','rgb(7, 8, 10)'];
   return [...document.querySelectorAll('.bnd *,.bnd-sheet *')].filter(e=>e.offsetParent&&!e.closest('.dt-th')&&[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())).filter(e=>{const s=getComputedStyle(e);return okc.indexOf(s.color)<0||parseFloat(s.fontSize)<15;}).map(e=>e.className+':'+getComputedStyle(e).color+'/'+getComputedStyle(e).fontSize);});
 (async()=>{
   await L.launch();

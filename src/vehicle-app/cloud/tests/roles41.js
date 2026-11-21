@@ -55,8 +55,13 @@ const shot=async(p,n)=>p.screenshot({path:OUT+n});
   });
   ok(own.home&&!own.board,'owner still lands on Home, with no tech dashboard');
   ok(own.nav.indexOf('dashboard')<0&&own.nav[0]==='client-portal','owner navigation is not given a new dashboard item');
-  var frozen=['client-portal','todo','requests','reminders','valuations','inspections','expenses','documents','recommendations','archives','access','account'];
-  ok(JSON.stringify(own.nav)===JSON.stringify(frozen),'owner nav is unchanged ('+own.nav.join(',')+')');
+  var frozen=['client-portal','garage','requests','todo','more'];
+  ok(JSON.stringify(own.nav)===JSON.stringify(frozen),'owner nav is the five primary tabs ('+own.nav.join(',')+')');
+  ok(await p.evaluate(()=>{
+    var ids=['reminders','valuations','inspections','expenses','documents','recommendations','archives','access'];
+    var pages=ids.every(function(id){return !!document.querySelector('#more-sheet [onclick*="'+id+'"]');});
+    return pages&&!!document.querySelector('#more-sheet [onclick*="openAccountModal"]');
+  }),'every former tab is still reachable from More');
   let band=await p.evaluate(()=>{
     var o=ownerClientId(),v=getVehicles().filter(function(x){return x.clientId===o;})[0];
     RQ.on=true;RQ.rows=RQ.rows||[];

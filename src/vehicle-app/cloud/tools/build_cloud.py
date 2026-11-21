@@ -9,16 +9,88 @@ OUT=os.path.join(CLOUD,'evoai-cloud.html')
 T=HERE+os.sep
 PUB=os.path.join(ROOT,'cloud','index.html')
 BASE=os.path.join(CLOUD,'base','v37-index.html')
+def _materialise(html, directory):
+    """Pull CSS, JS, fonts and images out of the shell. Splash CSS stays inline."""
+    import base64
+    os.makedirs(os.path.join(directory,'assets'),exist_ok=True)
+    font_names=['inter.woff','evodisplay.woff','cormorant.woff']
+    img_names=['lockup.webp','mark.webp','emblem.webp','centre.webp']
+    fi={'font/woff':0,'image/webp':0}
+    sizes=[]
+    def repl(m):
+        mime,b64=m.group(1),m.group(2)
+        raw=base64.b64decode(b64)
+        if mime=='font/woff':
+            name='assets/'+font_names[fi['font/woff']];fi['font/woff']+=1
+        elif mime=='image/webp':
+            name='assets/'+img_names[fi['image/webp']];fi['image/webp']+=1
+        else:
+            name='assets/blob-%d.bin'%len(sizes)
+        open(os.path.join(directory,name),'wb').write(raw)
+        sizes.append((name,len(raw)))
+        return name
+    css_m=re.search(r'<style>(.*?)</style>',html,re.S)
+    if not css_m:raise SystemExit('no style block')
+    css=re.sub(r'data:([^;)\s]+);base64,([A-Za-z0-9+/=]+)',repl,css_m.group(1))
+    open(os.path.join(directory,'app.css'),'w',encoding='utf-8').write(css)
+    splash=('html,body{margin:0;background:#07080A;color:#F2F0EB}'
+        '#boot-loading{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:#07080A;color:#F2F0EB}'
+        '.evo-boot{display:flex;flex-direction:column;align-items:center;text-align:center}'
+        '.evo-wmt{margin-top:18px;letter-spacing:.42em;font:500 22px/1 Georgia,serif;color:#E2C58E}'
+        '.evo-tag{margin-top:12px;letter-spacing:.2em;font:15px/1.4 Georgia,serif;color:#E2C58E;text-transform:uppercase}'
+        '#boot-loading-text{margin-top:18px;font-size:18px;color:#F2F0EB}'
+        '#boot-ring{width:168px;height:168px;display:block}')
+    link=('<style id="splash-critical">'+splash+'</style>\n'
+          '<link rel="stylesheet" href="app.css">\n')
+    html=html[:css_m.start()]+link+html[css_m.end():]
+    scripts=list(re.finditer(r'<script>(.*?)</script>',html,re.S))
+    if len(scripts)<2:raise SystemExit('expected vendor and app scripts')
+    open(os.path.join(directory,'vendor.js'),'w',encoding='utf-8').write(scripts[0].group(1))
+    open(os.path.join(directory,'app.js'),'w',encoding='utf-8').write(scripts[1].group(1))
+    html=html[:scripts[1].start()]+'<script defer src="app.js"></script>'+html[scripts[1].end():]
+    html=html[:scripts[0].start()]+'<script defer src="vendor.js"></script>'+html[scripts[0].end():]
+    # offsets shifted; scripts[0] is before scripts[1], replacing [1] first keeps [0] valid.
+    sizes.append(('app.css',os.path.getsize(os.path.join(directory,'app.css'))))
+    sizes.append(('app.js',os.path.getsize(os.path.join(directory,'app.js'))))
+    sizes.append(('vendor.js',os.path.getsize(os.path.join(directory,'vendor.js'))))
+    return html,sizes
 def _publish(html):
-    open(OUT,'w',encoding='utf-8').write(html)
-    if os.path.exists(os.path.dirname(PUB)):
-        open(PUB,'w',encoding='utf-8').write(html)
-        sw=os.path.join(ROOT,'cloud','sw.js')
-        if os.path.exists(sw):
-            s=open(sw,encoding='utf-8').read()
-            s=re.sub(r"var CACHE='[^']*'","var CACHE='evoai-shell-v39-pricelist'",s,count=1)
-            open(sw,'w',encoding='utf-8').write(s)
-    print('built',len(html))
+    import importlib.util
+    gen = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gen_carbon_twill.py')
+    spec = importlib.util.spec_from_file_location('gen_carbon_twill', gen)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod.main()
+    before=len(html.encode('utf-8'))
+    targets=[]
+    targets.append((CLOUD,'evoai-cloud.html'))
+    if os.path.isdir(os.path.dirname(PUB)):
+        targets.append((os.path.dirname(PUB),'index.html'))
+    report=None
+    for directory,name in targets:
+        out,sizes=_materialise(html,directory)
+        open(os.path.join(directory,name),'w',encoding='utf-8').write(out)
+        report=(len(out.encode('utf-8')),sizes)
+    sw_dirs=[os.path.join(ROOT,'cloud')]
+    src_sw=os.path.join(CLOUD,'sw.js')
+    if os.path.isfile(src_sw):sw_dirs.append(CLOUD)
+    shell="var CACHE='evoai-shell-v40-cleanup';"
+    for d in sw_dirs:
+        sw=os.path.join(d,'sw.js')
+        if not os.path.isfile(sw):continue
+        s=open(sw,encoding='utf-8').read()
+        s=re.sub(r"var CACHE='[^']*';",shell,s,count=1)
+        s=s.replace("'evoai-cloud.html',","'index.html','app.css','app.js','vendor.js','assets/lockup.webp','assets/mark.webp','assets/emblem.webp','assets/centre.webp','assets/inter.woff','assets/evodisplay.woff','assets/cormorant.woff',")
+        s=s.replace("caches.match('evoai-cloud.html')","caches.match('index.html')")
+        open(sw,'w',encoding='utf-8').write(s)
+    if report:
+        html_n,sizes=report
+        files=sum(n for _,n in sizes)
+        print('before_first_load',before)
+        print('after_html',html_n)
+        print('after_first_load',html_n+files)
+        for nm,n in sizes:print(' ',nm,n)
+    print('built',before)
 if not os.path.exists(SRC):
     # The Obsidian base and PUBLIC_KEYS.txt were never in this repo. v37 (cloud/index.html)
     # already contains every patch through requests, including splash. Apply only later patches.
@@ -45,6 +117,7 @@ if not os.path.exists(SRC):
         js=js.replace(old,new)
     exec(open(T+'patches_roles.py',encoding='utf-8').read())
     exec(open(T+'patches_pricelist.py',encoding='utf-8').read())
+    exec(open(T+'patches_cleanup.py',encoding='utf-8').read())
     if errs:
         print('\n'.join(errs));sys.exit(1)
     _publish(html_head+js+html_tail)
@@ -194,6 +267,7 @@ exec(open(T+'patches_splash.py').read())  # v36b splash (p39b) — was only in b
 exec(open(T+'patches_requests.py').read())  # v37 / v40 requests (p40)
 exec(open(T+'patches_roles.py').read())  # v38 roles, estimates, history (p41)
 exec(open(T+'patches_pricelist.py').read())  # v39 price list (p42)
+exec(open(T+'patches_cleanup.py',encoding='utf-8').read())  # v40 cleanup
 if errs:
     print('\n'.join(errs));sys.exit(1)
 vendor=open('/workspace/vehicle-app/cloud/vendor/supabase.js').read()

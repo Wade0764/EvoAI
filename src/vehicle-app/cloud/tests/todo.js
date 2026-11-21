@@ -21,7 +21,7 @@ await L.launch();
 let p=await L.open({pre:BASE,w:430,h:932});
 await L.login(p,'olivia@test.com');await L.sleep(600);
 ok(await p.evaluate(()=>!!document.querySelector('.nav-item[data-page="todo"]')),'To Do tab in the nav');
-ok(await p.evaluate(()=>{var n=[].slice.call(document.querySelectorAll('.sidebar .nav-item')).filter(function(e){return e.offsetParent;});return n[1]&&n[1].dataset.page==='todo';}),'To Do sits right after Overview');
+ok(await p.evaluate(()=>{var n=[].slice.call(document.querySelectorAll('.sidebar .nav-item.nav-primary')).filter(function(e){return e.offsetParent;}).map(function(e){return e.dataset.page;});return n.indexOf('todo')>n.indexOf('client-portal')&&n[n.length-1]==='more';}),'To do is a fixed primary tab, after Overview');
 await p.evaluate(()=>showPage('todo'));await L.sleep(400);
 let s=await info(p);
 ok(s.active,'To Do page opens for an owner');
