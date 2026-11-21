@@ -114,6 +114,11 @@ collectionBrief=function(vs){
 };
 var _showDueBanner=showDueBanner;
 showDueBanner=function(){dueBannerShown=true;showEl('due-banner',false);};
+var _valueOverviewNum=valueOverviewNum;
+valueOverviewNum=function(t){
+  if(t&&t.nValued)return _valueOverviewNum(t);
+  return '<span class="val-empty">'+esc(noValueText(t))+'</span>';
+};
 var _renderOverview=renderOverview;
 renderOverview=function(owner,vehicles){
   _renderOverview(owner,vehicles);

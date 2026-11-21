@@ -71,58 +71,86 @@ input, textarea, select { caret-color: #E2C58E; }
   .sidebar {
     display: flex !important;
     flex-direction: row !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     align-items: stretch !important;
-    justify-content: space-between !important;
-    padding: 0 2px calc(4px + var(--sab)) !important;
+    justify-content: stretch !important;
+    padding: 0 6px calc(4px + var(--sab)) !important;
     border-radius: 0 !important;
   }
   .sidebar .nav-item.nav-primary {
+    position: relative;
     flex: 1 1 0;
+    width: 0;
     min-width: 0;
     max-width: none;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 2px;
-    padding: 8px 1px 6px !important;
-    font-size: 15px !important;
+    justify-content: flex-end;
+    gap: 1px;
+    box-sizing: border-box;
+    padding: 18px 2px 7px !important;
+    font-size: 13px !important;
     font-weight: 600 !important;
-    letter-spacing: .02em !important;
+    letter-spacing: .04em !important;
     text-transform: uppercase !important;
-    white-space: normal !important;
-    overflow: hidden;
+    white-space: nowrap !important;
+    overflow: visible;
     line-height: 1.05;
+    text-align: center;
     color: #F2F0EB !important;
     background: transparent !important;
   }
+  .sidebar .nav-item.nav-primary > span {
+    font-size: 13px !important;
+    letter-spacing: .04em !important;
+    line-height: 1.05 !important;
+  }
+  .sidebar .nav-item.nav-primary::before {
+    content: '';
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    display: block;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 auto 1px;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: currentColor;
+    -webkit-mask: var(--nav-ico) center / contain no-repeat;
+    mask: var(--nav-ico) center / contain no-repeat;
+  }
+  .sidebar .nav-item.nav-primary[data-page="dashboard"],
+  .sidebar .nav-item.nav-primary[data-page="client-portal"] { --nav-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'><path d='M4 11l8-7 8 7v9H4z'/></svg>"); }
+  .sidebar .nav-item.nav-primary[data-page="garage"] { --nav-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'><path d='M4 15h16M6 15l2-5h8l2 5M7 18a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z'/></svg>"); }
+  .sidebar .nav-item.nav-primary[data-page="requests"] { --nav-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'><path d='M5 6h14v9H8l-3 3z'/></svg>"); }
+  .sidebar .nav-item.nav-primary[data-page="todo"] { --nav-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'><path d='M5 7h14M5 12h14M5 17h9'/></svg>"); }
+  .sidebar .nav-item.nav-primary[data-page="more"] { --nav-ico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><circle cx='6' cy='12' r='1.6'/><circle cx='12' cy='12' r='1.6'/><circle cx='18' cy='12' r='1.6'/></svg>"); }
   .sidebar .nav-item.nav-primary[style*="display: none"],
   .sidebar .nav-item.nav-primary[style*="display:none"] { display: none !important; }
   .sidebar .nav-item.nav-primary.active {
     color: #F2F0EB !important;
     background: linear-gradient(180deg, color-mix(in srgb, #0A5A42 55%, transparent), transparent) !important;
   }
-  .sidebar .nav-item.nav-primary.active::before {
-    content: '' !important;
-    position: absolute !important;
-    left: 18% !important;
-    right: 18% !important;
-    top: 0 !important;
-    width: auto !important;
-    height: 3px !important;
-    background: #2B8F68 !important;
-    box-shadow: 0 0 10px #2B8F68 !important;
+  .sidebar .nav-item.nav-primary.active {
+    box-shadow: inset 0 3px 0 #2B8F68;
   }
-  .sidebar .nav-item .nav-badge {
+  .sidebar .nav-item.nav-primary .nav-badge {
     position: absolute;
-    top: 4px;
-    right: 6px;
+    top: 2px;
+    right: 2px;
     margin: 0 !important;
-    min-width: 18px;
-    height: 18px;
-    line-height: 18px;
-    font-size: 15px !important;
+    min-width: 16px;
+    height: 16px;
+    line-height: 16px;
+    padding: 0 3px;
+    font-size: 13px !important;
+    letter-spacing: 0 !important;
+    pointer-events: none;
+    z-index: 2;
   }
 }
 
@@ -132,7 +160,7 @@ input, textarea, select { caret-color: #E2C58E; }
   z-index: 140;
   left: 0;
   right: 0;
-  bottom: calc(64px + var(--sab));
+  bottom: calc(76px + var(--sab));
   max-height: min(78vh, 680px);
   overflow: auto;
   background: #07080A;
@@ -198,6 +226,23 @@ input, textarea, select { caret-color: #E2C58E; }
 #cp-hero .hero-chart, #dash-hero .hero-chart { display: none; }
 #cp-hero .hero-grid, #dash-hero .hero-grid { margin-top: 4px; }
 #cp-hero .num, #dash-hero .num { font-size: 42px; }
+#cp-hero .num:has(.val-empty),
+#dash-hero .num:has(.val-empty) {
+  font-size: 18px !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+  white-space: normal !important;
+  margin-top: 6px !important;
+  min-height: 0 !important;
+}
+.val-empty {
+  display: block;
+  font-size: 18px !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+  font-weight: 500 !important;
+  color: #F2F0EB !important;
+}
 .ovc-seg { margin-bottom: 12px; }
 #cp-vch, #dash-vch { position: relative; }
 .due-chip {
@@ -266,6 +311,13 @@ input, textarea, select { caret-color: #E2C58E; }
   line-height: 1.12 !important;
   font-weight: 500 !important;
   letter-spacing: 0 !important;
+}
+#modal-vehicle-detail .hero-sub,
+#vd-nickname .hero-sub {
+  font-size: 18px !important;
+  line-height: 1.35 !important;
+  font-weight: 500 !important;
+  color: #F2F0EB !important;
 }
 #modal-vehicle-detail .vhead, #modal-vehicle-detail .hero-sub, #vd-nickname { overflow: visible; white-space: normal; }
 #modal-vehicle-detail .sh { margin-top: 18px; }
